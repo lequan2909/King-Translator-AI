@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         King Translator AI
 // @namespace    https://kingsmanvn.pages.dev
-// @version      4.2.4
+// @version      4.2.5
 // @author       King1x32
 // @icon         https://raw.githubusercontent.com/king1x32/UserScripts/refs/heads/main/kings.jpg
 // @license      GPL3
@@ -146,7 +146,7 @@
     },
     pageTranslation: {
       enabled: true, // Bật/tắt tính năng
-      autoTranslate: true,
+      autoTranslate: false,
       showInitialButton: true, // Hiện nút dịch ban đầu
       buttonTimeout: 10000, // Thời gian hiển thị nút (10 giây)
       useCustomSelectors: false,
@@ -1985,7 +1985,7 @@
         color: textColor,
         padding: "10px 20px",
         borderRadius: "8px",
-        zIndex: "2147483647 !important",
+        zIndex: "2147483647",
         animation: "fadeInOut 2s ease",
         fontFamily: "Arial, sans-serif",
         fontSize: "14px",
@@ -6440,23 +6440,100 @@
           e.stopPropagation();
           try {
             this.showTranslatingStatus();
+            const image = e.target;
+            const imageUrl = new URL(image.src);
+            const referer = window.location.href;
+
             const canvas = document.createElement("canvas");
-            canvas.width = e.target.naturalWidth;
-            canvas.height = e.target.naturalHeight;
             const ctx = canvas.getContext("2d");
-            ctx.drawImage(e.target, 0, 0);
-            const blob = await new Promise((resolve) =>
-              canvas.toBlob(resolve, "image/png")
-            );
-            const file = new File([blob], "web-image.png", {
-              type: "image/png",
+
+            // Thêm hàm loadImage với GM_xmlhttpRequest
+            const loadImage = async (url) => {
+              return new Promise((resolve, reject) => {
+                GM_xmlhttpRequest({
+                  method: "GET",
+                  url: url,
+                  headers: {
+                    "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
+                    "Accept-Encoding": "gzip, deflate, br",
+                    "Accept-Language": "en-US,en;q=0.9",
+                    "Cache-Control": "no-cache",
+                    "Pragma": "no-cache",
+                    "Referer": referer,
+                    "Origin": imageUrl.origin,
+                    "Sec-Fetch-Dest": "image",
+                    "Sec-Fetch-Mode": "no-cors",
+                    "Sec-Fetch-Site": "cross-site",
+                    "User-Agent": navigator.userAgent
+                  },
+                  responseType: "blob",
+                  anonymous: true,
+                  onload: function(response) {
+                    if (response.status === 200) {
+                      const blob = response.response;
+                      const img = new Image();
+                      img.onload = () => {
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        ctx.drawImage(img, 0, 0);
+                        resolve();
+                      };
+                      img.onerror = () => reject(new Error("Không thể load ảnh"));
+                      img.src = URL.createObjectURL(blob);
+                    } else {
+                      // Fallback nếu request thất bại
+                      const img = new Image();
+                      img.crossOrigin = "anonymous";
+                      img.onload = () => {
+                        canvas.width = img.naturalWidth;
+                        canvas.height = img.naturalHeight;
+                        ctx.drawImage(img, 0, 0);
+                        resolve();
+                      };
+                      img.onerror = () => reject(new Error("Không thể load ảnh"));
+                      img.src = url;
+                    }
+                  },
+                  onerror: function() {
+                    // Fallback nếu request thất bại
+                    const img = new Image();
+                    img.crossOrigin = "anonymous";
+                    img.onload = () => {
+                      canvas.width = img.naturalWidth;
+                      canvas.height = img.naturalHeight;
+                      ctx.drawImage(img, 0, 0);
+                      resolve();
+                    };
+                    img.onerror = () => reject(new Error("Không thể load ảnh"));
+                    img.src = url;
+                  }
+                });
+              });
+            };
+
+            await loadImage(image.src);
+
+            const blob = await new Promise((resolve, reject) => {
+              try {
+                canvas.toBlob((b) => {
+                  if (b) resolve(b);
+                  else reject(new Error("Không thể tạo blob"));
+                }, "image/png");
+              } catch (err) {
+                reject(new Error("Lỗi khi tạo blob"));
+              }
             });
+
+            const file = new File([blob], "web-image.png", { type: "image/png" });
             const showSource = this.translator.userSettings.settings.displayOptions.languageLearning.showSource;
             const result = await this.ocr.processImage(file);
+
+            // Xử lý kết quả OCR và hiển thị
             const translations = result.split("\n");
             let fullTranslation = "";
             let pinyin = "";
             let text = "";
+
             for (const trans of translations) {
               const parts = trans.split("<|>");
               if (showSource) {
@@ -6465,13 +6542,14 @@
               pinyin += (parts[1]?.trim() || "") + "\n";
               fullTranslation += (parts[2]?.trim() || trans) + "\n";
             }
+
             this.displayPopup(
               fullTranslation.trim(),
               text.trim(),
               "OCR Web Image",
               pinyin.trim()
             );
-            this.removeWebImageListeners();
+
           } catch (error) {
             console.error("OCR error:", error);
             this.showNotification(error.message, "error");
@@ -7326,7 +7404,7 @@ Return ONLY a JSON object like:
         color: textColor,
         padding: "10px 20px",
         borderRadius: "8px",
-        zIndex: "2147483647 !important",
+        zIndex: "2147483647",
         animation: "fadeInOut 2s ease",
         fontFamily: "Arial, sans-serif",
         fontSize: "14px",
@@ -7519,76 +7597,88 @@ Return ONLY a JSON object like:
       const settings = this.userSettings.settings;
       const targetLanguage =
         targetLang || settings.displayOptions.targetLanguage;
-      const share_media = `Bạn là một người dịch phụ đề phim chuyên nghiệp, chuyên tạo file SRT. Bạn cần dịch một đoạn hội thoại phim sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn chính xác và tự nhiên, giữ nguyên ý nghĩa của câu gốc. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của bộ phim để người xem có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
-      - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
-      - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
-      - Kiểm tra chính tả và ngữ pháp trong bản dịch.
-      - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để hội thoại hoàn chỉnh hơn.
-      - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
-      - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn hội thoại liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
-  Lưu ý:
-    - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...`;
-      const base_normal = `Cho bạn văn bản cần xử lý: "${text}"
-    Hãy dịch văn bản cần xử lý trên sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' với các yêu cầu sau:
-      - Dịch phải tuân thủ chặt chẽ bối cảnh và sắc thái ban đầu của văn bản.
-      - Đảm bảo sự lưu loát và tự nhiên như người bản xứ.
-      - Không thêm bất kỳ giải thích hay diễn giải nào ngoài bản dịch.
-      - Bảo toàn các thuật ngữ và danh từ riêng với tỷ lệ 1:1.
-    Nếu bạn nhận thấy văn bản là truyện thì hãy dịch truyện theo yêu cầu sau:
-      Bạn là một người dịch truyện chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch một đoạn truyện sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn giữ nguyên ý nghĩa của câu gốc và phù hợp với văn phong của ngôn ngữ đích. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của câu chuyện để người đọc có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
-        - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
-        - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
-        - Kiểm tra chính tả và ngữ pháp trong bản dịch.
-        - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để câu văn hoàn chỉnh hơn.
-        - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
-        - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn truyện liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
-    Lưu ý:
-      - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
-      - Hãy in ra bản dịch mà không có dấu ngoặc kép, giữ nguyên định dạng phông chữ ban đầu và không giải thích gì thêm.`;
+      const share_normal = `
+Hãy dịch văn bản cần xử lý sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' với các yêu cầu sau:
+  - Dịch phải tuân thủ chặt chẽ bối cảnh và sắc thái ban đầu của văn bản.
+  - Đảm bảo sự lưu loát và tự nhiên như người bản xứ.
+  - Không thêm bất kỳ giải thích hay diễn giải nào ngoài bản dịch.
+  - Bảo toàn các thuật ngữ và danh từ riêng với tỷ lệ 1:1.
+Nếu bạn nhận thấy văn bản là truyện thì hãy dịch truyện theo yêu cầu sau:
+  Bạn là một người dịch truyện chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch một đoạn truyện sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn giữ nguyên ý nghĩa của câu gốc và phù hợp với văn phong của ngôn ngữ đích. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của câu chuyện để người đọc có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
+    - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
+    - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
+    - Kiểm tra chính tả và ngữ pháp trong bản dịch.
+    - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để câu văn hoàn chỉnh hơn.
+    - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
+    - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn truyện liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
+`;
+      const share_ocr = `
+Bạn là một người dịch truyện chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch một đoạn truyện sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn giữ nguyên ý nghĩa của câu gốc và phù hợp với văn phong của ngôn ngữ đích. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của câu chuyện để người đọc có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
+  - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
+  - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
+  - Kiểm tra chính tả và ngữ pháp trong bản dịch.
+  - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để câu văn hoàn chỉnh hơn.
+  - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
+  - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn truyện liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
+`;
+      const share_media = `
+Bạn là một người dịch phụ đề phim chuyên nghiệp, chuyên tạo file SRT. Bạn cần dịch một đoạn hội thoại phim sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn chính xác và tự nhiên, giữ nguyên ý nghĩa của câu gốc. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của bộ phim để người xem có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
+  - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
+  - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
+  - Kiểm tra chính tả và ngữ pháp trong bản dịch.
+  - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để hội thoại hoàn chỉnh hơn.
+  - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
+  - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn hội thoại liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
+`;
+      const share_pinyin = `
+Hãy trả về theo format sau, mỗi phần cách nhau bằng dấu <|> và không có giải thích thêm:
+  Văn bản gốc <|> phiên âm (Nếu văn bản gốc là tiếng Anh thì hãy trả về phiên âm của US) <|> bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'
+  Ví dụ: Hello <|> heˈloʊ <|> Xin chào
+Lưu ý:
+  - Nếu có từ là tiếng Trung, hãy trả về giá trị phiên âm của từ đó chính là pinyin + số tone (1-4) của từ đó. Ví dụ: 你好 <|> Nǐ3 hǎo3 <|> Xin chào
+  - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
+  - Chỉ trả về bản dịch theo format trên, mỗi 1 cụm theo format sẽ ở 1 dòng, giữ nguyên định dạng phông chữ ban đầu và không giải thích thêm.
+`;
       const basePrompts = {
-        normal: `${base_normal}`,
+        normal: `${share_normal}
+Lưu ý:
+  - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
+  - Hãy in ra bản dịch mà không có dấu ngoặc kép, giữ nguyên định dạng phông chữ ban đầu và không giải thích gì thêm.
+
+Văn bản cần xử lý: "${text}"`,
         advanced: `Dịch và phân tích từ khóa: "${text}"`,
-        ocr: `Bạn là một người dịch truyện chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch một đoạn truyện sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn giữ nguyên ý nghĩa của câu gốc và phù hợp với văn phong của ngôn ngữ đích. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của câu chuyện để người đọc có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
-        - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
-        - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
-        - Kiểm tra chính tả và ngữ pháp trong bản dịch.
-        - Thêm các trợ từ ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' khi cần để câu văn hoàn chỉnh hơn.
-        - Sử dụng đại từ nhân xưng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' tự nhiên và hợp ngữ cảnh.
-        - Tham khảo các trang web sau để lấy văn phong phù hợp cho các đoạn truyện liên quan đến sex: [https://truyensex.moe/, https://truyensexvn.org/, https://truyensex.vip/, https://truyensextv69.com/].
-  Lưu ý:
-    - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
-    - Chỉ trả về bản dịch ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', không giải thích thêm.`,
+        ocr: `${share_ocr}
+Lưu ý:
+  - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,..
+  - Đọc hiểu thật kĩ và xử lý toàn bộ văn bản trong hình ảnh.
+  - Không cần giải thích thêm.`,
         media: `${share_media}
-    - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc rõ ràng. Không cần giải thích thêm.`,
-        page: `${base_normal}`,
+Lưu ý:
+  - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,..
+  - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc rõ ràng.
+  - Không cần giải thích thêm.`,
+        page: `${share_normal}
+Lưu ý:
+  - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
+  - Hãy in ra bản dịch mà không có dấu ngoặc kép, giữ nguyên định dạng phông chữ ban đầu và không giải thích gì thêm.
+
+Văn bản cần xử lý: "${text}"`,
       };
       const pinyinPrompts = {
-        normal: `Hãy trả về theo format sau, mỗi phần cách nhau bằng dấu <|> và không có giải thích thêm:
-    Văn bản gốc <|> pinyin có số tone (1-4) <|> bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'
-    Văn bản cần xử lý: "${text}"
-  Lưu ý:
-    - Nếu có từ không phải là tiếng Trung, hãy trả về giá trị pinyin của từ đó là phiên âm của từ đó và theo ngôn ngữ đó (Nếu là tiếng Anh thì hay theo phiên âm của US). Ví dụ: Hello <|> /heˈloʊ/ <|> Xin chào
-    - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
-    - Chỉ trả về bản dịch theo format trên và không giải thích thêm.`,
+        normal: `${share_normal}
+${share_pinyin}
+Văn bản cần xử lý: "${text}"`,
         advanced: `Dịch và phân tích từ khóa: "${text}"`,
-        ocr: `Hãy trả về theo format sau, mỗi phần cách nhau bằng dấu <|> và không có giải thích thêm:
-    Văn bản gốc <|> pinyin có số tone (1-4) <|> bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'
-    Đọc hiểu thật kĩ và xử lý toàn bộ văn bản trong hình ảnh.
-  Lưu ý:
-    - Nếu có từ không phải là tiếng Trung, hãy trả về giá trị pinyin của từ đó là phiên âm của từ đó và theo ngôn ngữ đó (Nếu là tiếng Anh thì hay theo phiên âm của US). Ví dụ: Hello <|> /heˈloʊ/ <|> Xin chào
-    - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
-    - Chỉ trả về bản dịch theo format trên, mỗi 1 cụm theo format sẽ ở 1 dòng và không giải thích thêm.`,
+        ocr: `${share_ocr}
+${share_pinyin}
+Đọc hiểu thật kĩ và xử lý toàn bộ văn bản trong hình ảnh.`,
         media: `${share_media}
-    - Định dạng bản dịch của bạn theo định dạng SRT phải đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc, có dòng văn bản gốc và dòng văn bản dịch.
-    - Không cần giải thích thêm.`,
-        page: `Hãy trả về theo format sau, mỗi phần cách nhau bằng dấu <|> và không có giải thích thêm:
-    Văn bản gốc <|> pinyin có số tone (1-4) <|> bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'
-    Dịch thật tự nhiên, đúng ngữ cảnh, giữ nguyên định dạng phông chữ ban đầu. Nếu có từ không phải là tiếng Trung, hãy trả về phiên âm của từ đó theo ngôn ngữ của từ đó.
-    Văn bản cần xử lý: "${text}"
-  Lưu ý:
-    - Nếu có từ không phải là tiếng Trung, hãy trả về giá trị pinyin của từ đó là phiên âm của từ đó và theo ngôn ngữ đó (Nếu là tiếng Anh thì hay theo phiên âm của US). Ví dụ: Hello <|> /heˈloʊ/ <|> Xin chào
-    - Bản dịch phải hoàn toàn bằng ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
-    - Chỉ trả về bản dịch theo format trên và không giải thích thêm.`,
+${share_pinyin}
+  - Định dạng bản dịch của bạn theo định dạng SRT phải đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc và có đủ 2 dòng là văn bản gốc nhận diện từ media và dòng văn bản dịch.
+  - Không cần giải thích thêm.`,
+        page: `${share_normal}
+${share_pinyin}
+Văn bản cần xử lý: "${text}"`,
       };
       return isPinyinMode ? pinyinPrompts[type] : basePrompts[type];
     }
