@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         King Translator AI
 // @namespace    https://kingsmanvn.pages.dev
-// @version      4.2.5
+// @version      4.2.6
 // @author       King1x32
 // @icon         https://raw.githubusercontent.com/king1x32/UserScripts/refs/heads/main/kings.jpg
 // @license      GPL3
@@ -177,6 +177,11 @@
         ".html5-player-chrome",
         ".html5-video-player",
       ],
+      generation: {
+        temperature: 0.2,
+        topP: 0.9,
+        topK: 40
+      }
     },
     promptSettings: {
       enabled: true,
@@ -260,8 +265,8 @@
         borderRadius: "15px",
         fontFamily: "SF Pro Rounded, Arial, sans-serif",
         fontSize: "16px",
-        top: "50%",
-        left: "50%",
+        top: `${window.innerHeight / 2}px`,
+        left: `${window.innerWidth / 2}px`,
         transform: "translate(-50%, -50%)",
         display: "flex",
         flexDirection: "column",
@@ -360,6 +365,11 @@
         ".html5-player-chrome",
         ".html5-video-player",
       ],
+      generation: {
+        temperature: 0.2,
+        topP: 0.9,
+        topK: 40
+      }
     },
     ocrOptions: {
       enabled: true,
@@ -394,7 +404,7 @@
         minFontSize: "8px",
         maxFontSize: "16px",
       },
-      translationMode: "parallel", // 'translation_only', 'parallel' hoặc 'language_learning'
+      translationMode: "translation_only", // 'translation_only', 'parallel' hoặc 'language_learning'
       sourceLanguage: "auto", // 'auto' hoặc 'zh','en','vi',...
       targetLanguage: "vi", // 'vi', 'en', 'zh', 'ko', 'ja',...
       languageLearning: {
@@ -445,88 +455,6 @@
       perMilliseconds: CONFIG.RATE_LIMIT.perMilliseconds,
     },
   };
-  class NetworkOptimizer {
-    constructor() {
-      this.queue = [];
-      this.processing = false;
-      this.retryDelays = [1000, 2000, 4000];
-      this.batchSize = 5; // Số api đa luồng
-      this.batchDelay = 100;
-    }
-    async optimizeRequest(request) {
-      const priority = this.calculatePriority(request);
-      const optimizedRequest = {
-        ...request,
-        priority,
-        retries: 0,
-        timestamp: Date.now(),
-      };
-      this.queue.push(optimizedRequest);
-      if (!this.processing) {
-        this.processQueue();
-      }
-    }
-    async batchRequests(requests) {
-      const batches = [];
-      for (let i = 0; i < requests.length; i += this.batchSize) {
-        batches.push(requests.slice(i, i + this.batchSize));
-      }
-      const results = [];
-      await Promise.all(batches.map(async (batch) => {
-        const batchResults = await Promise.all(
-          batch.map((req) => this.executeRequest(req))
-        );
-        results.push(...batchResults);
-      }));
-      return results;
-    }
-    calculatePriority(request) {
-      if (request.urgent) return 3;
-      if (request.type === "translation") return 2;
-      return 1;
-    }
-    async processQueue() {
-      this.processing = true;
-      while (this.queue.length > 0) {
-        const batch = this.createBatch();
-        await this.processBatch(batch);
-      }
-      this.processing = false;
-    }
-    createBatch() {
-      return this.queue
-        .sort((a, b) => b.priority - a.priority)
-        .slice(0, this.batchSize);
-    }
-    async processBatch(batch) {
-      try {
-        const results = await this.batchRequests(batch);
-        this.queue = this.queue.filter((req) => !batch.includes(req));
-        return results;
-      } catch (error) {
-        console.error("Batch processing error:", error);
-        throw error;
-      }
-    }
-    async executeRequest(request) {
-      try {
-        const response = await fetch(request.url, request.options);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return await response.json();
-      } catch (error) {
-        if (request.retries < this.retryDelays.length) {
-          await new Promise((resolve) =>
-            setTimeout(resolve, this.retryDelays[request.retries])
-          );
-          request.retries++;
-          return this.executeRequest(request);
-        }
-        throw error;
-      }
-    }
-  }
   class MobileOptimizer {
     constructor(ui) {
       this.ui = ui;
@@ -585,27 +513,27 @@
       const style = document.createElement("style");
       style.textContent = `
       .translator-tools-container {
-        bottom: 25px !important;
-        right: 5px !important;
+        bottom: 25px;
+        right: 5px;
       }
       .translator-tools-button {
-        padding: 8px 15px !important;
-        font-size: 14px !important;
+        padding: 8px 15px;
+        font-size: 14px;
       }
       .translator-tools-dropdown {
-        min-width: 195px !important;
-        max-height: 60vh !important;
-        overflow-y: auto !important;
+        min-width: 195px;
+        max-height: 60vh;
+        overflow-y: auto;
       }
       .translator-tools-item {
-        padding: 10px !important;
+        padding: 10px;
       }
       .draggable {
-        max-width: 95vw !important;
-        max-height: 80vh !important;
+        max-width: 95vw;
+        max-height: 80vh;
       }
     `;
-      document.head.appendChild(style);
+      this.ui.shadowRoot.appendChild(style);
     }
     optimizeAddedNodes(nodes) {
       nodes.forEach((node) => {
@@ -622,17 +550,17 @@
   //   const style = document.createElement("style");
   //   style.textContent = `
   //   .translator-tools-container {
-  //     position: fixed !important;
-  //     bottom: 40px !important;
-  //     right: 25px !important;
-  //     z-index: 2147483647 !important;
-  //     font-family: Arial, sans-serif !important;
-  //     display: block !important;
-  //     visibility: visible !important;
-  //     opacity: 1 !important;
+  //     position: fixed;
+  //     bottom: 40px;
+  //     right: 25px;
+  //     z-index: 2147483647;
+  //     font-family: Arial, sans-serif;
+  //     display: block;
+  //     visibility: visible;
+  //     opacity: 1;
   //   }
   // `;
-  //   document.head.appendChild(style);
+  //   this.shadowRoot.appendChild(style);
   // };
   class UserSettings {
     constructor(translator) {
@@ -657,115 +585,115 @@
       const resetStyle = `
         * {
             all: revert;
-            box-sizing: border-box !important;
-            font-family: Arial, sans-serif !important;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
         .settings-grid {
-            display: grid !important;
-            grid-template-columns: 47% 53% !important;
-            align-items: center !important;
-            gap: 10px !important;
-            margin-bottom: 8px !important;
+            display: grid;
+            grid-template-columns: 47% 53%;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
         }
         .settings-label {
-            min-width: 100px !important;
-            text-align: left !important;
-            padding-right: 10px !important;
+            min-width: 100px;
+            text-align: left;
+            padding-right: 10px;
         }
         .settings-input {
-            min-width: 100px !important;
-            margin-left: 5px !important;
+            min-width: 100px;
+            margin-left: 5px;
         }
         h2 {
-            flex: 1 !important;
-            display: flex !important;
-            font-family: Arial, sans-serif !important;
-            align-items: center !important;
-            justify-content: center !important;
+            flex: 1;
+            display: flex;
+            font-family: Arial, sans-serif;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 15px;
             font-weight: bold;
-            color: ${theme.title} !important;
-            grid-column: 1 / -1 !important;
+            color: ${theme.title};
+            grid-column: 1 / -1;
         }
         h3 {
-            font-family: Arial, sans-serif !important;
+            font-family: Arial, sans-serif;
             margin-bottom: 15px;
             font-weight: bold;
-            color: ${theme.title} !important;
-            grid-column: 1 / -1 !important;
+            color: ${theme.title};
+            grid-column: 1 / -1;
         }
         h4 {
-            color: ${theme.title} !important;
+            color: ${theme.title};
         }
         input[type="radio"],
         input[type="checkbox"] {
-            align-items: center !important;
-            justify-content: center !important;
+            align-items: center;
+            justify-content: center;
         }
         button {
-            font-family: Arial, sans-serif !important;
-            font-size: 14px !important;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
             background-color: ${isDark ? "#444" : "#ddd"};
-            color: ${isDark ? "#ddd" : "#000"} !important;
-            padding: 5px 15px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            border: none !important;
-            margin: 5px !important;
+            color: ${isDark ? "#ddd" : "#000"};
+            padding: 5px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            margin: 5px;
         }
         #cancelSettings {
-            background-color: ${isDark ? "#666" : "#ddd"} !important;
-            color: ${isDark ? "#ddd" : "#000"} !important;
-            padding: 5px 15px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            border: none !important;
-            margin: 5px !important;
+            background-color: ${isDark ? "#666" : "#ddd"};
+            color: ${isDark ? "#ddd" : "#000"};
+            padding: 5px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            margin: 5px;
         }
         #cancelSettings:hover {
-            background-color: ${isDark ? "#888" : "#aaa"} !important;
+            background-color: ${isDark ? "#888" : "#aaa"};
         }
         #saveSettings {
-            background-color: #007BFF !important;
-            padding: 5px 15px !important;
-            border-radius: 8px !important;
-            cursor: pointer !important;
-            border: none !important;
-            margin: 5px !important;
+            background-color: #007BFF;
+            padding: 5px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            margin: 5px;
         }
         #saveSettings:hover {
-            background-color: #009ddd !important;
+            background-color: #009ddd;
         }
         button {
-          font-family: Arial, sans-serif !important;
-          font-size: 14px !important;
-          border: none !important;
-          border-radius: 8px !important;
-          cursor: pointer !important;
-          transition: all 0.2s ease !important;
-          font-weight: 500 !important;
-          letter-spacing: 0.3px !important;
+          font-family: Arial, sans-serif;
+          font-size: 14px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-weight: 500;
+          letter-spacing: 0.3px;
         }
         button:hover {
-          transform: translateY(-2px) !important;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         button:active {
-          transform: translateY(0) !important;
+          transform: translateY(0);
         }
         #exportSettings:hover {
-          background-color: #218838 !important;
+          background-color: #218838;
         }
         #importSettings:hover {
-          background-color: #138496 !important;
+          background-color: #138496;
         }
         #cancelSettings:hover {
-          background-color: ${isDark ? "#777" : "#dae0e5"} !important;
+          background-color: ${isDark ? "#777" : "#dae0e5"};
         }
         #saveSettings:hover {
-          background-color: #0056b3 !important;
+          background-color: #0056b3;
         }
         @keyframes buttonPop {
           0% { transform: scale(1); }
@@ -776,35 +704,35 @@
           animation: buttonPop 0.2s ease;
         }
         .radio-group {
-            display: flex !important;
-            gap: 15px !important;
+            display: flex;
+            gap: 15px;
         }
         .radio-group label {
-            flex: 1 !important;
-            display: flex !important;
-            color: ${isDark ? "#ddd" : "#000"} !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 5px !important;
+            flex: 1;
+            display: flex;
+            color: ${isDark ? "#ddd" : "#000"};
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
         }
         .radio-group input[type="radio"] {
-            margin-right: 5px !important;
+            margin-right: 5px;
         }
         .shortcut-container {
-            display: flex !important;
-            align-items: center !important;
-            gap: 8px !important;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .shortcut-prefix {
-            white-space: nowrap !important;
+            white-space: nowrap;
             color: ${isDark ? "#aaa" : "#555"};
-            font-size: 14px !important;
-            min-width: 45px !important;
+            font-size: 14px;
+            min-width: 45px;
         }
         .shortcut-input {
-            flex: 1 !important;
-            min-width: 60px !important;
-            max-width: 100px !important;
+            flex: 1;
+            min-width: 60px;
+            max-width: 100px;
         }
         .prompt-textarea {
           width: 100%;
@@ -1056,6 +984,24 @@
       </div>
     </div>
   </div>
+  <div class="settings-grid">
+    <span class="settings-label">Temperature:</span>
+    <input type="number" id="pageTranslationTemperature" class="settings-input"
+      value="${this.settings.pageTranslation.generation.temperature}"
+      min="0" max="1" step="0.1">
+  </div>
+  <div class="settings-grid">
+    <span class="settings-label">Top P:</span>
+    <input type="number" id="pageTranslationTopP" class="settings-input"
+      value="${this.settings.pageTranslation.generation.topP}"
+      min="0" max="1" step="0.1">
+  </div>
+  <div class="settings-grid">
+    <span class="settings-label">Top K:</span>
+    <input type="number" id="pageTranslationTopK" class="settings-input"
+      value="${this.settings.pageTranslation.generation.topK}"
+      min="1" max="100" step="1">
+  </div>
 </div>
 <div style="margin-bottom: 15px;">
   <h3>TÙY CHỈNH PROMPT</h3>
@@ -1218,6 +1164,18 @@
         }>Chế độ học ngôn ngữ</option>
     </select>
   </div>
+  <div id="languageLearningOptions" style="display: ${this.settings.displayOptions.translationMode === "language_learning"
+          ? "block"
+          : "none"
+        }">
+    <div id="sourceOption" class="settings-grid">
+      <span class="settings-label">Hiện bản gốc:</span>
+      <input type="checkbox" id="showSource" ${this.settings.displayOptions.languageLearning.showSource
+          ? "checked"
+          : ""
+        }>
+    </div>
+  </div>
   <div class="settings-grid">
     <span class="settings-label">Ngôn ngữ nguồn:</span>
     <select id="sourceLanguage" class="settings-input">
@@ -1353,18 +1311,6 @@
       <option value="ur" ${this.settings.displayOptions.targetLanguage === "ur" ? "selected" : ""
         }>Tiếng Urdu</option>
     </select>
-  </div>
-  <div id="languageLearningOptions" style="display: ${this.settings.displayOptions.translationMode === "language_learning"
-          ? "block"
-          : "none"
-        }">
-    <div id="sourceOption" class="settings-grid">
-      <span class="settings-label">Hiện bản gốc:</span>
-      <input type="checkbox" id="showSource" ${this.settings.displayOptions.languageLearning.showSource
-          ? "checked"
-          : ""
-        }>
-    </div>
   </div>
   <div class="settings-grid">
     <span class="settings-label">Cỡ chữ dịch ảnh web:</span>
@@ -1821,7 +1767,7 @@
         if (e.target.classList.contains("remove-key")) {
           const provider = e.target.dataset.provider;
           e.target.parentElement.remove();
-          const container = document.querySelector(
+          const container = this.$(
             `#${provider}Keys .api-keys-container`
           );
           Array.from(container.querySelectorAll(".remove-key")).forEach(
@@ -1870,9 +1816,6 @@
         }
       };
       document.addEventListener("keydown", handleEscape);
-      container.addEventListener("remove", () => {
-        document.removeEventListener("keydown", handleEscape);
-      });
       const exportBtn = container.querySelector("#exportSettings");
       const importBtn = container.querySelector("#importSettings");
       const importInput = container.querySelector("#importInput");
@@ -1979,7 +1922,7 @@
       Object.assign(notification.style, {
         position: "fixed",
         top: "20px",
-        left: "50%",
+        left: `${window.innerWidth / 2}px`,
         transform: "translateX(-50%)",
         backgroundColor,
         color: textColor,
@@ -2188,6 +2131,11 @@
               ]
               : customSelectors
             : DEFAULT_SETTINGS.pageTranslation.defaultSelectors,
+          generation: {
+            temperature: parseFloat(settingsUI.querySelector("#pageTranslationTemperature").value),
+            topP: parseFloat(settingsUI.querySelector("#pageTranslationTopP").value),
+            topK: parseInt(settingsUI.querySelector("#pageTranslationTopK").value)
+          }
         },
         ocrOptions: {
           enabled: settingsUI.querySelector("#ocrEnabled").checked,
@@ -2298,13 +2246,13 @@
             ),
           },
           media: {
-            enabled: document.getElementById("mediaCacheEnabled").checked,
+            enabled: settingsUI.querySelector("#mediaCacheEnabled").checked,
             maxSize: parseInt(
-              document.getElementById("mediaCacheMaxSize").value
+              settingsUI.querySelector("#mediaCacheMaxSize").value
             ),
             expirationTime:
               parseInt(
-                document.getElementById("mediaCacheExpirationTime").value
+                settingsUI.querySelector("#mediaCacheExpirationTime").value
               ) * 1000,
           },
         },
@@ -2327,7 +2275,7 @@
         );
         this.translator.ui.removeToolsContainer();
         this.translator.ui.resetState();
-        const overlays = document.querySelectorAll(".translator-overlay");
+        const overlays = this.$$(".translator-overlay");
         overlays.forEach((overlay) => overlay.remove());
         if (isToolsEnabled) {
           this.translator.ui.setupTranslatorTools();
@@ -2352,51 +2300,51 @@
       this.failedKeys = new Map();
       this.activeKeys = new Map();
       this.keyStats = new Map();
+      this.rateLimitedKeys = new Map();
       this.keyRotationInterval = 10000; // 10s
-      this.maxConcurrentRequests = 3;
+      this.maxConcurrentRequests = 5;
       this.retryDelays = [1000, 2000, 4000];
       this.successRateThreshold = 0.7;
       this.setupKeyRotation();
     }
-
-    // Lấy key khả dụng
+    markKeyAsRateLimited(key) {
+      const now = Date.now();
+      this.rateLimitedKeys.set(key, {
+        timestamp: now,
+        retryAfter: now + this.settings.rateLimit.perMilliseconds
+      });
+    }
     getAvailableKeys(provider) {
       const allKeys = this.settings.apiKey[provider];
       if (!allKeys || allKeys.length === 0) {
         throw new Error("Không có API key nào được cấu hình");
       }
-
+      const now = Date.now();
       return allKeys.filter(key => {
         if (!key) return false;
-
         const failedInfo = this.failedKeys.get(key);
         const activeInfo = this.activeKeys.get(key);
+        const rateLimitInfo = this.rateLimitedKeys.get(key);
         const stats = this.keyStats.get(key);
-
-        // Kiểm tra nhiều điều kiện
-        const isFailed = failedInfo && Date.now() - failedInfo.timestamp < 60000;
-        const isBusy = activeInfo && activeInfo.requests >= this.maxConcurrentRequests;
-        const hasLowSuccessRate = stats && stats.total > 10 &&
+        const isFailed = failedInfo && (now - failedInfo.timestamp < 60000);
+        const isBusy = activeInfo && (activeInfo.requests >= this.maxConcurrentRequests);
+        const isRateLimited = rateLimitInfo && (now < rateLimitInfo.retryAfter);
+        const hasLowSuccessRate = stats &&
+          stats.total > 10 &&
           (stats.success / stats.total) < this.successRateThreshold;
-
-        return !isFailed && !isBusy && !hasLowSuccessRate;
+        return !isFailed && !isBusy && !isRateLimited && !hasLowSuccessRate;
       });
     }
-
-    // Thực hiện request với multiple keys
     async executeWithMultipleKeys(promiseGenerator, provider, maxConcurrent = 3) {
       const availableKeys = this.getAvailableKeys(provider);
       if (!availableKeys || availableKeys.length === 0) {
         throw new Error("Không có API key khả dụng");
       }
-
       const promises = [];
       let currentKeyIndex = 0;
-
       const processRequest = async () => {
         if (currentKeyIndex >= availableKeys.length) return null;
         const key = availableKeys[currentKeyIndex++];
-
         try {
           const result = await this.useKey(key, () => promiseGenerator(key));
           if (result) {
@@ -2405,31 +2353,26 @@
           }
         } catch (error) {
           this.updateKeyStats(key, false);
-          if (error.message.includes("API key not valid") ||
-            error.message.includes("rate limit")) {
+          if (error.message.includes("API key not valid")) {
             this.markKeyAsFailed(key);
+          } else if (error.message.includes("rate limit")) {
+            this.markKeyAsRateLimited(key);
           }
           return { status: "rejected", reason: error };
         }
       };
-
       for (let i = 0; i < Math.min(maxConcurrent, availableKeys.length); i++) {
         promises.push(processRequest());
       }
-
       const results = await Promise.all(promises);
       const successResults = results
         .filter(r => r && r.status === "fulfilled")
         .map(r => r.value);
-
       if (successResults.length > 0) {
         return successResults;
       }
-
       throw new Error("Tất cả API key đều thất bại");
     }
-
-    // Sử dụng một key cụ thể
     async useKey(key, action) {
       let activeInfo = this.activeKeys.get(key) || {
         requests: 0,
@@ -2437,7 +2380,6 @@
       };
       activeInfo.requests++;
       this.activeKeys.set(key, activeInfo);
-
       try {
         const result = await action();
         return result;
@@ -2461,24 +2403,18 @@
         }
       }
     }
-
-    // Đánh dấu key thất bại
     markKeyAsFailed(key) {
       if (!key) return;
       const failInfo = this.failedKeys.get(key) || { failures: 0 };
       failInfo.failures++;
       failInfo.timestamp = Date.now();
       this.failedKeys.set(key, failInfo);
-
       if (this.activeKeys.has(key)) {
         this.activeKeys.delete(key);
       }
-
       this.updateKeyStats(key, false);
       console.log(`Marked key as failed: ${key.slice(0, 8)}... (${failInfo.failures} failures)`);
     }
-
-    // Cập nhật thống kê key
     updateKeyStats(key, success) {
       const stats = this.keyStats.get(key) || {
         success: 0,
@@ -2487,41 +2423,36 @@
         lastUsed: 0,
         avgResponseTime: 0
       };
-
       stats.total++;
       if (success) {
         stats.success++;
       } else {
         stats.fails++;
       }
-
       stats.lastUsed = Date.now();
       this.keyStats.set(key, stats);
     }
-
-    // Thiết lập rotation key tự động
     setupKeyRotation() {
       setInterval(() => {
         const now = Date.now();
-
-        // Xóa failed keys cũ
+        for (const [key, info] of this.rateLimitedKeys.entries()) {
+          if (now >= info.retryAfter) {
+            this.rateLimitedKeys.delete(key);
+          }
+        }
         for (const [key, info] of this.failedKeys.entries()) {
           if (now - info.timestamp >= 60000) {
             this.failedKeys.delete(key);
           }
         }
-
-        // Reset active requests
         for (const [key, info] of this.activeKeys.entries()) {
           if (now - info.timestamp >= 30000) {
             info.requests = 0;
             this.activeKeys.set(key, info);
           }
         }
-
-        // Cập nhật thống kê
         for (const [key, stats] of this.keyStats.entries()) {
-          if (now - stats.lastUsed > 3600000) { // 1 giờ
+          if (now - stats.lastUsed > 3600000) {
             stats.success = Math.floor(stats.success * 0.9);
             stats.total = Math.floor(stats.total * 0.9);
             this.keyStats.set(key, stats);
@@ -2536,88 +2467,143 @@
       this.getSettings = getSettings;
       this.keyManager = new APIKeyManager(getSettings());
       this.currentProvider = getSettings().apiProvider;
-      this.networkOptimizer = new NetworkOptimizer();
+      this.keyRateLimits = new Map();
     }
-    async request(prompt) {
+    getGenerationConfig(useCase) {
+      const settings = this.getSettings();
+      switch (useCase) {
+        case 'ocr':
+          return {
+            temperature: settings.ocrOptions.temperature,
+            topP: settings.ocrOptions.topP,
+            topK: settings.ocrOptions.topK
+          };
+        case 'media':
+          return {
+            temperature: settings.mediaOptions.temperature,
+            topP: settings.mediaOptions.topP,
+            topK: settings.mediaOptions.topK
+          };
+        case 'page':
+          return {
+            temperature: settings.pageTranslation.generation.temperature,
+            topP: settings.pageTranslation.generation.topP,
+            topK: settings.pageTranslation.generation.topK
+          };
+        default:
+          return {
+            temperature: settings.pageTranslation.generation.temperature,
+            topP: settings.pageTranslation.generation.topP,
+            topK: settings.pageTranslation.generation.topK
+          };
+      }
+    }
+    async checkRateLimit(apiKey) {
+      const now = Date.now();
+      const settings = this.getSettings();
+      const { maxRequests, perMilliseconds } = settings.rateLimit;
+      if (!this.keyRateLimits.has(apiKey)) {
+        this.keyRateLimits.set(apiKey, {
+          queue: [],
+          lastRequestTime: 0
+        });
+      }
+      const rateLimitInfo = this.keyRateLimits.get(apiKey);
+      rateLimitInfo.queue = rateLimitInfo.queue.filter(
+        time => now - time < perMilliseconds
+      );
+      if (rateLimitInfo.queue.length >= maxRequests) {
+        const oldestRequest = rateLimitInfo.queue[0];
+        const waitTime = perMilliseconds - (now - oldestRequest);
+        if (waitTime > 0) {
+          return false;
+        }
+        rateLimitInfo.queue.shift();
+      }
+      rateLimitInfo.queue.push(now);
+      rateLimitInfo.lastRequestTime = now;
+      return true;
+    }
+    async request(prompt, useCase = 'normal') {
       const provider = this.config.providers[this.currentProvider];
       if (!provider) {
         throw new Error(`Provider ${this.currentProvider} not found`);
       }
-
       try {
         const responses = await this.keyManager.executeWithMultipleKeys(
           async (key) => {
+            const canUseKey = await this.checkRateLimit(key);
+            if (!canUseKey) {
+              this.keyManager.markKeyAsRateLimited(key);
+              throw new Error("Rate limit exceeded for this key");
+            }
             const selectedModel = this.getGeminiModel();
-            return new Promise((resolve, reject) => {
-              GM_xmlhttpRequest({
-                method: "POST",
-                url: `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${key}`,
-                headers: { "Content-Type": "application/json" },
-                data: JSON.stringify({
-                  contents: [{
-                    parts: [{ text: prompt }]
-                  }],
-                  generationConfig: {
-                    temperature: this.getSettings().mediaOptions.temperature,
-                    topP: this.getSettings().mediaOptions.topP,
-                    topK: this.getSettings().mediaOptions.topK
-                  }
-                }),
-                onload: (response) => {
-                  if (response.status === 200) {
-                    try {
-                      const result = JSON.parse(response.responseText);
-                      if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        resolve(result.candidates[0].content.parts[0].text);
-                      } else {
-                        reject(new Error("Invalid response format"));
-                      }
-                    } catch (error) {
-                      reject(new Error("Failed to parse response"));
-                    }
-                  } else {
-                    if (response.status === 400) {
-                      reject(new Error("API key not valid"));
-                    } else if (response.status === 429) {
-                      reject(new Error("API key rate limit exceeded"));
-                    } else {
-                      reject(new Error(`API Error: ${response.status}`));
-                    }
-                  }
-                },
-                onerror: (error) => reject(error)
-              });
-            });
+            const generationConfig = this.getGenerationConfig(useCase);
+            return await this.makeApiRequest(key, selectedModel, prompt, generationConfig);
           },
           this.currentProvider
         );
-
-        // Lấy kết quả đầu tiên thành công
         if (responses && responses.length > 0) {
           return provider.responseParser(responses[0]);
         }
-
         throw new Error("Failed to get translation after all retries");
-
       } catch (error) {
         console.error("Request failed:", error);
         throw error;
       }
     }
+    async makeApiRequest(key, model, prompt, generationConfig) {
+      return new Promise((resolve, reject) => {
+        GM_xmlhttpRequest({
+          method: "POST",
+          url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+          headers: { "Content-Type": "application/json" },
+          data: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }]
+            }],
+            generationConfig
+          }),
+          onload: (response) => {
+            if (response.status === 200) {
+              try {
+                const result = JSON.parse(response.responseText);
+                if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
+                  resolve(result.candidates[0].content.parts[0].text);
+                } else {
+                  reject(new Error("Invalid response format"));
+                }
+              } catch (error) {
+                reject(new Error("Failed to parse response"));
+              }
+            } else {
+              if (response.status === 429 || response.status === 403) {
+                this.keyManager.markKeyAsFailed(key);
+                reject(new Error("API key rate limit exceeded"));
+              } else {
+                reject(new Error(`API Error: ${response.status}`));
+              }
+            }
+          },
+          onerror: (error) => reject(error)
+        });
+      });
+    }
     getGeminiModel() {
       const settings = this.getSettings();
-      return settings.selectedModel || "gemini-2.0-flash-lite";
-    }
-    markKeyAsFailed(key) {
-      if (!key) return;
-      const failInfo = this.failedKeys.get(key) || { failures: 0 };
-      failInfo.failures++;
-      failInfo.timestamp = Date.now();
-      this.failedKeys.set(key, failInfo);
-      if (this.activeKeys.has(key)) {
-        this.activeKeys.delete(key);
+      const geminiOptions = settings.geminiOptions;
+      switch (geminiOptions.modelType) {
+        case 'fast':
+          return geminiOptions.fastModel;
+        case 'pro':
+          return geminiOptions.proModel;
+        case 'vision':
+          return geminiOptions.visionModel;
+        case 'custom':
+          return geminiOptions.customModel || "gemini-2.0-flash-lite";
+        default:
+          return "gemini-2.0-flash-lite";
       }
-      console.log(`Marked key as failed: ${key.slice(0, 8)}... (${failInfo.failures} failures)`);
     }
   }
   class InputTranslator {
@@ -2629,14 +2615,6 @@
       this.setupObservers();
       this.setupEventListeners();
       this.initializeExistingEditors();
-      GM_addStyle(`
-            .input-translate-button-container {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-            }
-            .input-translate-button {
-                font-family: inherit;
-            }
-        `);
     }
     setupObservers() {
       const settings = this.translator.userSettings.settings;
@@ -2815,7 +2793,7 @@
             display: flex;
             gap: 2px;
             align-items: center;
-            z-index: 2147483647 !important;
+            z-index: 2147483647;
             pointer-events: auto;
             background-color: rgba(0,74,153,0.1);
             border-radius: 8px;
@@ -2882,16 +2860,18 @@
             ? this.page.languageCode
             : displayOptions.sourceLanguage;
         console.log("sourceLanguage: ", sourceLanguage);
-        const translation = await this.translator.translate(
-          text,
-          null,
-          false,
-          false,
-          reverse ? sourceLanguage : displayOptions.targetLanguage
+        const chunks = this.createChunks(text, 2000);
+        const results = await Promise.all(
+          chunks.map(chunk => this.translator.translate(
+            chunk,
+            null,
+            false,
+            false,
+            reverse ? sourceLanguage : displayOptions.targetLanguage
+          ))
         );
-        if (translation) {
-          this.setEditorContent(editor, translation);
-        }
+        const finalTranslation = results.join('\n');
+        this.setEditorContent(editor, finalTranslation);
       } catch (error) {
         console.error("Translation error:", error);
         this.translator.ui.showNotification(
@@ -3022,7 +3002,7 @@
         this.translator.ui.showProcessingStatus(
           "Đang chuẩn bị chụp màn hình..."
         );
-        const elements = document.querySelectorAll(
+        const elements = this.$$(
           ".translator-tools-container, .translator-notification, .center-translate-status"
         );
         elements.forEach((el) => {
@@ -3080,7 +3060,7 @@
         return file;
       } catch (error) {
         console.error("Screen capture error:", error);
-        const elements = document.querySelectorAll(
+        const elements = this.$$(
           ".translator-tools-container, .translator-notification, .center-translate-status"
         );
         elements.forEach((el) => {
@@ -3388,29 +3368,6 @@
       }
     }
   }
-  class RateLimiter {
-    constructor(translator) {
-      this.translator = translator;
-      this.queue = [];
-      this.lastRequestTime = 0;
-      this.requestCount = 0;
-    }
-    async waitForSlot() {
-      const now = Date.now();
-      const settings = this.translator.userSettings.settings;
-      const { maxRequests, perMilliseconds } = settings.rateLimit;
-      this.queue = this.queue.filter((time) => now - time < perMilliseconds);
-      if (this.queue.length >= maxRequests) {
-        const oldestRequest = this.queue[0];
-        const waitTime = perMilliseconds - (now - oldestRequest);
-        if (waitTime > 0) {
-          await new Promise((resolve) => setTimeout(resolve, waitTime));
-        }
-        this.queue.shift();
-      }
-      this.queue.push(now);
-    }
-  }
   class PageTranslator {
     constructor(translator) {
       this.translator = translator;
@@ -3419,7 +3376,6 @@
       this.isTranslated = false;
       this.languageCode = this.detectLanguage().languageCode;
       this.pageCache = new Map();
-      this.rateLimiter = new RateLimiter(translator);
       this.pdfLoaded = true;
     }
     getExcludeSelectors() {
@@ -3467,7 +3423,7 @@
         if (!this.translator.api) {
           throw new Error("API không khả dụng");
         }
-        const response = await this.translator.api.request(prompt);
+        const response = await this.translator.api.request(prompt, "page");
         this.languageCode = response.trim().toLowerCase();
         const targetLanguage =
           this.translator.userSettings.settings.displayOptions.targetLanguage;
@@ -3504,7 +3460,7 @@
         }
         const result = await this.translatePage();
         if (result.success) {
-          const toolsContainer = document.querySelector(
+          const toolsContainer = this.$(
             ".translator-tools-container"
           );
           if (toolsContainer) {
@@ -3520,7 +3476,7 @@
               }
             }
           }
-          const floatingButton = document.querySelector(
+          const floatingButton = this.$(
             ".page-translate-button"
           );
           if (floatingButton) {
@@ -3545,70 +3501,205 @@
       try {
         if (!this.domObserver) {
           this.setupDOMObserver();
-          // this.domObserver.disconnect();
-          // this.domObserver = null;
         }
         if (this.isTranslated) {
-          for (const [node, originalText] of this.originalTexts.entries()) {
-            if (node && node.parentNode) {
-              node.textContent = originalText;
-            }
-          }
+          await Promise.all(
+            Array.from(this.originalTexts.entries()).map(async ([node, originalText]) => {
+              if (node && node.parentNode) {
+                node.textContent = originalText;
+              }
+            })
+          );
           this.originalTexts.clear();
           this.isTranslated = false;
-          this.updateUI("Dịch trang", "📄 Dịch trang");
           return {
             success: true,
-            message: "Đã chuyển về văn bản gốc",
+            message: "Đã chuyển về văn bản gốc"
           };
         }
         const textNodes = this.collectTextNodes();
         if (textNodes.length === 0) {
           return {
             success: false,
-            message: "Không tìm thấy nội dung cần dịch",
+            message: "Không tìm thấy nội dung cần dịch"
           };
         }
-        const settings = this.translator.userSettings.settings.displayOptions;
-        const mode = settings.translationMode;
-        const chunks = this.createChunks(textNodes, 2000); // Tăng kích thước chunk
-        const translations = await Promise.all(chunks.map(async (chunk) => {
-          const textsToTranslate = chunk
-            .map((node) => node.textContent.trim())
-            .filter((text) => text.length > 0)
-            .join("\n");
-          if (!textsToTranslate) return null;
-          try {
-            const prompt = this.translator.createPrompt(textsToTranslate, "page");
-            const translatedText = await this.translator.api.request(prompt);
-            return { chunk, translatedText };
-          } catch (error) {
-            console.error("Chunk translation error:", error);
-            return null;
-          }
-        }));
-        translations.forEach(translation => {
-          if (!translation) return;
-          const { chunk, translatedText } = translation;
-          const translatedParts = translatedText.split("\n");
-          let translationIndex = 0;
-          chunk.forEach((node) => {
-            const text = node.textContent.trim();
-            if (text.length > 0 && node.parentNode) {
-              this.originalTexts.set(node, node.textContent);
-              if (translationIndex < translatedParts.length) {
-                let translated = translatedParts[translationIndex++];
-                node.textContent = this.formatTranslation(text, translated, mode, settings);
-              }
+        const chunks = this.createChunks(textNodes, 2000);
+        const nodeStatus = new Map();
+        await Promise.all(
+          textNodes.map(async node => {
+            nodeStatus.set(node, {
+              translated: false,
+              text: node.textContent
+            });
+          })
+        );
+        const results = await Promise.all(
+          chunks.map(async chunk => {
+            try {
+              const textsToTranslate = chunk
+                .map(node => node.textContent.trim())
+                .filter(text => text.length > 0)
+                .join('\n');
+              if (!textsToTranslate) return;
+              const prompt = this.translator.createPrompt(textsToTranslate, "page");
+              const translatedText = await this.translator.api.request(prompt, 'page');
+              if (!translatedText) return;
+              const translations = translatedText.split('\n');
+              await Promise.all(
+                chunk.map(async (node, index) => {
+                  if (index >= translations.length) return;
+                  const text = node.textContent.trim();
+                  if (text.length > 0 && node.parentNode && document.contains(node)) {
+                    try {
+                      this.originalTexts.set(node, node.textContent);
+                      const translated = translations[index];
+                      const mode = this.translator.userSettings.settings.displayOptions.translationMode;
+                      let output = this.formatTranslation(
+                        text,
+                        translated,
+                        mode,
+                        this.translator.userSettings.settings.displayOptions
+                      );
+                      if (await this.updateNode(node, output)) {
+                        nodeStatus.set(node, {
+                          translated: true,
+                          text: node.textContent
+                        });
+                      }
+                    } catch (error) {
+                      console.error("Node update error:", error);
+                      nodeStatus.set(node, {
+                        translated: false,
+                        error: "Update failed"
+                      });
+                    }
+                  }
+                })
+              );
+            } catch (error) {
+              console.error("Chunk processing error:", error);
+              await Promise.all(
+                chunk.map(async node => {
+                  nodeStatus.set(node, {
+                    translated: false,
+                    error: error.message
+                  });
+                })
+              );
             }
-          });
-        });
+          })
+        );
+        const processedResults = await Promise.all(
+          results.map(async result => {
+            if (!result) {
+              return {
+                failed: true,
+                error: "Translation failed"
+              };
+            }
+            return {
+              failed: false
+            };
+          })
+        );
+        const failedCount = processedResults.filter(r => r.failed).length;
         this.isTranslated = true;
-        return { success: true, message: "Đã dịch xong trang" };
+        if (failedCount > 0) {
+          return {
+            success: true,
+            message: `Đã dịch trang (${failedCount} phần bị lỗi)`
+          };
+        }
+        return {
+          success: true,
+          message: "Đã dịch xong trang"
+        };
       } catch (error) {
         console.error("Page translation error:", error);
-        return { success: false, message: error.message };
+        return {
+          success: false,
+          message: error.message
+        };
       }
+    }
+    async updateNode(node, translation) {
+      if (!node || !node.parentNode || !document.contains(node)) {
+        return false;
+      }
+      try {
+        node.textContent = translation;
+        return true;
+      } catch (error) {
+        console.error("Node update failed:", error);
+        return false;
+      }
+    }
+    createChunks(nodes, maxChunkSize = 2000) {
+      const chunks = [];
+      let currentChunk = [];
+      let currentLength = 0;
+      const isSentenceEnd = text => /[.!?。！？]$/.test(text.trim());
+      const isPunctuationBreak = text => /[,;，；、]$/.test(text.trim());
+      const isParagraphBreak = node => {
+        const parentTag = node.parentElement?.tagName?.toLowerCase();
+        return ['p', 'div', 'h1', 'h2', 'h3', 'li'].includes(parentTag);
+      };
+      for (const node of nodes) {
+        const text = node.textContent.trim();
+        if ((currentLength + text.length > maxChunkSize) && currentChunk.length > 0) {
+          let splitIndex = currentChunk.length - 1;
+          while (splitIndex > 0) {
+            if (isParagraphBreak(currentChunk[splitIndex])) break;
+            splitIndex--;
+          }
+          if (splitIndex === 0) {
+            splitIndex = currentChunk.length - 1;
+            while (splitIndex > 0) {
+              if (isSentenceEnd(currentChunk[splitIndex].textContent)) break;
+              splitIndex--;
+            }
+          }
+          if (splitIndex === 0) {
+            splitIndex = currentChunk.length - 1;
+            while (splitIndex > 0) {
+              if (isPunctuationBreak(currentChunk[splitIndex].textContent)) break;
+              splitIndex--;
+            }
+          }
+          const newChunk = currentChunk.splice(splitIndex + 1);
+          chunks.push(currentChunk);
+          currentChunk = newChunk;
+          currentLength = currentChunk.reduce((len, n) => len + n.textContent.trim().length, 0);
+        }
+        currentChunk.push(node);
+        currentLength += text.length;
+        const isLastNode = nodes.indexOf(node) === nodes.length - 1;
+        const isEndOfParagraph = isParagraphBreak(node);
+        if ((isLastNode || isEndOfParagraph) && currentChunk.length > 0) {
+          chunks.push(currentChunk);
+          currentChunk = [];
+          currentLength = 0;
+        }
+      }
+      if (currentChunk.length > 0) {
+        chunks.push(currentChunk);
+      }
+      const finalChunks = [];
+      let previousChunk = null;
+      for (const chunk of chunks) {
+        const chunkLength = chunk.reduce((len, node) => len + node.textContent.trim().length, 0);
+        if (chunkLength < maxChunkSize * 0.3 && previousChunk) {
+          const combinedLength = previousChunk.reduce((len, node) => len + node.textContent.trim().length, 0) + chunkLength;
+          if (combinedLength <= maxChunkSize) {
+            previousChunk.push(...chunk);
+            continue;
+          }
+        }
+        finalChunks.push(chunk);
+        previousChunk = chunk;
+      }
+      return finalChunks;
     }
     async detectContext(text) {
       const prompt = `Analyze the context and writing style of this text and return JSON format with these properties:
@@ -3617,7 +3708,7 @@
     - domain: general/technical/business/academic/other
     Text: "${text}"`;
       try {
-        const analysis = await this.translator.api.request(prompt);
+        const analysis = await this.translator.api.request(prompt, "page");
         const result = JSON.parse(analysis);
         return {
           style: result.style,
@@ -3633,112 +3724,6 @@
         };
       }
     }
-    distributeChunks(chunks, groupCount) {
-      const groups = Array(groupCount)
-        .fill()
-        .map(() => []);
-      let currentSize = 0;
-      let currentGroup = 0;
-      chunks.forEach((chunk) => {
-        groups[currentGroup].push(chunk);
-        currentSize += chunk.length;
-        if (currentSize >= Math.ceil(chunks.length / groupCount)) {
-          currentGroup = (currentGroup + 1) % groupCount;
-          currentSize = 0;
-        }
-      });
-      return groups.filter((group) => group.length > 0);
-    }
-    async translateChunkGroup(chunks, apiKey) {
-      const results = [];
-      for (const chunk of chunks) {
-        try {
-          await this.rateLimiter.waitForSlot();
-          const result = await this.translateChunkWithKey(chunk, apiKey);
-          if (result) {
-            results.push(result);
-          }
-        } catch (error) {
-          if (
-            error.message.includes("rate limit") ||
-            error.message.includes("API key not valid")
-          ) {
-            this.translator.api.keyManager.markKeyAsFailed(apiKey);
-            throw error;
-          }
-          console.error("Chunk translation error:", error);
-        }
-      }
-      return results;
-    }
-    async translateChunkWithKey(chunk, apiKey) {
-      const textsToTranslate = chunk
-        .map((node) => node.textContent.trim())
-        .filter((text) => text.length > 0)
-        .join("\n");
-      if (!textsToTranslate) return false;
-      try {
-        const settings = this.translator.userSettings.settings;
-        const selectedModel = this.translator.api.getGeminiModel();
-        const prompt = this.translator.createPrompt(textsToTranslate, "page");
-        const response = await new Promise((resolve, reject) => {
-          GM_xmlhttpRequest({
-            method: "POST",
-            url: `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`,
-            headers: { "Content-Type": "application/json" },
-            data: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    {
-                      text: prompt,
-                    },
-                  ],
-                },
-              ],
-              generationConfig: {
-                temperature: settings.ocrOptions.temperature,
-                topP: settings.ocrOptions.topP,
-                topK: settings.ocrOptions.topK,
-              },
-            }),
-            onload: (response) => {
-              if (response.status === 200) {
-                try {
-                  const result = JSON.parse(response.responseText);
-                  if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                    resolve(result.candidates[0].content.parts[0].text);
-                  } else {
-                    reject(new Error("Invalid response format"));
-                  }
-                } catch (error) {
-                  reject(new Error("Failed to parse response"));
-                }
-              } else {
-                if (response.status === 400) {
-                  reject(new Error("API key not valid"));
-                } else if (response.status === 429) {
-                  reject(new Error("API key rate limit exceeded"));
-                } else {
-                  reject(new Error(`API Error: ${response.status}`));
-                }
-              }
-            },
-            onerror: (error) => reject(error),
-          });
-        });
-        const translations = response.split("\n");
-        chunk.forEach((node, index) => {
-          if (translations[index]) {
-            this.originalTexts.set(node, node.textContent);
-            node.textContent = translations[index].trim();
-          }
-        });
-        return true;
-      } catch (error) {
-        throw error;
-      }
-    }
     async translateHTML(htmlContent) {
       try {
         const parser = new DOMParser();
@@ -3747,53 +3732,46 @@
         const styles = doc.getElementsByTagName("style");
         [...scripts, ...styles].forEach(element => element.remove());
         const translatableNodes = this.getTranslatableHTMLNodes(doc.body);
-        const chunks = this.createHTMLChunks(translatableNodes);
+        const chunks = this.createChunks(translatableNodes, 2000);
         this.translator.ui.showTranslatingStatus();
-        const { translationMode: mode } = this.translator.userSettings.settings.displayOptions;
-        const SEPARATOR = "<<|SPLIT|>>";
-        for (const chunk of chunks) {
-          const textsToTranslate = chunk.nodes
-            .map(node => ({
-              text: node.textContent.trim(),
-              type: node.nodeType,
-              isAttribute: node.isAttribute,
-              attributeName: node.attributeName
-            }))
-            .filter(item => item.text.length > 0);
-          if (textsToTranslate.length === 0) continue;
-          const textToTranslate = textsToTranslate
-            .map(item => item.text)
-            .join(SEPARATOR);
-          const prompt = this.translator.createPrompt(textToTranslate, "page");
-          const translatedText = await this.translator.api.request(prompt);
-          const translatedParts = translatedText.split(SEPARATOR);
-          chunk.nodes.forEach((node, index) => {
-            if (index >= translatedParts.length) return;
-            const translation = translatedParts[index];
-            if (!translation) return;
-            const originalText = node.textContent.trim();
-            let formattedTranslation = "";
-            if (mode === "translation_only") {
-              formattedTranslation = translation;
-            } else if (mode === "parallel") {
-              formattedTranslation = `[Gốc]: ${originalText}\n [DỊCH]: ${translation.split("<|>")[2] || translation}   `;
-            } else if (mode === "language_learning") {
-              let sourceHTML = "";
-              if (showSource) {
-                sourceHTML = `[Gốc]: ${originalText}`;
-              }
-              formattedTranslation = `${sourceHTML}\n [Pinyin]: ${translation.split("<|>")[1] || ""}\n [Dịch]: ${translation.split("<|>")[2] || translation}   `;
+        await Promise.all(
+          chunks.map(async chunk => {
+            try {
+              const textsToTranslate = await Promise.all(
+                chunk.map(node => node.textContent.trim())
+              );
+              const validTexts = textsToTranslate.filter(text => text.length > 0);
+              if (validTexts.length === 0) return;
+              const textToTranslate = validTexts.join("\n");
+              const prompt = this.translator.createPrompt(textToTranslate, "page");
+              const translatedText = await this.translator.api.request(prompt, 'page');
+              if (!translatedText) return;
+              const translations = translatedText.split("\n");
+              await Promise.all(
+                chunk.map(async (node, index) => {
+                  if (index >= translations.length) return;
+                  const text = node.textContent.trim();
+                  if (text.length > 0 && node.parentNode && document.contains(node)) {
+                    try {
+                      if (node.isAttribute) {
+                        node.ownerElement.setAttribute(node.attributeName, translations[index].trim());
+                      } else {
+                        node.textContent = translations[index].trim();
+                      }
+                    } catch (error) {
+                      console.error("DOM update error:", error);
+                    }
+                  }
+                })
+              );
+            } catch (error) {
+              console.error("Chunk translation error:", error);
             }
-            if (node.isAttribute) {
-              node.ownerElement.setAttribute(node.attributeName, formattedTranslation.trim());
-            } else {
-              node.textContent = formattedTranslation.trim();
-            }
-          });
-        }
+          })
+        );
         return doc.documentElement.outerHTML;
       } catch (error) {
-        console.error("Lỗi dịch HTML:", error);
+        console.error("HTML translation error:", error);
         throw error;
       } finally {
         this.translator.ui.removeTranslatingStatus();
@@ -3835,26 +3813,6 @@
         }
       }
       return translatableNodes;
-    }
-    createHTMLChunks(nodes, maxChunkSize = 1000) {
-      const chunks = [];
-      let currentChunk = { nodes: [], size: 0 };
-      for (const node of nodes) {
-        const textLength = node.textContent.length;
-        if (currentChunk.size + textLength > maxChunkSize) {
-          if (currentChunk.nodes.length > 0) {
-            chunks.push(currentChunk);
-          }
-          currentChunk = { nodes: [node], size: textLength };
-        } else {
-          currentChunk.nodes.push(node);
-          currentChunk.size += textLength;
-        }
-      }
-      if (currentChunk.nodes.length > 0) {
-        chunks.push(currentChunk);
-      }
-      return chunks;
     }
     async loadPDFJS() {
       if (!this.pdfLoaded) {
@@ -4124,28 +4082,8 @@
       }
       return chunks;
     }
-    rateLimiter = {
-      queue: [],
-      lastRequestTime: 0,
-      requestCount: 0,
-      async waitForSlot() {
-        const now = Date.now();
-        const settings = this.translator.userSettings.settings;
-        const { maxRequests, perMilliseconds } = settings.rateLimit;
-        this.queue = this.queue.filter((time) => now - time < perMilliseconds);
-        if (this.queue.length >= maxRequests) {
-          const oldestRequest = this.queue[0];
-          const waitTime = perMilliseconds - (now - oldestRequest);
-          if (waitTime > 0) {
-            await new Promise((resolve) => setTimeout(resolve, waitTime));
-          }
-          this.queue.shift();
-        }
-        this.queue.push(now);
-      },
-    };
     updateUI(menuText, buttonText) {
-      const toolsContainer = document.querySelector(
+      const toolsContainer = this.$(
         ".translator-tools-container"
       );
       if (toolsContainer) {
@@ -4159,7 +4097,7 @@
           }
         }
       }
-      const floatingButton = document.querySelector(".page-translate-button");
+      const floatingButton = this.$(".page-translate-button");
       if (floatingButton) {
         floatingButton.innerHTML = buttonText;
       }
@@ -4241,25 +4179,6 @@
         nodes.push(node);
       }
       return nodes;
-    }
-    createChunks(nodes, maxChunkSize = 2000) {
-      const chunks = [];
-      let currentChunk = [];
-      let currentLength = 0;
-      for (const node of nodes) {
-        const text = node.textContent.trim();
-        if ((currentLength + text.length > maxChunkSize) && currentChunk.length > 0) {
-          chunks.push(currentChunk);
-          currentChunk = [];
-          currentLength = 0;
-        }
-        currentChunk.push(node);
-        currentLength += text.length;
-      }
-      if (currentChunk.length > 0) {
-        chunks.push(currentChunk);
-      }
-      return chunks;
     }
     setupDOMObserver() {
       if (this.domObserver) {
@@ -4356,76 +4275,28 @@
           .map((node) => node.textContent.trim())
           .filter((text) => text.length > 0)
           .join("\n");
-
         if (!textsToTranslate) return;
-
         const prompt = this.translator.createPrompt(textsToTranslate, "page");
-        const settings = this.translator.userSettings.settings;
-        const responses = await this.translator.api.keyManager.executeWithMultipleKeys(
-          async (key) => {
-            const selectedModel = this.translator.api.getGeminiModel();
-            const response = await new Promise((resolve, reject) => {
-              GM_xmlhttpRequest({
-                method: "POST",
-                url: `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${key}`,
-                headers: { "Content-Type": "application/json" },
-                data: JSON.stringify({
-                  contents: [{
-                    parts: [{ text: prompt }]
-                  }],
-                  generationConfig: {
-                    temperature: settings.ocrOptions.temperature,
-                    topP: settings.ocrOptions.topP,
-                    topK: settings.ocrOptions.topK
-                  }
-                }),
-                onload: (response) => {
-                  if (response.status === 200) {
-                    try {
-                      const result = JSON.parse(response.responseText);
-                      if (result?.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        resolve(result.candidates[0].content.parts[0].text);
-                      } else {
-                        reject(new Error("Invalid response format"));
-                      }
-                    } catch (error) {
-                      reject(new Error("Failed to parse response"));
-                    }
-                  } else {
-                    if (response.status === 429 || response.status === 403) {
-                      reject(new Error("API key rate limit exceeded"));
-                    } else {
-                      reject(new Error(`API Error: ${response.status}`));
-                    }
-                  }
-                },
-                onerror: (error) => reject(error)
-              });
-            });
-            return response;
-          },
-          settings.apiProvider
-        );
-
-        if (responses && responses.length > 0) {
-          const translatedText = responses[0];
-          if (translatedText) {
-            const translatedParts = translatedText.split("\n");
-            let translationIndex = 0;
-            for (let i = 0; i < chunk.length; i++) {
-              const node = chunk[i];
-              const text = node.textContent.trim();
-              if (text.length > 0 && node.parentNode) {
+        const translatedText = await this.translator.api.request(prompt, 'page');
+        if (translatedText) {
+          const translations = translatedText.split("\n");
+          let translationIndex = 0;
+          await Promise.all(chunk.map(async (node, _index) => {
+            const text = node.textContent.trim();
+            if (text.length > 0 && node.parentNode && document.contains(node)) {
+              try {
                 this.originalTexts.set(node, node.textContent);
-                if (translationIndex < translatedParts.length) {
-                  const translated = translatedParts[translationIndex++];
-                  const mode = settings.displayOptions.translationMode;
-                  let output = this.formatTranslation(text, translated, mode, settings.displayOptions);
+                if (translationIndex < translations.length) {
+                  const translated = translations[translationIndex++];
+                  const mode = this.translator.userSettings.settings.displayOptions.translationMode;
+                  let output = this.formatTranslation(text, translated, mode, this.translator.userSettings.settings.displayOptions);
                   node.textContent = output;
                 }
+              } catch (error) {
+                console.error("DOM update error:", error);
               }
             }
-          }
+          }));
         }
       } catch (error) {
         console.error("Chunk translation error:", error);
@@ -4674,6 +4545,14 @@
       this.ignoreNextSelectionChange = false;
       this.touchCount = 0;
       this.currentTranslateButton = null;
+      this.isProcessing = false;
+      this.touchEndProcessed = false;
+      this.currentOverlay = null;
+      this.currentSelectionBox = null;
+      this.currentStatusContainer = null;
+      this.currentGuide = null;
+      this.currentCancelBtn = null;
+      this.currentStyle = null;
       // Khởi tạo trạng thái tools
       if (localStorage.getItem("translatorToolsEnabled") === null) {
         localStorage.setItem("translatorToolsEnabled", "true");
@@ -4682,331 +4561,532 @@
       const themeMode = this.translator.userSettings.settings.theme;
       const theme = CONFIG.THEME[themeMode];
       const isDark = themeMode === "dark";
-      GM_addStyle(`
-    .translator-settings-container {
-        z-index: 2147483647 !important;
-        position: fixed !important;
-        background-color: ${theme.background} !important;
-        color: ${theme.text} !important;
-        padding: 20px !important;
-        border-radius: 12px !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
-        width: auto !important;
-        min-width: 320px !important;
-        max-width: 90vw !important;
-        max-height: 90vh !important;
-        overflow-y: auto !important;
-        top: 50% !important;
-        left: 50% !important;
-        transform: translate(-50%, -50%) !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        font-size: 14px !important;
-        line-height: 1.4 !important;
-    }
-    .translator-settings-container * {
-        font-family: Arial, sans-serif !important;
-        box-sizing: border-box !important;
-    }
-    .translator-settings-container input[type="checkbox"],
-    .translator-settings-container input[type="radio"] {
-        appearance: auto !important;
-        -webkit-appearance: auto !important;
-        -moz-appearance: auto !important;
-        position: relative !important;
-        width: 16px !important;
-        height: 16px !important;
-        margin: 3px 5px !important;
-        padding: 0 !important;
-        accent-color: #0000aa !important;
-        border: 1px solid ${theme.border} !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        cursor: pointer !important;
-    }
-    .radio-group {
-        display: flex !important;
-        gap: 15px !important;
-        align-items: center !important;
-    }
-    .radio-group label {
-        flex: 1 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 5px !important;
-        gap: 5px !important;
-    }
-    .radio-group input[type="radio"] {
-        margin: 0 !important;
-        position: relative !important;
-        top: 0 !important;
-    }
-    .translator-settings-container input[type="radio"] {
-        border-radius: 50% !important;
-    }
-    .translator-settings-container input[type="checkbox"] {
-        display: flex !important;
-        position: relative !important;
-        margin: 5px 53% 5px 47% !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    .settings-grid input[type="text"],
-    .settings-grid input[type="number"],
-    .settings-grid select {
-        appearance: auto !important;
-        -webkit-appearance: auto !important;
-        -moz-appearance: auto !important;
-        background-color: ${isDark ? "#202020" : "#eeeeee"} !important;
-        color: ${theme.text} !important;
-        border: 1px solid ${theme.border} !important;
-        border-radius: 8px !important;
-        padding: 7px 10px !important;
-        margin: 5px !important;
-        font-size: 14px !important;
-        line-height: normal !important;
-        height: auto !important;
-        width: auto !important;
-        min-width: 100px !important;
-        display: inline-block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    .settings-grid select {
-        padding-right: 20px !important;
-    }
-    .settings-grid label {
-        display: inline-flex !important;
-        align-items: center !important;
-        margin: 3px 10px !important;
-        color: ${theme.text} !important;
-        cursor: pointer !important;
-        user-select: none !important;
-    }
-    .settings-grid input:not([type="hidden"]),
-    .settings-grid select,
-    .settings-grid textarea {
-        display: inline-block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        position: static !important;
-    }
-    .settings-grid input:disabled,
-    .settings-grid select:disabled {
-        opacity: 0.5 !important;
-        cursor: not-allowed !important;
-    }
-    .translator-settings-container input[type="checkbox"]:hover,
-    .translator-settings-container input[type="radio"]:hover {
-        border-color: ${theme.mode === "dark" ? "#777" : "#444"} !important;
-    }
-    .settings-grid input:focus,
-    .settings-grid select:focus {
-        outline: 2px solid rgba(74, 144, 226, 0.5) !important;
-        outline-offset: 1px !important;
-    }
-    .settings-grid input::before,
-    .settings-grid input::after {
-        content: none !important;
-        display: none !important;
-    }
-    .translator-settings-container button {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        line-height: 1 !important;
-    }
-    .translator-settings-container .api-key-entry input[type="text"].gemini-key,
-    .translator-settings-container .api-key-entry input[type="text"].openai-key {
-      padding: 8px 10px !important;
-      margin: 0px 3px 3px 15px !important;
-      appearance: auto !important;
-      -webkit-appearance: auto !important;
-      -moz-appearance: auto !important;
-      font-size: 14px !important;
-      line-height: normal !important;
-      width: auto !important;
-      min-width: 100px !important;
-      display: inline-block !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      border: 1px solid ${theme.border} !important;
-      border-radius: 10px !important;
-      box-sizing: border-box !important;
-      font-family: Arial, sans-serif !important;
-      text-align: left !important;
-      vertical-align: middle !important;
-      background-color: ${isDark ? "#202020" : "#eeeeee"} !important;
-      color: ${theme.text} !important;
-    }
-    .translator-settings-container .api-key-entry input[type="text"].gemini-key:focus,
-    .translator-settings-container .api-key-entry input[type="text"].openai-key:focus {
-      outline: 3px solid rgba(74, 144, 226, 0.5) !important;
-      outline-offset: 1px !important;
-      box-shadow: none !important;
-    }
-    .translator-settings-container .api-key-entry {
-      display: flex !important;
-      gap: 10px !important;
-      align-items: center !important;
-    }
-    .remove-key {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 24px !important;
-        height: 24px !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-    }
-    .translator-settings-container::-webkit-scrollbar {
-        width: 8px !important;
-    }
-    .translator-settings-container::-webkit-scrollbar-track {
-        background-color: ${theme.mode === "dark" ? "#222" : "#eeeeee"} !important;
-        border-radius: 8px !important;
-    }
-    .translator-settings-container::-webkit-scrollbar-thumb {
-        background-color: ${theme.mode === "dark" ? "#666" : "#888"} !important;
-        border-radius: 8px !important;
-    }
-`);
-      GM_addStyle(`
+      this.container = document.createElement('div');
+      this.container.id = 'king-translator-root';
+      this.container.style.cssText = `z-index: 2147483647;`;
+      this.shadowRoot = this.container.attachShadow({ mode: 'closed' });
+      const style = document.createElement('style');
+      style.textContent = `
+  .translator-settings-container {
+    z-index: 2147483647;
+    position: fixed;
+    background-color: ${theme.background};
+    color: ${theme.text};
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    width: auto;
+    min-width: 320px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    top: ${window.innerHeight / 2}px;
+    left: ${window.innerWidth / 2}px;
+    transform: translate(-50%, -50%);
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .translator-settings-container * {
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+  }
+  .translator-settings-container input[type="checkbox"],
+  .translator-settings-container input[type="radio"] {
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    position: relative;
+    width: 16px;
+    height: 16px;
+    margin: 3px 5px;
+    padding: 0;
+    accent-color: #0000aa;
+    border: 1px solid ${theme.border};
+    opacity: 1;
+    visibility: visible;
+    cursor: pointer;
+  }
+  .radio-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  .radio-group label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    gap: 5px;
+  }
+  .radio-group input[type="radio"] {
+    margin: 0;
+    position: relative;
+    top: 0;
+  }
+  .translator-settings-container input[type="radio"] {
+    border-radius: 50%;
+  }
+  .translator-settings-container input[type="checkbox"] {
+    display: flex;
+    position: relative;
+    margin: 5px 53% 5px 47%;
+    align-items: center;
+    justify-content: center;
+  }
+  .settings-grid input[type="text"],
+  .settings-grid input[type="number"],
+  .settings-grid select {
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    background-color: ${isDark ? "#202020" : "#eeeeee"};
+    color: ${theme.text};
+    border: 1px solid ${theme.border};
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin: 5px;
+    font-size: 14px;
+    line-height: normal;
+    height: auto;
+    width: auto;
+    min-width: 100px;
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
+  }
+  .settings-grid select {
+    padding-right: 20px;
+  }
+  .settings-grid label {
+    display: inline-flex;
+    align-items: center;
+    margin: 3px 10px;
+    color: ${theme.text};
+    cursor: pointer;
+    user-select: none;
+  }
+  .settings-grid input:not([type="hidden"]),
+  .settings-grid select,
+  .settings-grid textarea {
+    display: inline-block;
+    opacity: 1;
+    visibility: visible;
+    position: static;
+  }
+  .settings-grid input:disabled,
+  .settings-grid select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .translator-settings-container input[type="checkbox"]:hover,
+  .translator-settings-container input[type="radio"]:hover {
+    border-color: ${theme.mode === "dark" ? "#777" : "#444"};
+  }
+  .settings-grid input:focus,
+  .settings-grid select:focus {
+    outline: 2px solid rgba(74, 144, 226, 0.5);
+    outline-offset: 1px;
+  }
+  .settings-grid input::before,
+  .settings-grid input::after {
+    content: none;
+    display: none;
+  }
+  .translator-settings-container button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1;
+  }
+  .translator-settings-container .api-key-entry input[type="text"].gemini-key,
+  .translator-settings-container .api-key-entry input[type="text"].openai-key {
+    padding: 8px 10px;
+    margin: 0px 3px 3px 15px;
+    appearance: auto;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    font-size: 14px;
+    line-height: normal;
+    width: auto;
+    min-width: 100px;
+    display: inline-block;
+    visibility: visible;
+    opacity: 1;
+    border: 1px solid ${theme.border};
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    text-align: left;
+    vertical-align: middle;
+    background-color: ${isDark ? "#202020" : "#eeeeee"};
+    color: ${theme.text};
+  }
+  .translator-settings-container .api-key-entry input[type="text"].gemini-key:focus,
+  .translator-settings-container .api-key-entry input[type="text"].openai-key:focus {
+    outline: 3px solid rgba(74, 144, 226, 0.5);
+    outline-offset: 1px;
+    box-shadow: none;
+  }
+  .translator-settings-container .api-key-entry {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .remove-key {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    line-height: 1;
+  }
+  .translator-settings-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  .translator-settings-container::-webkit-scrollbar-track {
+    background-color: ${theme.mode === "dark" ? "#222" : "#eeeeee"};
+    border-radius: 8px;
+  }
+  .translator-settings-container::-webkit-scrollbar-thumb {
+    background-color: ${theme.mode === "dark" ? "#666" : "#888"};
+    border-radius: 8px;
+  }
   .translator-tools-container {
-    position: fixed !important;
+    position: fixed;
     bottom: 40px;
     right: 25px;
-    color: ${theme.text} !important;
-    border-radius: 10px !important;
-    z-index: 2147483647 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    color: ${theme.text};
+    border-radius: 10px;
+    z-index: 2147483647;
+    display: block;
+    visibility: visible;
+    opacity: 1;
   }
   .translator-tools-container * {
-    font-family: Arial, sans-serif !important;
-    box-sizing: border-box !important;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
   }
   .translator-tools-button {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 12px 20px !important;
-    border: none !important;
-    border-radius: 9px !important;
-    background-color: rgba(74,144,226,0.4) !important;
-    color: white !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2) !important;
-    font-size: 15px !important;
-    line-height: 1 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 9px;
+    background-color: rgba(74,144,226,0.4);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    font-size: 15px;
+    line-height: 1;
+    visibility: visible;
+    opacity: 1;
   }
   .translator-tools-dropdown {
     display: none;
-    position: absolute !important;
-    bottom: 100% !important;
-    right: 0 !important;
-    margin-bottom: 10px !important;
-    background-color: ${theme.background} !important;
-    color: ${theme.text} !important;
-    border-radius: 10px !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
-    padding: 15px 12px 9px 12px !important;
-    min-width: 205px !important;
-    z-index: 2147483647 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 10px;
+    background-color: ${theme.background};
+    color: ${theme.text};
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 15px 12px 9px 12px;
+    min-width: 205px;
+    z-index: 2147483647;
+    visibility: visible;
+    opacity: 1;
   }
   .translator-tools-item {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 10px !important;
-    margin-bottom: 5px !important;
-    cursor: pointer !important;
-    transition: all 0.2s ease !important;
-    border-radius: 10px !important;
-    background-color: ${theme.backgroundShadow} !important;
-    color: ${theme.text} !important;
-    border: 1px solid ${theme.border} !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 10px;
+    background-color: ${theme.backgroundShadow};
+    color: ${theme.text};
+    border: 1px solid ${theme.border};
+    visibility: visible;
+    opacity: 1;
   }
   .item-icon, .item-text {
-    font-family: Arial, sans-serif !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+    font-family: Arial, sans-serif;
+    visibility: visible;
+    opacity: 1;
   }
   .item-icon {
-    font-size: 18px !important;
+    font-size: 18px;
   }
   .item-text {
-    font-size: 14px !important;
+    font-size: 14px;
   }
   .translator-tools-item:hover {
-    background-color: ${theme.button.translate.background} !important;
-    color: ${theme.button.translate.text} !important;
+    background-color: ${theme.button.translate.background};
+    color: ${theme.button.translate.text};
   }
   .translator-tools-item:active {
-    transform: scale(0.98) !important;
+    transform: scale(0.98);
   }
-`);
-      GM_addStyle(`
-    .settings-label,
-    .settings-section-title,
-    .shortcut-prefix,
-    .item-text,
-    .translator-settings-container label {
-      color: ${theme.text} !important;
-      margin: 2px 10px !important;
+  .translator-tools-button:hover {
+    transform: translateY(-2px);
+    background-color: #357abd;
+  }
+  .translator-tools-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+  .translator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 2147483647;
+    cursor: crosshair;
+  }
+  .translator-guide {
+    position: fixed;
+    top: 20px;
+    left: ${window.innerWidth / 2}px;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 2147483647;
+  }
+  .translator-cancel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2147483647;
+    transition: all 0.3s ease;
+  }
+  .translator-cancel:hover {
+    background-color: #ff0000;
+    transform: scale(1.1);
+  }
+  /* Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
     }
-    .translator-settings-container input[type="text"],
-    .translator-settings-container input[type="number"],
-    .translator-settings-container select {
-      background-color: ${isDark ? "#202020" : "#eeeeee"} !important;
-      color: ${theme.text} !important;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    /* Đảm bảo input không ghi đè lên label */
-    .translator-settings-container input {
-      color: inherit !important;
+  }
+  .translator-tools-container {
+    animation: fadeIn 0.3s ease;
+  }
+  .translator-tools-dropdown {
+    animation: fadeIn 0.2s ease;
+  }
+  .translator-tools-container.hidden,
+  .translator-notification.hidden,
+  .center-translate-status.hidden {
+    visibility: hidden;
+  }
+  .settings-label,
+  .settings-section-title,
+  .shortcut-prefix,
+  .item-text,
+  .translator-settings-container label {
+    color: ${theme.text};
+    margin: 2px 10px;
+  }
+  .translator-settings-container input[type="text"],
+  .translator-settings-container input[type="number"],
+  .translator-settings-container select {
+    background-color: ${isDark ? "#202020" : "#eeeeee"};
+    color: ${theme.text};
+  }
+  /* Đảm bảo input không ghi đè lên label */
+  .translator-settings-container input {
+    color: inherit;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .processing-spinner {
+    width: 30px;
+    height: 30px;
+    color: white;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto 10px auto;
+  }
+  .processing-message {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .processing-progress {
+    font-size: 12px;
+    opacity: 0.8;
+  }
+  .translation-div p {
+    margin: 5px 0;
+  }
+  .translation-div strong {
+    font-weight: bold;
+  }
+  .translator-context-menu {
+    position: fixed;
+    color: ${theme.text};
+    background-color: ${theme.background};
+    border-radius: 8px;
+    padding: 8px 8px 5px 8px;
+    min-width: 150px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 2147483647;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.1s ease-out;
+    animation: menuAppear 0.15s ease-out forwards;
+  }
+  @keyframes menuAppear {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
     }
-`);
-      GM_addStyle(`
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
-    .processing-spinner {
-        width: 30px;
-        height: 30px;
-        color: white;
-        border: 3px solid rgba(255,255,255,0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 1s ease-in-out infinite;
-        margin: 0 auto 10px auto;
-    }
-    .processing-message {
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
-    .processing-progress {
-        font-size: 12px;
-        opacity: 0.8;
-    }
-    .translation-div p {
-      margin: 5px 0;
-    }
-    .translation-div strong {
-      font-weight: bold;
-    }
-    `);
+  }
+  .translator-context-menu-item {
+    padding: 5px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    color: ${theme.text};
+    background-color: ${theme.backgroundShadow};
+    border: 1px solid ${theme.border};
+    border-radius: 7px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    z-index: 2147483647;
+  }
+  .translator-context-menu-item:hover {
+    background-color: ${theme.button.translate.background};
+    color: ${theme.button.translate.text};
+  }
+  .translator-context-menu-item:active {
+    transform: scale(0.98);
+  }
+  .input-translate-button-container {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  }
+  .input-translate-button {
+    font-family: inherit;
+  }
+  .translator-notification {
+    position: fixed;
+    top: 20px;
+    left: ${window.innerWidth / 2}px;
+    transform: translateX(-50%);
+    z-index: 2147483647;
+    animation: fadeInOut 2s ease;
+  }
+  /* Styles cho loading/processing status */
+  .center-translate-status {
+    position: fixed;
+    top: ${window.innerHeight / 2}px;
+    left: ${window.innerWidth / 2}px;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    z-index: 2147483647;
+  }
+  /* Styles cho translate button */
+  .translator-button {
+    position: fixed;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    z-index: 2147483647;
+    font-size: 14px;
+  }
+  /* Styles cho popup */
+  .draggable {
+    position: fixed;
+    background-color: ${theme.background};
+    color: ${theme.text};
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    z-index: 2147483647;
+  }
+  /* Styles cho web image OCR */
+  .translator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    z-index: 2147483647;
+  }
+  /* Styles cho manga translation */
+  .manga-translation-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 2147483647;
+  }
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+    `;
+      this.shadowRoot.appendChild(style);
+      document.body.appendChild(this.container);
       // Khởi tạo các managers
       this.mobileOptimizer = new MobileOptimizer(this);
       this.ss = new UserSettings(translator);
@@ -5032,7 +5112,6 @@
       this.translationButtonEnabled = true;
       this.translationTapEnabled = true;
       this.mediaElement = null;
-      this.container = null;
       // Setup event listeners sau khi mọi thứ đã được khởi tạo
       this.setupEventListeners();
       // Setup page translation
@@ -5071,7 +5150,7 @@
         }
       });
       setTimeout(() => {
-        if (!document.querySelector(".translator-tools-container")) {
+        if (!this.$(".translator-tools-container")) {
           const isEnabled =
             localStorage.getItem("translatorToolsEnabled") === "true";
           if (isEnabled) {
@@ -5082,6 +5161,12 @@
       this.debouncedCreateButton = debounce((selection, x, y) => {
         this.createTranslateButton(selection, x, y);
       }, 100);
+    }
+    $(selector) {
+      return this.shadowRoot.querySelector(selector);
+    }
+    $$(selector) {
+      return this.shadowRoot.querySelectorAll(selector);
     }
     createCloseButton() {
       const button = document.createElement("span");
@@ -5101,17 +5186,8 @@
       return button;
     }
     showTranslationBelow(translatedText, targetElement, text) {
-      const selection = window.getSelection();
-      const lastSelectedNode = selection.focusNode;
-      let lastSelectedParagraph = lastSelectedNode.parentElement;
-      while (lastSelectedParagraph && lastSelectedParagraph.tagName !== "P") {
-        lastSelectedParagraph = lastSelectedParagraph.parentElement;
-      }
-      if (!lastSelectedParagraph) {
-        lastSelectedParagraph = targetElement;
-      }
       if (
-        lastSelectedParagraph.nextElementSibling?.classList.contains(
+        targetElement.nextElementSibling?.classList.contains(
           "translation-div"
         )
       ) {
@@ -5145,20 +5221,20 @@
       const themeMode = this.translator.userSettings.settings.theme;
       const theme = CONFIG.THEME[themeMode];
       translationDiv.appendChild(this.createCloseButton());
-      lastSelectedParagraph.parentNode.appendChild(translationDiv);
+      targetElement.insertAdjacentElement('afterend', translationDiv);
       translationDiv.style.cssText = `
         display: block; /* Giữ cho phần dịch không bị kéo dài hết chiều ngang */
         max-width: fit-content; /* Giới hạn chiều rộng */
         width: auto; /* Để nó co giãn theo nội dung */
         min-width: 150px;
-        color: ${theme.text} !important;
-        background-color: ${theme.background} !important;
+        color: ${theme.text};
+        background-color: ${theme.background};
         padding: 10px 20px 10px 10px;
         margin-top: 10px;
         border-radius: 8px;
         position: relative;
-        z-index: 2147483647 !important;
-        border: 1px solid ${theme.border} !important;
+        z-index: 2147483647;
+        border: 1px solid ${theme.border};
         white-space: normal; /* Cho phép xuống dòng nếu quá dài */
         overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
       `;
@@ -5265,14 +5341,14 @@
       background-color: ${isDark ? "#888" : "#555"};
     }
   `;
-      document.head.appendChild(scrollbarStyle);
+      this.shadowRoot.appendChild(scrollbarStyle);
       contentContainer.classList.add("translator-content");
       const cleanedText = translatedText.replace(/(\*\*)(.*?)\1/g, `<b style="color: ${theme.text};">$2</b>`);
       const textContainer = document.createElement("div");
       Object.assign(textContainer.style, {
         display: "flex",
         flexDirection: "column",
-        zIndex: "2147483647 !important",
+        zIndex: "2147483647",
         gap: "15px"
       });
       if (
@@ -5287,7 +5363,7 @@
           borderRadius: "8px",
           border: `1px solid ${theme.border}`,
           wordBreak: "break-word",
-          zIndex: "2147483647 !important",
+          zIndex: "2147483647",
         });
         originalContainer.innerHTML = `
       <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Bản gốc:</div>
@@ -5308,7 +5384,7 @@
           borderRadius: "8px",
           border: `1px solid ${theme.border}`,
           wordBreak: "break-word",
-          zIndex: "2147483647 !important",
+          zIndex: "2147483647",
         });
         originalContainer.innerHTML = `
       <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Bản gốc:</div>
@@ -5329,7 +5405,7 @@
           borderRadius: "8px",
           border: `1px solid ${theme.border}`,
           wordBreak: "break-word",
-          zIndex: "2147483647 !important",
+          zIndex: "2147483647",
         });
         pinyinContainer.innerHTML = `
       <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Pinyin:</div>
@@ -5345,7 +5421,7 @@
         borderRadius: "8px",
         border: `1px solid ${theme.border}`,
         wordBreak: "break-word",
-        zIndex: "2147483647 !important",
+        zIndex: "2147483647",
       });
       translationContainer.innerHTML = `
     <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title
@@ -5356,14 +5432,25 @@
       contentContainer.appendChild(textContainer);
       popup.appendChild(dragHandle);
       popup.appendChild(contentContainer);
-      Object.assign(popup.style, {
-        ...popupStyle,
-        maxHeight: "85vh",
-        display: "flex",
-        flexDirection: "column",
-      });
       this.makeDraggable(popup, dragHandle);
-      document.body.appendChild(popup);
+      this.shadowRoot.appendChild(popup);
+      this.handleClickOutside = (e) => {
+        if (!popup.contains(e.target)) {
+          document.removeEventListener("click", this.handleClickOutside);
+          popup.remove();
+        }
+      };
+      popup.addEventListener("click", (e) => {
+        e.stopPropagation();
+      });
+      document.addEventListener("click", this.handleClickOutside);
+      const handleEscape = (e) => {
+        if (e.key === "Escape") {
+          document.removeEventListener("keydown", handleEscape);
+          popup.remove();
+        }
+      };
+      document.addEventListener("keydown", handleEscape);
     }
     makeDraggable(element, handle) {
       let pos1 = 0,
@@ -5474,7 +5561,7 @@
         zIndex: '2147483647',
         userSelect: 'none'
       });
-      document.body.appendChild(button);
+      this.shadowRoot.appendChild(button);
       this.currentTranslateButton = button;
       this.setupClickHandlers(selection);
     }
@@ -5534,7 +5621,7 @@
     }
     showTranslatingStatus() {
       this.debug("Showing translating status");
-      if (!document.getElementById("translator-animation-style")) {
+      if (!this.shadowRoot.getElementById("translator-animation-style")) {
         const style = document.createElement("style");
         style.id = "translator-animation-style";
         style.textContent = `
@@ -5544,14 +5631,14 @@
           }
           .center-translate-status {
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: ${window.innerHeight / 2}px;
+            left: ${window.innerWidth / 2}px;
             transform: translate(-50%, -50%);
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 15px 25px;
             border-radius: 8px;
-            z-index: 2147483647 !important;
+            z-index: 2147483647;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -5569,7 +5656,7 @@
             animation: spin 1s ease-in-out infinite;
           }
         `;
-        document.head.appendChild(style);
+        this.shadowRoot.appendChild(style);
       }
       this.removeTranslatingStatus();
       const status = document.createElement("div");
@@ -5578,7 +5665,7 @@
       <div class="spinner" style="color: white"></div>
       <span style="color: white">Đang dịch...</span>
     `;
-      document.body.appendChild(status);
+      this.shadowRoot.appendChild(status);
       this.translatingStatus = status;
       this.debug("Translation status shown");
     }
@@ -5710,7 +5797,7 @@
               e.preventDefault();
               const settingsUI =
                 this.translator.userSettings.createSettingsUI();
-              document.body.appendChild(settingsUI);
+              this.shadowRoot.appendChild(settingsUI);
               break;
             case 5:
               e.preventDefault();
@@ -5732,11 +5819,11 @@
         }
         touchCount = 0;
       };
-      document.addEventListener("touchstart", handleTouchStart.bind(this), {
+      this.shadowRoot.addEventListener("touchstart", handleTouchStart.bind(this), {
         passive: false,
       });
-      document.addEventListener("touchend", handleTouch.bind(this));
-      document.addEventListener("touchcancel", handleTouch.bind(this));
+      this.shadowRoot.addEventListener("touchend", handleTouch.bind(this));
+      this.shadowRoot.addEventListener("touchcancel", handleTouch.bind(this));
     }
     toggleTranslatorTools() {
       if (this.isTogglingTools) return;
@@ -5751,7 +5838,7 @@
         this.translator.userSettings.saveSettings();
         this.removeToolsContainer();
         this.resetState();
-        const overlays = document.querySelectorAll(".translator-overlay");
+        const overlays = this.$$(".translator-overlay");
         overlays.forEach((overlay) => overlay.remove());
         if (newState) {
           this.setupTranslatorTools();
@@ -5766,23 +5853,12 @@
       }
     }
     removeToolsContainer() {
-      const container = document.querySelector(".translator-tools-container");
+      const container = this.$('.translator-tools-container');
       if (container) {
-        const ocrInput = container.querySelector("#translator-ocr-input");
-        const mediaInput = container.querySelector("#translator-media-input");
-        if (ocrInput)
-          ocrInput.removeEventListener("change", this.handleOCRInput);
-        if (mediaInput)
-          mediaInput.removeEventListener("change", this.handleMediaInput);
-        const mainButton = container.querySelector(".translator-tools-button");
-        if (mainButton) {
-          mainButton.removeEventListener("click", this.handleButtonClick);
-        }
-        const menuItems = container.querySelectorAll(".translator-tools-item");
-        menuItems.forEach((item) => {
-          if (item.handler) {
-            item.removeEventListener("click", item.handler);
-          }
+        const inputs = container.querySelectorAll('input');
+        inputs.forEach(input => {
+          input.removeEventListener('change', this.handleOCRInput);
+          input.removeEventListener('change', this.handleMediaInput);
         });
         container.remove();
       }
@@ -5797,7 +5873,7 @@
         this.showTranslatingStatus();
         const result = await this.page.translatePage();
         if (result.success) {
-          const toolsContainer = document.querySelector(
+          const toolsContainer = this.$(
             ".translator-tools-container"
           );
           if (toolsContainer) {
@@ -5813,7 +5889,7 @@
               }
             }
           }
-          const floatingButton = document.querySelector(
+          const floatingButton = this.$(
             ".page-translate-button"
           );
           if (floatingButton) {
@@ -5844,7 +5920,7 @@
         position: fixed;
         bottom: 20px;
         left: 20px;
-        z-index: 2147483647 !important;
+        z-index: 2147483647;
         padding: 8px 16px;
         background-color: #4CAF50;
         color: white;
@@ -5860,7 +5936,7 @@
         transform: translateY(-2px);
     }
   `;
-      document.head.appendChild(style);
+      this.shadowRoot.appendChild(style);
       const button = document.createElement("button");
       button.className = "page-translate-button";
       button.innerHTML = this.page.isTranslated
@@ -5874,7 +5950,7 @@
             button.innerHTML = this.page.isTranslated
               ? "📄 Bản gốc"
               : "📄 Dịch trang";
-            const toolsContainer = document.querySelector(
+            const toolsContainer = this.$(
               ".translator-tools-container"
             );
             if (toolsContainer) {
@@ -5899,7 +5975,7 @@
           this.removeTranslatingStatus();
         }
       };
-      document.body.appendChild(button);
+      this.shadowRoot.appendChild(button);
       setTimeout(() => {
         if (button && button.parentNode) {
           button.parentNode.removeChild(button);
@@ -5913,13 +5989,13 @@
       const isEnabled =
         localStorage.getItem("translatorToolsEnabled") === "true";
       if (!isEnabled) return;
-      if (document.querySelector(".translator-tools-container")) {
+      if (this.$(".translator-tools-container")) {
         return;
       }
       this.removeToolsContainer();
       // bypassCSP();
       const observer = new MutationObserver(() => {
-        const container = document.querySelector(".translator-tools-container");
+        const container = this.$(".translator-tools-container");
         if (
           !container ||
           container.style.display === "none" ||
@@ -6155,7 +6231,7 @@
           handler: () => {
             dropdown.style.display = "none";
             const settingsUI = this.translator.userSettings.createSettingsUI();
-            document.body.appendChild(settingsUI);
+            this.shadowRoot.appendChild(settingsUI);
           }
         });
       menuItems.forEach((item) => {
@@ -6186,87 +6262,11 @@
       container.appendChild(dropdown);
       container.appendChild(ocrInput);
       container.appendChild(mediaInput);
-      document.body.appendChild(container);
-      GM_addStyle(`
-  .translator-tools-button:hover {
-    transform: translateY(-2px);
-    background-color: #357abd;
-  }
-  .translator-tools-button:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-  .translator-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.3);
-    z-index: 2147483647 !important;
-    cursor: crosshair;
-  }
-  .translator-guide {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0,0,0,0.8);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    z-index: 2147483647 !important;
-  }
-  .translator-cancel {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background-color: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2147483647 !important;
-    transition: all 0.3s ease;
-  }
-  .translator-cancel:hover {
-    background-color: #ff0000;
-    transform: scale(1.1);
-  }
-  /* Animation */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .translator-tools-container {
-    animation: fadeIn 0.3s ease;
-  }
-  .translator-tools-dropdown {
-    animation: fadeIn 0.2s ease;
-  }
-  .translator-tools-container.hidden,
-  .translator-notification.hidden,
-  .center-translate-status.hidden {
-    visibility: hidden !important;
-  }
-`);
-      if (!document.body.contains(container)) {
-        document.body.appendChild(container);
+      this.shadowRoot.appendChild(container);
+      if (!this.shadowRoot.contains(container)) {
+        this.shadowRoot.appendChild(container);
       }
-      container.style.zIndex = "2147483647 !important";
+      container.style.zIndex = "2147483647";
     }
     showProcessingStatus(message) {
       this.removeProcessingStatus();
@@ -6279,18 +6279,18 @@
         `;
       Object.assign(status.style, {
         position: "fixed",
-        top: "50%",
-        left: "50%",
+        top: `${window.innerHeight / 2}px`,
+        left: `${window.innerWidth / 2}px`,
         transform: "translate(-50%, -50%)",
         backgroundColor: "rgba(0, 0, 0, 0.8)",
         color: "white",
         padding: "20px",
         borderRadius: "8px",
-        zIndex: "2147483647 !important",
+        zIndex: "2147483647",
         textAlign: "center",
         minWidth: "200px",
       });
-      document.body.appendChild(status);
+      this.shadowRoot.appendChild(status);
       this.processingStatus = status;
     }
     updateProcessingStatus(message, progress) {
@@ -6310,6 +6310,8 @@
         this.processingStatus.remove();
         this.processingStatus = null;
       }
+      const status = this.$('.processing-status');
+      if (status) status.remove();
     }
     readFileContent(file) {
       return new Promise((resolve, reject) => {
@@ -6324,14 +6326,14 @@
       loading.id = "pdf-loading-status";
       loading.style.cssText = `
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: ${window.innerHeight / 2}px;
+            left: ${window.innerWidth / 2}px;
             transform: translate(-50%, -50%);
             background-color: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 20px;
             border-radius: 8px;
-            z-index: 2147483647 !important;
+            z-index: 2147483647;
         `;
       loading.innerHTML = `
             <div style="text-align: center;">
@@ -6339,14 +6341,14 @@
                 <div style="color: white">${message}</div>
             </div>
         `;
-      document.body.appendChild(loading);
+      this.shadowRoot.appendChild(loading);
     }
     removeLoadingStatus() {
-      const loading = document.getElementById("pdf-loading-status");
+      const loading = this.shadowRoot.getElementById("pdf-loading-status");
       if (loading) loading.remove();
     }
     updateProgress(message, percent) {
-      const loading = document.getElementById("pdf-loading-status");
+      const loading = this.shadowRoot.getElementById("pdf-loading-status");
       if (loading) {
         loading.innerHTML = `
                 <div style="text-align: center;">
@@ -6362,57 +6364,57 @@
       const style = document.createElement("style");
       style.textContent = `
     .translator-overlay {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-      background-color: rgba(0,0,0,0.3) !important;
-      z-index: 2147483647 !important;
-      pointer-events: none !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.3);
+      z-index: 2147483647;
+      pointer-events: none;
     }
     .translator-guide {
-      position: fixed !important;
-      top: 20px !important;
-      left: 50% !important;
-      transform: translateX(-50%) !important;
-      background-color: rgba(0,0,0,0.8) !important;
-      color: white !important;
-      padding: 10px 20px !important;
-      border-radius: 8px !important;
-      font-size: 14px !important;
-      z-index: 2147483647 !important;
-      pointer-events: none !important;
+      position: fixed;
+      top: 20px;
+      left: ${window.innerWidth / 2}px;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 2147483647;
+      pointer-events: none;
     }
     .translator-cancel {
-      position: fixed !important;
-      top: 20px !important;
-      right: 20px !important;
-      background-color: #ff4444 !important;
-      color: white !important;
-      border: none !important;
-      border-radius: 50% !important;
-      width: 30px !important;
-      height: 30px !important;
-      font-size: 16px !important;
-      cursor: pointer !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      z-index: 2147483647 !important;
-      pointer-events: auto !important;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #ff4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2147483647;
+      pointer-events: auto;
     }
     img {
-      pointer-events: auto !important;
+      pointer-events: auto;
     }
     img.translator-image-highlight {
-      outline: 3px solid #4a90e2 !important;
-      cursor: pointer !important;
-      position: relative !important;
-      z-index: 2147483647 !important;
+      outline: 3px solid #4a90e2;
+      cursor: pointer;
+      position: relative;
+      z-index: 2147483647;
     }
   `;
-      document.head.appendChild(style);
+      this.shadowRoot.appendChild(style);
       const overlay = document.createElement("div");
       overlay.className = "translator-overlay";
       const guide = document.createElement("div");
@@ -6421,9 +6423,9 @@
       const cancelBtn = document.createElement("button");
       cancelBtn.className = "translator-cancel";
       cancelBtn.textContent = "✕";
-      document.body.appendChild(overlay);
-      document.body.appendChild(guide);
-      document.body.appendChild(cancelBtn);
+      this.shadowRoot.appendChild(overlay);
+      this.shadowRoot.appendChild(guide);
+      this.shadowRoot.appendChild(cancelBtn);
       const handleHover = (e) => {
         if (e.target.tagName === "IMG") {
           e.target.classList.add("translator-image-highlight");
@@ -6443,11 +6445,8 @@
             const image = e.target;
             const imageUrl = new URL(image.src);
             const referer = window.location.href;
-
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
-
-            // Thêm hàm loadImage với GM_xmlhttpRequest
             const loadImage = async (url) => {
               return new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
@@ -6481,7 +6480,6 @@
                       img.onerror = () => reject(new Error("Không thể load ảnh"));
                       img.src = URL.createObjectURL(blob);
                     } else {
-                      // Fallback nếu request thất bại
                       const img = new Image();
                       img.crossOrigin = "anonymous";
                       img.onload = () => {
@@ -6495,7 +6493,6 @@
                     }
                   },
                   onerror: function() {
-                    // Fallback nếu request thất bại
                     const img = new Image();
                     img.crossOrigin = "anonymous";
                     img.onload = () => {
@@ -6510,9 +6507,7 @@
                 });
               });
             };
-
             await loadImage(image.src);
-
             const blob = await new Promise((resolve, reject) => {
               try {
                 canvas.toBlob((b) => {
@@ -6523,17 +6518,13 @@
                 reject(new Error("Lỗi khi tạo blob"));
               }
             });
-
             const file = new File([blob], "web-image.png", { type: "image/png" });
             const showSource = this.translator.userSettings.settings.displayOptions.languageLearning.showSource;
             const result = await this.ocr.processImage(file);
-
-            // Xử lý kết quả OCR và hiển thị
             const translations = result.split("\n");
             let fullTranslation = "";
             let pinyin = "";
             let text = "";
-
             for (const trans of translations) {
               const parts = trans.split("<|>");
               if (showSource) {
@@ -6542,14 +6533,12 @@
               pinyin += (parts[1]?.trim() || "") + "\n";
               fullTranslation += (parts[2]?.trim() || trans) + "\n";
             }
-
             this.displayPopup(
               fullTranslation.trim(),
               text.trim(),
               "OCR Web Image",
               pinyin.trim()
             );
-
           } catch (error) {
             console.error("OCR error:", error);
             this.showNotification(error.message, "error");
@@ -6584,7 +6573,7 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0,0,0,0.3);
-      z-index: 2147483647 !important;
+      z-index: 2147483647;
       pointer-events: none;
       transition: background 0.3s ease;
     }
@@ -6594,14 +6583,14 @@
     .translator-guide {
       position: fixed;
       top: 20px;
-      left: 50%;
+      left: ${window.innerWidth / 2}px;
       transform: translateX(-50%);
       background-color: rgba(0,0,0,0.8);
       color: white;
       padding: 10px 20px;
       border-radius: 8px;
       font-size: 14px;
-      z-index: 2147483647 !important;
+      z-index: 2147483647;
     }
     .translator-cancel {
       position: fixed;
@@ -6615,14 +6604,14 @@
       height: 30px;
       font-size: 16px;
       cursor: pointer;
-      z-index: 2147483647 !important;
+      z-index: 2147483647;
     }
     .manga-translation-container {
       position: absolute;
       top: 0;
       left: 0;
       pointer-events: none;
-      z-index: 2147483647 !important;
+      z-index: 2147483647;
     }
     .manga-translation-overlay {
       position: absolute;
@@ -6643,10 +6632,10 @@
       cursor: pointer;
     }
   `;
-      document.head.appendChild(style);
+      this.shadowRoot.appendChild(style);
       const overlayContainer = document.createElement("div");
       overlayContainer.className = "manga-translation-container";
-      document.body.appendChild(overlayContainer);
+      this.shadowRoot.appendChild(overlayContainer);
       const overlay = document.createElement("div");
       overlay.className = "translator-overlay";
       const guide = document.createElement("div");
@@ -6655,9 +6644,9 @@
       const cancelBtn = document.createElement("button");
       cancelBtn.className = "translator-cancel";
       cancelBtn.textContent = "✕";
-      document.body.appendChild(overlay);
-      document.body.appendChild(guide);
-      document.body.appendChild(cancelBtn);
+      this.shadowRoot.appendChild(overlay);
+      this.shadowRoot.appendChild(guide);
+      this.shadowRoot.appendChild(cancelBtn);
       let existingOverlays = [];
       const handleHover = (e) => {
         if (e.target.tagName === "IMG") {
@@ -6809,7 +6798,7 @@
                   // overflowWrap: "normal",
                   lineHeight: "1.2",
                   pointerEvents: "none",
-                  zIndex: "2147483647 !important",
+                  zIndex: "2147483647",
                   fontSize:
                     this.translator.userSettings.settings.displayOptions
                       .webImageTranslation.fontSize || "9px",
@@ -6847,9 +6836,9 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 2147483647 !important;
+  z-index: 2147483647;
 `;
-              document.head.appendChild(style);
+              this.shadowRoot.appendChild(style);
             }
           } catch (error) {
             console.error("Translation error:", error);
@@ -7062,7 +7051,7 @@ Return ONLY a JSON object like:
         const selection = window.getSelection();
         const selectedText = selection.toString().trim();
         if (selectedText) {
-          const oldMenus = document.querySelectorAll(
+          const oldMenus = this.$$(
             ".translator-context-menu"
           );
           oldMenus.forEach((menu) => menu.remove());
@@ -7141,7 +7130,7 @@ Return ONLY a JSON object like:
           top = Math.max(5, Math.min(top, bottomEdge - 5));
           contextMenu.style.left = `${left}px`;
           contextMenu.style.top = `${top}px`;
-          document.body.appendChild(contextMenu);
+          this.shadowRoot.appendChild(contextMenu);
           const closeMenu = (e) => {
             if (!contextMenu.contains(e.target)) {
               contextMenu.remove();
@@ -7156,58 +7145,6 @@ Return ONLY a JSON object like:
           window.addEventListener("scroll", handleScroll);
         }
       });
-      const themeMode = this.translator.userSettings.settings.theme;
-      const theme = CONFIG.THEME[themeMode];
-      GM_addStyle(`
-        .translator-context-menu {
-          position: fixed;
-          color: ${theme.text};
-          background-color: ${theme.background};
-          border-radius: 8px;
-          padding: 8px 8px 5px 8px;
-          min-width: 150px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-          z-index: 2147483647 !important;
-          font-family: Arial, sans-serif;
-          font-size: 14px;
-          opacity: 0;
-          transform: scale(0.95);
-          transition: all 0.1s ease-out;
-          animation: menuAppear 0.15s ease-out forwards;
-        }
-        @keyframes menuAppear {
-          from {
-            opacity: 0;
-            transform: scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        .translator-context-menu-item {
-          padding: 5px;
-          margin-bottom: 3px;
-          cursor: pointer;
-          color: ${theme.text};
-          background-color: ${theme.backgroundShadow};
-          border: 1px solid ${theme.border};
-          border-radius: 7px;
-          transition: all 0.2s ease;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          white-space: nowrap;
-          z-index: 2147483647 !important;
-        }
-        .translator-context-menu-item:hover {
-          background-color: ${theme.button.translate.background};
-          color: ${theme.button.translate.text};
-        }
-        .translator-context-menu-item:active {
-          transform: scale(0.98);
-        }
-      `);
     }
     removeWebImageListeners() {
       if (this.webImageListeners) {
@@ -7244,7 +7181,7 @@ Return ONLY a JSON object like:
       if ((e.altKey || e.metaKey) && e.key === "s") {
         e.preventDefault();
         const settingsUI = this.translator.userSettings.createSettingsUI();
-        document.body.appendChild(settingsUI);
+        this.shadowRoot.appendChild(settingsUI);
       }
     }
     async handleTranslationShortcuts(e) {
@@ -7336,7 +7273,7 @@ Return ONLY a JSON object like:
       if (isEnabled) {
         this.setupTranslatorTools();
       }
-      document.addEventListener("settingsChanged", (e) => {
+      this.shadowRoot.addEventListener("settingsChanged", (e) => {
         this.removeToolsContainer();
         const newSettings = e.detail;
         if (newSettings.theme !== this.translator.userSettings.settings.theme) {
@@ -7398,7 +7335,7 @@ Return ONLY a JSON object like:
       Object.assign(notification.style, {
         position: "fixed",
         top: "20px",
-        left: "50%",
+        left: `${window.innerWidth / 2}px`,
         transform: "translateX(-50%)",
         backgroundColor,
         color: textColor,
@@ -7411,7 +7348,7 @@ Return ONLY a JSON object like:
         boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
       });
       notification.textContent = message;
-      document.body.appendChild(notification);
+      this.shadowRoot.appendChild(notification);
       setTimeout(() => notification.remove(), 2000);
     }
     resetState() {
@@ -7428,7 +7365,8 @@ Return ONLY a JSON object like:
     }
     removeTranslateButton() {
       if (this.currentTranslateButton) {
-        this.currentTranslateButton.remove();
+        const button = this.$('.translator-button');
+        if (button) button.remove();
         this.currentTranslateButton = null;
       }
     }
@@ -7437,6 +7375,8 @@ Return ONLY a JSON object like:
         this.translatingStatus.remove();
         this.translatingStatus = null;
       }
+      const status = this.$('.center-translate-status');
+      if (status) status.remove();
     }
   }
   class Translator {
@@ -7482,7 +7422,7 @@ Return ONLY a JSON object like:
           translatedText = this.cache.get(text, isAdvanced, targetLanguage);
         }
         if (!translatedText) {
-          translatedText = await this.api.request(prompt);
+          translatedText = await this.api.request(prompt, 'page');
           if (cacheEnabled && translatedText) {
             this.cache.set(text, translatedText, isAdvanced, targetLanguage);
           }
@@ -7555,7 +7495,7 @@ Return ONLY a JSON object like:
         this.userSettings.settings.displayOptions.targetLanguage;
       const prompt = `Vui lòng kiểm tra và sửa chữa bất kỳ lỗi ngữ pháp hoặc vấn đề về ngữ cảnh trong bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' này: "${translation}". Không thêm hay bớt ý của bản gốc cũng như không thêm tiêu đề, không giải thích về các thay đổi đã thực hiện.`;
       try {
-        const corrected = await this.api.request(prompt);
+        const corrected = await this.api.request(prompt, 'page');
         return corrected.trim();
       } catch (error) {
         console.error("Auto-correction failed:", error);
@@ -7603,6 +7543,7 @@ Hãy dịch văn bản cần xử lý sang ngôn ngữ có mã ngôn ngữ là '
   - Đảm bảo sự lưu loát và tự nhiên như người bản xứ.
   - Không thêm bất kỳ giải thích hay diễn giải nào ngoài bản dịch.
   - Bảo toàn các thuật ngữ và danh từ riêng với tỷ lệ 1:1.
+
 Nếu bạn nhận thấy văn bản là truyện thì hãy dịch truyện theo yêu cầu sau:
   Bạn là một người dịch truyện chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch một đoạn truyện sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'. Hãy đảm bảo rằng bản dịch của bạn giữ nguyên ý nghĩa của câu gốc và phù hợp với văn phong của ngôn ngữ đích. Khi dịch, hãy chú ý đến ngữ cảnh văn hóa và bối cảnh của câu chuyện để người đọc có thể hiểu chính xác nội dung. Các quy tắc quan trọng bạn cần tuân thủ bao gồm:
     - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
@@ -7634,6 +7575,7 @@ Bạn là một người dịch phụ đề phim chuyên nghiệp, chuyên tạo
 Hãy trả về theo format sau, mỗi phần cách nhau bằng dấu <|> và không có giải thích thêm:
   Văn bản gốc <|> phiên âm (Nếu văn bản gốc là tiếng Anh thì hãy trả về phiên âm của US) <|> bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}'
   Ví dụ: Hello <|> heˈloʊ <|> Xin chào
+
 Lưu ý:
   - Nếu có từ là tiếng Trung, hãy trả về giá trị phiên âm của từ đó chính là pinyin + số tone (1-4) của từ đó. Ví dụ: 你好 <|> Nǐ3 hǎo3 <|> Xin chào
   - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,...
@@ -7684,7 +7626,7 @@ Văn bản cần xử lý: "${text}"`,
     }
     showSettingsUI() {
       const settingsUI = this.userSettings.createSettingsUI();
-      document.body.appendChild(settingsUI);
+      this.ui.shadowRoot.appendChild(settingsUI);
     }
     handleError(error, targetElement) {
       console.error("Translation failed:", error);
@@ -7722,7 +7664,7 @@ Văn bản cần xử lý: "${text}"`,
       width: 100%;
       height: 100%;
       background: rgba(0,0,0,0.5);
-      z-index: 2147483647 !important;
+      z-index: 2147483647;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -7855,7 +7797,7 @@ Văn bản cần xử lý: "${text}"`,
       container.appendChild(inputContainer);
       container.appendChild(buttonContainer);
       div.appendChild(container);
-      document.body.appendChild(div);
+      this.ui.shadowRoot.appendChild(div);
       div.addEventListener('click', (e) => {
         if (e.target === div) cleanup();
       });
@@ -7956,7 +7898,7 @@ Văn bản cần xử lý: "${text}"`,
         const a = document.createElement("a");
         a.href = url;
         a.download = `king1x32_translated_${file.name}`;
-        document.body.appendChild(a);
+        this.ui.shadowRoot.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
@@ -7980,7 +7922,7 @@ Văn bản cần xử lý: "${text}"`,
         const a = document.createElement("a");
         a.href = url;
         a.download = `king1x32_translated_${file.name.replace(".pdf", ".html")}`;
-        document.body.appendChild(a);
+        this.ui.shadowRoot.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
@@ -7997,7 +7939,7 @@ Văn bản cần xử lý: "${text}"`,
     const translator = window.translator;
     if (translator) {
       const settingsUI = translator.userSettings.createSettingsUI();
-      document.body.appendChild(settingsUI);
+      this.ui.shadowRoot.appendChild(settingsUI);
     }
   });
   new Translator();

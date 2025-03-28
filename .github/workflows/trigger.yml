@@ -11,7 +11,7 @@ jobs:
           curl -X POST \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
-            https://api.github.com/repos/${{ github.PAT_TOKEN }}/compiledUserscripts/dispatches \
+            https://api.github.com/repos/${{ github.repository_owner }}/compiledUserscripts/dispatches \
             -d '{
               "event_type": "source_push",
               "client_payload": {
