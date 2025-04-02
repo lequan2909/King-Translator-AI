@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         King Translator AI
 // @namespace    https://kingsmanvn.pages.dev
-// @version      4.2.6
+// @version      4.3
 // @author       King1x32
 // @icon         https://raw.githubusercontent.com/king1x32/UserScripts/refs/heads/main/kings.jpg
 // @license      GPL3
@@ -16,6 +16,7 @@
 // @grant        unsafeWindow
 // @inject-into  auto
 // @connect      generativelanguage.googleapis.com
+// @require      https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js
@@ -2609,9 +2610,11 @@
   class InputTranslator {
     constructor(translator) {
       this.translator = translator;
+      this.isSelectOpen = false;
       this.isTranslating = false;
       this.activeButtons = new Map();
       this.page = new PageTranslator(translator);
+      this.ui = new UIManager(translator);
       this.setupObservers();
       this.setupEventListeners();
       this.initializeExistingEditors();
@@ -2706,9 +2709,18 @@
         const editor = this.findParentEditor(e.target);
         if (editor) {
           setTimeout(() => {
+            if (this.isSelectOpen) {
+              return;
+            }
             const activeElement = document.activeElement;
             const container = this.activeButtons.get(editor);
-            if (container && !container.contains(activeElement)) {
+            const isContainerFocused = container && (
+              container === activeElement ||
+              container.contains(activeElement)
+            );
+            const isEditorFocused = editor === activeElement ||
+              editor.contains(activeElement);
+            if (!isContainerFocused && !isEditorFocused) {
               this.removeTranslateButton(editor);
             }
           }, 100);
@@ -2723,35 +2735,6 @@
           this.updateButtonVisibility(editor);
         }
       });
-    }
-    addTranslateButton(editor) {
-      if (this.activeButtons.has(editor)) {
-        this.updateButtonVisibility(editor);
-        return;
-      }
-      const container = this.createButtonContainer();
-      const translateButton = this.createButton(
-        "🌐",
-        "Dịch sang ngôn ngữ đích"
-      );
-      const reverseButton = this.createButton("🔄", "Dịch sang ngôn ngữ nguồn");
-      translateButton.onclick = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await this.translateEditor(editor, false);
-      };
-      reverseButton.onclick = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        await this.translateEditor(editor, true);
-      };
-      container.appendChild(translateButton);
-      container.appendChild(reverseButton);
-      this.positionButtonContainer(container, editor);
-      document.body.appendChild(container);
-      this.activeButtons.set(editor, container);
-      this.updateButtonVisibility(editor);
-      this.resizeObserver.observe(editor);
     }
     updateButtonVisibility(editor) {
       const container = this.activeButtons.get(editor);
@@ -2783,25 +2766,6 @@
       }
       editor.dispatchEvent(new Event("input", { bubbles: true }));
       editor.dispatchEvent(new Event("change", { bubbles: true }));
-    }
-    createButtonContainer() {
-      const container = document.createElement("div");
-      container.className = "input-translate-button-container";
-      const theme = this.getCurrentTheme();
-      container.style.cssText = `
-            position: absolute;
-            display: flex;
-            gap: 2px;
-            align-items: center;
-            z-index: 2147483647;
-            pointer-events: auto;
-            background-color: rgba(0,74,153,0.1);
-            border-radius: 8px;
-            padding: 2px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            border: 1px solid ${theme.border};
-        `;
-      return container;
     }
     createButton(icon, title) {
       const button = document.createElement("button");
@@ -2836,52 +2800,202 @@
       };
       return button;
     }
-    async translateEditor(editor, reverse = false) {
-      const settings = this.translator.userSettings.settings;
-      if (!settings.inputTranslation?.enabled && !settings.shortcuts?.enabled) return;
+    createButtonContainer() {
+      const container = document.createElement("div");
+      container.className = "input-translate-button-container";
+      const theme = this.getCurrentTheme();
+      container.style.cssText = `
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 2147483647;
+    pointer-events: auto;
+    background-color: rgba(0,74,153,0.1);
+    border-radius: 8px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    border: 1px solid ${theme.border};
+  `;
+      return container;
+    }
+    addTranslateButton(editor) {
+      if (this.activeButtons.has(editor)) {
+        this.updateButtonVisibility(editor);
+        return;
+      }
+      const container = this.createButtonContainer();
+      const settings = this.translator.userSettings.settings.displayOptions;
+      const sourceRow = document.createElement("div");
+      sourceRow.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    `;
+      const sourceButton = this.createButton("🌐", "Dịch sang ngôn ngữ nguồn");
+      const sourceSelect = document.createElement("select");
+      const theme = this.getCurrentTheme();
+      sourceSelect.style.cssText = `
+  background-color: rgba(255,255,255,0.05);
+  color: ${theme.text};
+  transition: all 0.15s ease;
+  padding: 4px;
+  border-radius: 6px;
+  border: none;
+  margin-left: 5px;
+  font-size: 14px;
+  max-height: 32px;
+  width: auto;
+  min-width: 75px;
+  max-width: 100px;
+`;
+      const languages = {
+        auto: "Tự động",
+        vi: "Tiếng Việt",
+        en: "Tiếng Anh",
+        zh: "Tiếng Trung",
+        ko: "Tiếng Hàn",
+        ja: "Tiếng Nhật",
+        fr: "Tiếng Pháp",
+        de: "Tiếng Đức",
+        es: "Tiếng Tây Ban Nha",
+        it: "Tiếng Ý",
+        pt: "Tiếng Bồ Đào Nha",
+        ru: "Tiếng Nga",
+        ar: "Tiếng Ả Rập",
+        hi: "Tiếng Hindi",
+        bn: "Tiếng Bengal",
+        id: "Tiếng Indonesia",
+        ms: "Tiếng Malaysia",
+        th: "Tiếng Thái",
+        tr: "Tiếng Thổ Nhĩ Kỳ",
+        nl: "Tiếng Hà Lan",
+        pl: "Tiếng Ba Lan",
+        uk: "Tiếng Ukraine",
+        el: "Tiếng Hy Lạp",
+        cs: "Tiếng Séc",
+        da: "Tiếng Đan Mạch",
+        fi: "Tiếng Phần Lan",
+        he: "Tiếng Do Thái",
+        hu: "Tiếng Hungary",
+        no: "Tiếng Na Uy",
+        ro: "Tiếng Romania",
+        sv: "Tiếng Thụy Điển",
+        ur: "Tiếng Urdu"
+      };
+      for (const [code, name] of Object.entries(languages)) {
+        const option = document.createElement("option");
+        option.value = code;
+        option.text = name;
+        option.selected = code === settings.sourceLanguage;
+        sourceSelect.appendChild(option);
+      }
+      sourceSelect.addEventListener('mousedown', () => {
+        this.isSelectOpen = true;
+      });
+      sourceSelect.addEventListener('blur', () => {
+        setTimeout(() => {
+          this.isSelectOpen = false;
+        }, 200);
+      });
+      sourceSelect.addEventListener('change', () => {
+        setTimeout(() => {
+          editor.focus();
+          this.isSelectOpen = false;
+        }, 200);
+      });
+      sourceButton.onclick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const sourceLang = sourceSelect.value;
+        await this.translateEditor(editor, true, sourceLang);
+      };
+      sourceRow.appendChild(sourceButton);
+      sourceRow.appendChild(sourceSelect);
+      const targetRow = document.createElement("div");
+      targetRow.style.cssText = `
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+    `;
+      const targetButton = this.createButton("🔄", "Dịch sang ngôn ngữ đích");
+      const targetSelect = document.createElement("select");
+      targetSelect.style.cssText = sourceSelect.style.cssText;
+      for (const [code, name] of Object.entries(languages)) {
+        if (code !== 'auto') {
+          const option = document.createElement("option");
+          option.value = code;
+          option.text = name;
+          option.selected = code === settings.targetLanguage;
+          targetSelect.appendChild(option);
+        }
+      }
+      targetSelect.addEventListener('mousedown', () => {
+        this.isSelectOpen = true;
+      });
+      targetSelect.addEventListener('blur', () => {
+        setTimeout(() => {
+          this.isSelectOpen = false;
+        }, 200);
+      });
+      targetSelect.addEventListener('change', () => {
+        setTimeout(() => {
+          editor.focus();
+          this.isSelectOpen = false;
+        }, 200);
+      });
+      targetButton.onclick = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetLang = targetSelect.value;
+        await this.translateEditor(editor, false, targetLang);
+      };
+      targetRow.appendChild(targetButton);
+      targetRow.appendChild(targetSelect);
+      container.appendChild(sourceRow);
+      container.appendChild(targetRow);
+      this.positionButtonContainer(container, editor);
+      this.ui.shadowRoot.appendChild(container);
+      this.activeButtons.set(editor, container);
+      container.addEventListener("mousedown", (e) => {
+        if (e.target.tagName !== 'SELECT') {
+          e.preventDefault();
+        }
+      });
+      this.updateButtonVisibility(editor);
+      this.resizeObserver.observe(editor);
+    }
+    async translateEditor(editor, isSource, selectedLang) {
       if (this.isTranslating) return;
       this.isTranslating = true;
       const container = this.activeButtons.get(editor);
-      const button = container?.querySelector(
-        reverse
-          ? ".input-translate-button:last-child"
-          : ".input-translate-button:first-child"
-      );
-      const originalText = button?.innerHTML;
+      const button = isSource ?
+        container.querySelector('button:first-of-type') :
+        container.querySelector('button:last-of-type');
+      const originalIcon = button.innerHTML;
       try {
         const text = this.getEditorContent(editor);
         if (!text) return;
         button.innerHTML = "⌛";
         button.style.opacity = "0.7";
-        const displayOptions =
-          this.translator.userSettings.settings.displayOptions;
-        const sourceLanguage =
-          displayOptions.sourceLanguage === "auto"
-            ? this.page.languageCode
-            : displayOptions.sourceLanguage;
-        console.log("sourceLanguage: ", sourceLanguage);
-        const chunks = this.createChunks(text, 2000);
-        const results = await Promise.all(
-          chunks.map(chunk => this.translator.translate(
-            chunk,
-            null,
-            false,
-            false,
-            reverse ? sourceLanguage : displayOptions.targetLanguage
-          ))
+        const sourceLang = isSource && selectedLang === "auto" ?
+          this.page.languageCode : selectedLang;
+        const translation = await this.translator.translate(
+          text,
+          null,
+          false,
+          false,
+          sourceLang
         );
-        const finalTranslation = results.join('\n');
-        this.setEditorContent(editor, finalTranslation);
+        this.setEditorContent(editor, translation);
       } catch (error) {
         console.error("Translation error:", error);
-        this.translator.ui.showNotification(
-          "Lỗi dịch: " + error.message,
-          "error"
-        );
+        this.translator.ui.showNotification("Lỗi dịch: " + error.message, "error");
       } finally {
         this.isTranslating = false;
         if (button) {
-          button.innerHTML = originalText;
+          button.innerHTML = originalIcon;
           button.style.opacity = "1";
         }
       }
@@ -2913,12 +3027,13 @@
     getCurrentTheme() {
       const themeMode = this.translator.userSettings.settings.theme;
       const theme = CONFIG.THEME[themeMode];
+      const isDark = themeMode === 'dark';
       return {
         backgroundColor: theme.background,
         text: theme.text,
         border: theme.border,
-        hoverBg: theme.background,
-        hoverText: theme.text,
+        hoverBg: isDark ? "#555" : "#eee",
+        hoverText: isDark ? "#eee" : "#555",
       };
     }
     updateAllButtonStyles() {
@@ -2995,7 +3110,10 @@
       }
       this.translator = translator;
       this.isProcessing = false;
-      this.imageCache = new ImageCache();
+      this.imageCache = new FileCache(
+        CONFIG.CACHE.image.maxSize,
+        CONFIG.CACHE.image.expirationTime
+      );
     }
     async captureScreen() {
       try {
@@ -3181,7 +3299,10 @@
     constructor(translator) {
       this.translator = translator;
       this.isProcessing = false;
-      this.mediaCache = new MediaCache();
+      this.mediaCache = new FileCache(
+        CONFIG.CACHE.media.maxSize,
+        CONFIG.CACHE.media.expirationTime
+      );
     }
     async processMediaFile(file) {
       try {
@@ -4328,63 +4449,10 @@
       }
     }
   }
-  class ImageCache {
-    constructor() {
-      this.maxSize = CONFIG.CACHE.image.maxSize;
-      this.expirationTime = CONFIG.CACHE.image.expirationTime;
-      this.cache = new Map();
-      this.accessOrder = [];
-    }
-    async generateKey(imageData) {
-      const hashBuffer = await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(imageData)
-      );
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-    }
-    async set(imageData, ocrResult) {
-      const key = await this.generateKey(imageData);
-      if (this.cache.has(key)) {
-        const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
-        this.accessOrder.push(key);
-      } else {
-        if (this.cache.size >= this.maxSize) {
-          const oldestKey = this.accessOrder.shift();
-          this.cache.delete(oldestKey);
-        }
-        this.accessOrder.push(key);
-      }
-      this.cache.set(key, {
-        result: ocrResult,
-        timestamp: Date.now(),
-      });
-    }
-    async get(imageData) {
-      const key = await this.generateKey(imageData);
-      const data = this.cache.get(key);
-      if (!data) return null;
-      if (Date.now() - data.timestamp > this.expirationTime) {
-        this.cache.delete(key);
-        const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
-        return null;
-      }
-      const index = this.accessOrder.indexOf(key);
-      this.accessOrder.splice(index, 1);
-      this.accessOrder.push(key);
-      return data.result;
-    }
-    clear() {
-      this.cache.clear();
-      this.accessOrder = [];
-    }
-  }
-  class MediaCache {
-    constructor() {
-      this.maxSize = CONFIG.CACHE.media.maxSize;
-      this.expirationTime = CONFIG.CACHE.media.expirationTime;
+  class FileCache {
+    constructor(maxSize, expirationTime) {
+      this.maxSize = maxSize;
+      this.expirationTime = expirationTime;
       this.cache = new Map();
       this.accessOrder = [];
     }
@@ -4396,7 +4464,7 @@
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
     }
-    async set(fileData, translation) {
+    async set(fileData, result) {
       const key = await this.generateKey(fileData);
       if (this.cache.has(key)) {
         const index = this.accessOrder.indexOf(key);
@@ -4409,15 +4477,17 @@
         }
         this.accessOrder.push(key);
       }
-      this.cache.set(key, {
-        translation,
-        timestamp: Date.now(),
-      });
+      const compressedData = LZString.compressToUTF16(JSON.stringify({
+        result,
+        timestamp: Date.now()
+      }));
+      this.cache.set(key, compressedData);
     }
     async get(fileData) {
       const key = await this.generateKey(fileData);
-      const data = this.cache.get(key);
-      if (!data) return null;
+      const compressedData = this.cache.get(key);
+      if (!compressedData) return null;
+      const data = JSON.parse(LZString.decompressFromUTF16(compressedData));
       if (Date.now() - data.timestamp > this.expirationTime) {
         this.cache.delete(key);
         const index = this.accessOrder.indexOf(key);
@@ -4427,7 +4497,7 @@
       const index = this.accessOrder.indexOf(key);
       this.accessOrder.splice(index, 1);
       this.accessOrder.push(key);
-      return data.translation;
+      return data.result;
     }
     clear() {
       this.cache.clear();
@@ -4457,15 +4527,18 @@
         }
         this.accessOrder.push(key);
       }
-      this.cache.set(key, {
+      const compressedData = LZString.compressToUTF16(JSON.stringify({
         translation,
-        timestamp: Date.now(),
-      });
+        timestamp: Date.now()
+      }));
+      this.cache.set(key, compressedData);
+      this.saveToIndexedDB(key, compressedData);
     }
     get(text, isAdvanced, targetLanguage) {
       const key = this.generateKey(text, isAdvanced, targetLanguage);
-      const data = this.cache.get(key);
-      if (!data) return null;
+      const compressedData = this.cache.get(key);
+      if (!compressedData) return null;
+      const data = JSON.parse(LZString.decompressFromUTF16(compressedData));
       if (Date.now() - data.timestamp > this.expirationTime) {
         this.cache.delete(key);
         const index = this.accessOrder.indexOf(key);
@@ -4476,6 +4549,36 @@
       this.accessOrder.splice(index, 1);
       this.accessOrder.push(key);
       return data.translation;
+    }
+    async saveToIndexedDB(key, value) {
+      try {
+        const db = await this.initDB();
+        const tx = db.transaction('translations', 'readwrite');
+        const store = tx.objectStore('translations');
+        await store.put({
+          key: key,
+          value: value,
+          timestamp: Date.now()
+        });
+      } catch (error) {
+        console.error('Error saving to IndexedDB:', error);
+      }
+    }
+    async loadFromIndexedDB() {
+      try {
+        const db = await this.initDB();
+        const tx = db.transaction('translations', 'readonly');
+        const store = tx.objectStore('translations');
+        const items = await store.getAll();
+        items.forEach(item => {
+          if (Date.now() - item.timestamp <= this.expirationTime) {
+            this.cache.set(item.key, item.value);
+            this.accessOrder.push(item.key);
+          }
+        });
+      } catch (error) {
+        console.error('Error loading from IndexedDB:', error);
+      }
     }
     clear() {
       this.cache.clear();
@@ -4533,12 +4636,109 @@
       });
     }
   }
+  const RELIABLE_FORMATS = {
+    text: {
+      maxSize: 10 * 1024 * 1024, // 10MB
+      formats: [
+        { ext: 'txt', mime: 'text/plain' }, // Văn bản thuần
+        { ext: 'srt', mime: 'application/x-subrip' }, // Phụ đề
+        { ext: 'vtt', mime: 'text/vtt' }, // Phụ đề web
+        { ext: 'html', mime: 'text/html' }, // HTML
+        { ext: 'md', mime: 'text/markdown' }, // Markdown
+        { ext: 'json', mime: 'application/json' }, // JSON
+      ]
+    }
+  };
+  class FileManager {
+    constructor(translator) {
+      this.translator = translator;
+      this.supportedFormats = RELIABLE_FORMATS;
+    }
+    isValidFormat(file) {
+      const extension = file.name.split('.').pop().toLowerCase();
+      const mimeType = file.type;
+      return RELIABLE_FORMATS.text.formats.some(format =>
+        format.ext === extension || format.mime === mimeType
+      );
+    }
+    isValidSize(file) {
+      return file.size <= RELIABLE_FORMATS.text.maxSize;
+    }
+    async processFile(file) {
+      try {
+        const content = await this.readFileContent(file);
+        const extension = file.name.split('.').pop().toLowerCase();
+        switch (extension) {
+          case 'txt':
+          case 'md':
+            return await this.translator.translate(content);
+          case 'json':
+            return await this.processJSON(content);
+          case 'html':
+            return await this.translator.page.translateHTML(content);
+          case 'srt':
+          case 'vtt':
+            return await this.processSubtitle(content);
+          default:
+            throw new Error('Định dạng không được hỗ trợ');
+        }
+      } catch (error) {
+        throw new Error(`Lỗi xử lý file: ${error.message}`);
+      }
+    }
+    async processJSON(content) {
+      try {
+        const json = JSON.parse(content);
+        const translated = await this.translateObject(json);
+        return JSON.stringify(translated, null, 2);
+      } catch (error) {
+        throw new Error('Lỗi xử lý JSON');
+      }
+    }
+    async processSubtitle(content) {
+      try {
+        const parts = content.split('\n\n');
+        const translated = [];
+        for (const part of parts) {
+          const lines = part.split('\n');
+          if (lines.length >= 3) {
+            const [index, timing, ...text] = lines;
+            const translatedText = await this.translator.translate(text.join(' '));
+            translated.push([index, timing, translatedText].join('\n'));
+          }
+        }
+        return translated.join('\n\n');
+      } catch (error) {
+        throw new Error('Lỗi xử lý phụ đề');
+      }
+    }
+    async translateObject(obj) {
+      const translated = {};
+      for (const key in obj) {
+        if (typeof obj[key] === 'string') {
+          translated[key] = await this.translator.translate(obj[key]);
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          translated[key] = await this.translateObject(obj[key]);
+        } else {
+          translated[key] = obj[key];
+        }
+      }
+      return translated;
+    }
+    readFileContent(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Không thể đọc file'));
+        reader.readAsText(file);
+      });
+    }
+  }
   class UIManager {
     constructor(translator) {
       if (!translator) {
         throw new Error("Translator instance is required");
       }
-      // Khởi tạo các thuộc tính cơ bản trước
       this.translator = translator;
       this.isTranslating = false;
       this.translatingStatus = null;
@@ -4553,11 +4753,9 @@
       this.currentGuide = null;
       this.currentCancelBtn = null;
       this.currentStyle = null;
-      // Khởi tạo trạng thái tools
       if (localStorage.getItem("translatorToolsEnabled") === null) {
         localStorage.setItem("translatorToolsEnabled", "true");
       }
-      // CSS tổng hợp cho settings
       const themeMode = this.translator.userSettings.settings.theme;
       const theme = CONFIG.THEME[themeMode];
       const isDark = themeMode === "dark";
@@ -5051,6 +5249,24 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     z-index: 2147483647;
   }
+  .tts-button {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    z-index: 2147483647;
+  }
+  .tts-button:hover {
+    transform: scale(1.1);
+  }
   /* Styles cho web image OCR */
   .translator-overlay {
     position: fixed;
@@ -5087,14 +5303,10 @@
     `;
       this.shadowRoot.appendChild(style);
       document.body.appendChild(this.container);
-      // Khởi tạo các managers
       this.mobileOptimizer = new MobileOptimizer(this);
-      this.ss = new UserSettings(translator);
       this.ocr = new OCRManager(translator);
       this.media = new MediaManager(translator);
       this.page = new PageTranslator(translator);
-      this.input = new InputTranslator(translator);
-      // Bind các methods
       this.handleSettingsShortcut = this.handleSettingsShortcut.bind(this);
       this.handleTranslationShortcuts =
         this.handleTranslationShortcuts.bind(this);
@@ -5105,16 +5317,12 @@
       this.showTranslatingStatus = this.showTranslatingStatus.bind(this);
       this.removeTranslatingStatus = this.removeTranslatingStatus.bind(this);
       this.resetState = this.resetState.bind(this);
-      // Gán các listeners
       this.settingsShortcutListener = this.handleSettingsShortcut;
       this.translationShortcutListener = this.handleTranslationShortcuts;
-      // Khởi tạo các trạng thái UI
       this.translationButtonEnabled = true;
       this.translationTapEnabled = true;
       this.mediaElement = null;
-      // Setup event listeners sau khi mọi thứ đã được khởi tạo
       this.setupEventListeners();
-      // Setup page translation
       if (document.readyState === "complete") {
         if (
           this.translator.userSettings.settings.pageTranslation.autoTranslate
@@ -5246,11 +5454,11 @@
       pinyin = ""
     ) {
       this.removeTranslateButton();
-      const themeMode = this.translator.userSettings.settings.theme;
+      const settings = this.translator.userSettings.settings;
+      const themeMode = settings.theme;
       const theme = CONFIG.THEME[themeMode];
       const isDark = themeMode === "dark";
-      const displayOptions =
-        this.translator.userSettings.settings.displayOptions;
+      const displayOptions = settings.displayOptions;
       const popup = document.createElement("div");
       popup.classList.add("draggable");
       const popupStyle = {
@@ -5314,7 +5522,10 @@
           backgroundColor: "transparent",
         });
       };
-      closeButton.onclick = () => popup.remove();
+      closeButton.onclick = () => {
+        speechSynthesis.cancel();
+        popup.remove();
+      };
       dragHandle.appendChild(titleSpan);
       dragHandle.appendChild(closeButton);
       const contentContainer = document.createElement("div");
@@ -5351,9 +5562,57 @@
         zIndex: "2147483647",
         gap: "15px"
       });
+      const createTTSButton = (text, lang) => {
+        const button = document.createElement("button");
+        let isPlaying = false;
+        const updateButtonState = () => {
+          button.innerHTML = isPlaying ? "🔈" : "🔊";
+          button.title = isPlaying ? "Dừng đọc" : "Đọc văn bản";
+        };
+        Object.assign(button.style, {
+          background: 'none',
+          border: 'none',
+          fontSize: '20px',
+          cursor: 'pointer',
+          padding: '5px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          transition: 'transform 0.2s ease',
+          marginLeft: '5px'
+        });
+        button.onmouseover = () => {
+          button.style.transform = 'scale(1.1)';
+        };
+        button.onmouseout = () => {
+          button.style.transform = 'scale(1)';
+        };
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+        utterance.onend = () => {
+          isPlaying = false;
+          updateButtonState();
+        };
+        utterance.oncancel = () => {
+          isPlaying = false;
+          updateButtonState();
+        };
+        button.onclick = () => {
+          if (isPlaying) {
+            speechSynthesis.cancel();
+            isPlaying = false;
+          } else {
+            speechSynthesis.cancel();
+            speechSynthesis.speak(utterance);
+            isPlaying = true;
+          }
+          updateButtonState();
+        };
+        updateButtonState();
+        return button;
+      };
       if (
-        displayOptions.translationMode == "parallel" &&
-        originalText
+        (displayOptions.translationMode == "parallel" || (displayOptions.translationMode == "language_learning" && displayOptions.languageLearning.showSource === true)) && originalText
       ) {
         const originalContainer = document.createElement("div");
         Object.assign(originalContainer.style, {
@@ -5365,31 +5624,29 @@
           wordBreak: "break-word",
           zIndex: "2147483647",
         });
-        originalContainer.innerHTML = `
-      <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Bản gốc:</div>
-      <div style="line-height: 1.5; color: ${theme.text};">&nbsp;&nbsp;&nbsp;&nbsp; ${originalText}</div>
-    `;
-        textContainer.appendChild(originalContainer);
-      }
-      if (
-        displayOptions.translationMode == "language_learning" && displayOptions.languageLearning.showSource === true &&
-        originalText
-      ) {
-        const originalContainer = document.createElement("div");
-        Object.assign(originalContainer.style, {
-          color: theme.text,
-          padding: "10px 15px",
-          backgroundColor: `${theme.backgroundShadow
-            }`,
-          borderRadius: "8px",
-          border: `1px solid ${theme.border}`,
-          wordBreak: "break-word",
-          zIndex: "2147483647",
-        });
-        originalContainer.innerHTML = `
-      <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Bản gốc:</div>
-      <div style="line-height: 1.5; color: ${theme.text};">&nbsp;&nbsp;&nbsp;&nbsp; ${originalText}</div>
-    `;
+        const originalHeader = document.createElement("div");
+        originalHeader.style.cssText = `
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  `;
+        const originalTitle = document.createElement("div");
+        originalTitle.style.cssText = `
+    font-weight: 500;
+    color: ${theme.title};
+  `;
+        originalTitle.textContent = "Bản gốc:";
+        originalHeader.appendChild(originalTitle);
+        originalHeader.appendChild(createTTSButton(originalText, settings.displayOptions.sourceLanguage));
+        const originalContent = document.createElement("div");
+        originalContent.style.cssText = `
+    line-height: 1.5;
+    color: ${theme.text};
+    margin-left: 20px;
+  `;
+        originalContent.textContent = originalText;
+        originalContainer.appendChild(originalHeader);
+        originalContainer.appendChild(originalContent);
         textContainer.appendChild(originalContainer);
       }
       if (
@@ -5400,17 +5657,35 @@
         Object.assign(pinyinContainer.style, {
           color: theme.text,
           padding: "10px 15px",
-          backgroundColor: `${theme.backgroundShadow
-            }`,
+          backgroundColor: `${theme.backgroundShadow}`,
           borderRadius: "8px",
           border: `1px solid ${theme.border}`,
           wordBreak: "break-word",
           zIndex: "2147483647",
         });
-        pinyinContainer.innerHTML = `
-      <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title};">Pinyin:</div>
-      <div style="line-height: 1.5; color: ${theme.text};">&nbsp;&nbsp;&nbsp;&nbsp; ${pinyin}</div>
-    `;
+        const pinyinHeader = document.createElement("div");
+        pinyinHeader.style.cssText = `
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+  `;
+        const pinyinTitle = document.createElement("div");
+        pinyinTitle.style.cssText = `
+    font-weight: 500;
+    color: ${theme.title};
+  `;
+        pinyinTitle.textContent = "Pinyin:";
+        pinyinHeader.appendChild(pinyinTitle);
+        pinyinHeader.appendChild(createTTSButton(pinyin, settings.displayOptions.sourceLanguage));
+        const pinyinContent = document.createElement("div");
+        pinyinContent.style.cssText = `
+    line-height: 1.5;
+    color: ${theme.text};
+    margin-left: 20px;
+  `;
+        pinyinContent.textContent = pinyin;
+        pinyinContainer.appendChild(pinyinHeader);
+        pinyinContainer.appendChild(pinyinContent);
         textContainer.appendChild(pinyinContainer);
       }
       const translationContainer = document.createElement("div");
@@ -5423,11 +5698,32 @@
         wordBreak: "break-word",
         zIndex: "2147483647",
       });
-      translationContainer.innerHTML = `
-    <div style="font-weight: 500; margin-bottom: 5px; color: ${theme.title
-        };">Bản dịch:</div>
-    <div style="line-height: 1.5; color: ${theme.text};">${this.formatTranslation(cleanedText, theme)}</div>
-  `;
+      const translationHeader = document.createElement("div");
+      translationHeader.style.cssText = `
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+`;
+      const translationTitle = document.createElement("div");
+      translationTitle.style.cssText = `
+  font-weight: 500;
+  color: ${theme.title};
+`;
+      translationTitle.textContent = "Bản dịch:";
+      translationHeader.appendChild(translationTitle);
+      translationHeader.appendChild(createTTSButton(
+        translatedText.split("<|>")[2]?.trim() || translatedText,
+        settings.displayOptions.targetLanguage
+      ));
+      const translationContent = document.createElement("div");
+      translationContent.style.cssText = `
+  line-height: 1.5;
+  color: ${theme.text};
+  margin-left: 20px;
+`;
+      translationContent.innerHTML = this.formatTranslation(cleanedText, theme);
+      translationContainer.appendChild(translationHeader);
+      translationContainer.appendChild(translationContent);
       textContainer.appendChild(translationContainer);
       contentContainer.appendChild(textContainer);
       popup.appendChild(dragHandle);
@@ -5437,6 +5733,7 @@
       this.handleClickOutside = (e) => {
         if (!popup.contains(e.target)) {
           document.removeEventListener("click", this.handleClickOutside);
+          speechSynthesis.cancel();
           popup.remove();
         }
       };
@@ -5447,6 +5744,7 @@
       const handleEscape = (e) => {
         if (e.key === "Escape") {
           document.removeEventListener("keydown", handleEscape);
+          speechSynthesis.cancel();
           popup.remove();
         }
       };
@@ -5486,7 +5784,7 @@
           if (line.startsWith(`<b style="color: ${theme.text};">KEYWORD</b>:`)) {
             return `<h4 style="margin-bottom: 5px; color: ${theme.text};">${line}</h4>`;
           }
-          return `<p style="margin-left: 20px; margin-bottom: 10px; white-space: pre-wrap; word-wrap: break-word; text-align: justify; color: ${theme.text};">${line}</p>`;
+          return `<p style="margin-bottom: 10px; white-space: pre-wrap; word-wrap: break-word; text-align: justify; color: ${theme.text};">${line}</p>`;
         })
         .join("");
     }
@@ -5726,7 +6024,6 @@
         }
         this.isDown = false;
       };
-      // PC Events
       this.currentTranslateButton.addEventListener("mousedown", handleStart);
       this.currentTranslateButton.addEventListener("mouseup", handleEnd);
       this.currentTranslateButton.addEventListener("mouseleave", () => {
@@ -5734,7 +6031,6 @@
           this.resetState();
         }
       });
-      // Mobile Events
       this.currentTranslateButton.addEventListener("touchstart", handleStart);
       this.currentTranslateButton.addEventListener("touchend", handleEnd);
       this.currentTranslateButton.addEventListener("touchcancel", () => {
@@ -5819,11 +6115,11 @@
         }
         touchCount = 0;
       };
-      this.shadowRoot.addEventListener("touchstart", handleTouchStart.bind(this), {
+      document.addEventListener("touchstart", handleTouchStart.bind(this), {
         passive: false,
       });
-      this.shadowRoot.addEventListener("touchend", handleTouch.bind(this));
-      this.shadowRoot.addEventListener("touchcancel", handleTouch.bind(this));
+      document.addEventListener("touchend", handleTouch.bind(this));
+      document.addEventListener("touchcancel", handleTouch.bind(this));
     }
     toggleTranslatorTools() {
       if (this.isTogglingTools) return;
@@ -6224,7 +6520,43 @@
             };
             input.click();
           },
-        },
+        }, {
+        icon: "📄",
+        text: "Dịch File",
+        handler: () => {
+          dropdown.style.display = "none";
+          const supportedFormats = RELIABLE_FORMATS.text.formats.map(f => `.${f.ext}`).join(',');
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = supportedFormats;
+          input.style.display = "none";
+          input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+              this.showTranslatingStatus();
+              const result = await this.translator.translateFile(file);
+              const blob = new Blob([result], { type: file.type });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `king1x32_translated_${file.name}`;
+              this.shadowRoot.appendChild(a);
+              a.click();
+              URL.revokeObjectURL(url);
+              a.remove();
+              this.showNotification("Dịch file thành công", "success");
+            } catch (error) {
+              console.error("Lỗi dịch file:", error);
+              this.showNotification(error.message, "error");
+            } finally {
+              this.removeTranslatingStatus();
+              input.value = "";
+            }
+          };
+          input.click();
+        }
+      },
         {
           icon: "⚙️",
           text: "Cài đặt King AI",
@@ -7047,13 +7379,12 @@ Return ONLY a JSON object like:
     }
     setupContextMenu() {
       if (!this.translator.userSettings.settings.contextMenu?.enabled) return;
+      let isSpeaking = false; // Thêm biến theo dõi trạng thái đọc
       document.addEventListener("contextmenu", (e) => {
         const selection = window.getSelection();
         const selectedText = selection.toString().trim();
         if (selectedText) {
-          const oldMenus = this.$$(
-            ".translator-context-menu"
-          );
+          const oldMenus = this.$$(".translator-context-menu");
           oldMenus.forEach((menu) => menu.remove());
           const contextMenu = document.createElement("div");
           contextMenu.className = "translator-context-menu";
@@ -7061,20 +7392,47 @@ Return ONLY a JSON object like:
             { text: "Dịch nhanh", action: "quick" },
             { text: "Dịch popup", action: "popup" },
             { text: "Dịch nâng cao", action: "advanced" },
+            {
+              text: "Đọc văn bản",
+              action: "tts",
+              getLabel: () => isSpeaking ? "Dừng đọc" : "Đọc văn bản" // Dynamic label
+            }
           ];
           const range = selection.getRangeAt(0).cloneRange();
           menuItems.forEach((item) => {
             const menuItem = document.createElement("div");
             menuItem.className = "translator-context-menu-item";
-            menuItem.textContent = item.text;
+            menuItem.textContent = item.getLabel ? item.getLabel() : item.text;
             menuItem.onclick = (e) => {
               e.preventDefault();
               e.stopPropagation();
               const newSelection = window.getSelection();
               newSelection.removeAllRanges();
               newSelection.addRange(range);
-              this.handleTranslateButtonClick(newSelection, item.action);
-              contextMenu.remove();
+              if (item.action === "tts") {
+                if (isSpeaking) {
+                  speechSynthesis.cancel();
+                  isSpeaking = false;
+                } else {
+                  speechSynthesis.cancel(); // Dừng phát âm hiện tại nếu có
+                  const utterance = new SpeechSynthesisUtterance(selectedText);
+                  utterance.lang = this.translator.userSettings.settings.displayOptions.sourceLanguage;
+                  utterance.onend = () => {
+                    isSpeaking = false;
+                    menuItem.textContent = "Đọc văn bản";
+                  };
+                  utterance.oncancel = () => {
+                    isSpeaking = false;
+                    menuItem.textContent = "Đọc văn bản";
+                  };
+                  speechSynthesis.speak(utterance);
+                  isSpeaking = true;
+                }
+                menuItem.textContent = isSpeaking ? "Dừng đọc" : "Đọc văn bản";
+              } else {
+                this.handleTranslateButtonClick(newSelection, item.action);
+                contextMenu.remove();
+              }
             };
             contextMenu.appendChild(menuItem);
           });
@@ -7133,16 +7491,18 @@ Return ONLY a JSON object like:
           this.shadowRoot.appendChild(contextMenu);
           const closeMenu = (e) => {
             if (!contextMenu.contains(e.target)) {
+              speechSynthesis.cancel();
               contextMenu.remove();
               document.removeEventListener("click", closeMenu);
             }
           };
           document.addEventListener("click", closeMenu);
-          const handleScroll = () => {
+          const handleScroll = debounce(() => {
+            speechSynthesis.cancel();
             contextMenu.remove();
             window.removeEventListener("scroll", handleScroll);
-          };
-          window.addEventListener("scroll", handleScroll);
+          }, 150);
+          window.addEventListener("scroll", handleScroll, { passive: true }); // Thêm passive để tối ưu performance
         }
       });
     }
@@ -7196,10 +7556,10 @@ Return ONLY a JSON object like:
         } else if (e.key === shortcuts.inputTranslate.key) {
           e.preventDefault();
           const activeElement = document.activeElement;
-          if (this.input.isValidEditor(activeElement)) {
-            const text = this.input.getEditorContent(activeElement);
+          if (this.translator.input.isValidEditor(activeElement)) {
+            const text = this.translator.input.getEditorContent(activeElement);
             if (text) {
-              await this.input.translateEditor(activeElement, true);
+              await this.translator.input.translateEditor(activeElement, true);
             }
           }
           return;
@@ -7389,6 +7749,7 @@ Return ONLY a JSON object like:
         apiKey: this.userSettings.getSetting("apiKey"),
       };
       this.api = new APIManager(apiConfig, () => this.userSettings.settings);
+      this.input = new InputTranslator(this);
       this.ocr = new OCRManager(this);
       this.media = new MediaManager(this);
       this.ui = new UIManager(this);
@@ -7397,7 +7758,7 @@ Return ONLY a JSON object like:
         this.userSettings.settings.cacheOptions.text.expirationTime
       );
       this.page = new PageTranslator(this);
-      this.inputTranslator = new InputTranslator(this);
+      this.fileManager = new FileManager(this);
       this.ui.setupEventListeners();
       this.cache.optimizeStorage();
       this.autoCorrectEnabled = true;
@@ -7455,6 +7816,19 @@ Return ONLY a JSON object like:
       } catch (error) {
         console.error("Lỗi dịch:", error);
         this.ui.showNotification(error.message, "error");
+      }
+    }
+    async translateFile(file) {
+      try {
+        if (!this.fileManager.isValidFormat(file)) {
+          throw new Error('Định dạng file không được hỗ trợ. Chỉ hỗ trợ: txt, srt, vtt, html, md, json');
+        }
+        if (!this.fileManager.isValidSize(file)) {
+          throw new Error('File quá lớn. Tối đa 10MB');
+        }
+        return await this.fileManager.processFile(file);
+      } catch (error) {
+        throw new Error(`Lỗi dịch file: ${error.message}`);
       }
     }
     async translateLongText(text, maxChunkSize = 1000) {
@@ -7651,7 +8025,7 @@ Văn bản cần xử lý: "${text}"`,
       timeout = setTimeout(later, wait);
     };
   }
-  const createFileInput = (accept, onFileSelected) => {
+  function createFileInput(accept, onFileSelected) {
     return new Promise((resolve) => {
       const translator = window.translator;
       const themeMode = translator.userSettings.settings.theme;
@@ -7661,8 +8035,8 @@ Văn bản cần xử lý: "${text}"`,
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       background: rgba(0,0,0,0.5);
       z-index: 2147483647;
       display: flex;
@@ -7709,6 +8083,8 @@ Văn bản cần xử lý: "${text}"`,
       color: ${theme.text};
       width: 100%;
       cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
     `;
       const buttonContainer = document.createElement('div');
       buttonContainer.style.cssText = `
@@ -7727,6 +8103,7 @@ Văn bản cần xử lý: "${text}"`,
       cursor: pointer;
       font-size: 14px;
       transition: all 0.2s ease;
+      font-family: inherit;
     `;
       cancelButton.textContent = 'Hủy';
       cancelButton.onmouseover = () => {
@@ -7748,6 +8125,7 @@ Văn bản cần xử lý: "${text}"`,
       font-size: 14px;
       transition: all 0.2s ease;
       opacity: 0.5;
+      font-family: inherit;
     `;
       translateButton.textContent = 'Dịch';
       translateButton.disabled = true;
@@ -7797,12 +8175,12 @@ Văn bản cần xử lý: "${text}"`,
       container.appendChild(inputContainer);
       container.appendChild(buttonContainer);
       div.appendChild(container);
-      this.ui.shadowRoot.appendChild(div);
+      translator.ui.shadowRoot.appendChild(div);
       div.addEventListener('click', (e) => {
         if (e.target === div) cleanup();
       });
     });
-  };
+  }
   GM_registerMenuCommand("📄 Dịch trang", async () => {
     const translator = window.translator;
     if (translator) {
@@ -7898,7 +8276,7 @@ Văn bản cần xử lý: "${text}"`,
         const a = document.createElement("a");
         a.href = url;
         a.download = `king1x32_translated_${file.name}`;
-        this.ui.shadowRoot.appendChild(a);
+        translator.ui.shadowRoot.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
@@ -7922,7 +8300,7 @@ Văn bản cần xử lý: "${text}"`,
         const a = document.createElement("a");
         a.href = url;
         a.download = `king1x32_translated_${file.name.replace(".pdf", ".html")}`;
-        this.ui.shadowRoot.appendChild(a);
+        translator.ui.shadowRoot.appendChild(a);
         a.click();
         URL.revokeObjectURL(url);
         a.remove();
@@ -7935,11 +8313,39 @@ Văn bản cần xử lý: "${text}"`,
       }
     });
   });
+  GM_registerMenuCommand("📄 Dịch File (srt, vtt, md, json, txt, html)", async () => {
+    const translator = window.translator;
+    if (!translator) return;
+    const supportedFormats = RELIABLE_FORMATS.text.formats
+      .map(f => `.${f.ext}`)
+      .join(',');
+    await createFileInput(supportedFormats, async (file) => {
+      try {
+        translator.ui.showTranslatingStatus();
+        const result = await translator.translateFile(file);
+        const blob = new Blob([result], { type: file.type });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `king1x32_translated_${file.name}`;
+        translator.ui.shadowRoot.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(url);
+        a.remove();
+        translator.ui.showNotification("Dịch file thành công", "success");
+      } catch (error) {
+        console.error("Lỗi dịch file:", error);
+        translator.ui.showNotification(error.message, "error");
+      } finally {
+        translator.ui.removeTranslatingStatus();
+      }
+    });
+  });
   GM_registerMenuCommand("⚙️ Cài đặt King Translator AI", () => {
     const translator = window.translator;
     if (translator) {
       const settingsUI = translator.userSettings.createSettingsUI();
-      this.ui.shadowRoot.appendChild(settingsUI);
+      translator.ui.shadowRoot.appendChild(settingsUI);
     }
   });
   new Translator();
