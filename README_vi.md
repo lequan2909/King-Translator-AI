@@ -27,6 +27,7 @@
 
 ## 🌟 Giới thiệu
 - Translator AI là một userscript dịch thuật tích hợp AI sáng tạo, cho phép người dùng dễ dàng dịch văn bản, hình ảnh, phương tiện và các trang web trực tiếp trong trình duyệt của họ. Nó sử dụng API Google Gemini để mang lại kết quả dịch chất lượng cao.
+- Công cụ này hỗ trợ nhiều chức năng, bao gồm dịch văn bản, hình ảnh, âm thanh, video, và đặc biệt là dịch truyện tranh manga với văn bản phủ lên, giúp người dùng trải nghiệm nội dung một cách thuận tiện và dễ dàng.
 
 ## 📸 Ảnh chụp màn hình
 

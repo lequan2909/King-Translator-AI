@@ -27,6 +27,7 @@
 
 ## 🌟 Introduction
 - Translator AI is an innovative AI-integrated translation userscript that allows users to effortlessly translate text, images, media, and web pages directly in their browser. It utilizes the Google Gemini API to deliver high-quality translation results.
+- This tool supports a variety of functions, including text translation, image translation, audio and video translation, and notably, manga translation with overlay text, enabling users to conveniently experience content in their desired language.
 
 ## 📸 Screenshots
 
