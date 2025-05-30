@@ -1,215 +1,222 @@
-# King Translator AI - Công cụ dịch thuật đa năng tích hợp AI
+# King Translator AI - Versatile AI-Powered Translation Tool
 
-![Version](https://img.shields.io/badge/version-4.2-blue)
+![Version](https://img.shields.io/badge/version-4.4-blue)
 ![Status](https://img.shields.io/badge/status-updated-green)
 ![License](https://img.shields.io/badge/license-GPL3-orange)
 
 <div align="center">
   <img src="kings.jpg" alt="Translator AI Logo" width="200"/>
   <br>
-  <i>Công cụ dịch thuật thông minh tích hợp AI (Google Gemini) cho trình duyệt</i>
+  <i>Intelligent AI-powered translation tool (Google Gemini) for browsers</i>
+  <h3>If you like this userscript, please give this repository a star!✨</h3>
 </div>
 
-## 📖 Mục lục
-- [Giới thiệu](#-giới-thiệu)
-- [Ảnh màn hình](#-ảnh-màn-hình)
-- [Tính năng](#-tính-năng)
-- [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
-- [Hướng dẫn sử dụng](#-hướng-dẫn-sử-dụng)
-- [Cấu hình](#-cấu-hình)
-- [Phím tắt](#-phím-tắt)
-- [Lưu ý](#-lưu-ý)
-- [Đóng góp](#-đóng-góp)
-- [Giấy phép](#-giấy-phép)
-- [Cài đặt](#-cài-đặt)
+## 📖 Table of Contents
+- [Introduction](#-introduction)
+- [Screenshots](#-screenshots)
+- [Features](#-features)
+- [Installation Guide](#-installation-guide)
+- [Usage Instructions](#-usage-instructions)
+- [Configuration](#-configuration)
+- [Shortcuts](#-shortcuts)
+- [Notes](#-notes)
+- [Contributions](#-contributions)
+- [License](#-license)
+- [Download](#-download)
+- [Hướng dẫn tiếng Việt](README_vi.md)
 
-## 🌟 Giới thiệu
+## 🌟 Introduction
+- Translator AI is an innovative AI-integrated translation userscript that allows users to effortlessly translate text, images, media, and web pages directly in their browser. It utilizes the Google Gemini API to deliver high-quality translation results.
 
-Translator AI là userscript dịch thuật tích hợp AI, cho phép dịch văn bản, hình ảnh, media và trang web trực tiếp trên trình duyệt. Sử dụng Google Gemini API để mang lại kết quả dịch chất lượng cao.
-
-## 📸 Ảnh màn hình
+## 📸 Screenshots
 
 ### 📱 Mobile
 <details>
-<summary>Click để xem</summary>
+<summary>Click to view</summary>
 
-![Mobile Screenshot 1](https://i.imgur.com/7pi9USr.jpeg)
-![Mobile Screenshot 2](https://i.imgur.com/3ksRC8R.jpeg)
-![Mobile Screenshot 3](https://i.imgur.com/Wu5jXLv.jpeg)
-![Mobile Screenshot 4](https://i.imgur.com/Bcy8QIu.jpeg)
-![Mobile Screenshot 5](https://i.imgur.com/AcXGewv.jpeg)
-![Mobile Screenshot 6](https://i.imgur.com/KQtCnnk.jpeg)
-![Mobile Screenshot 7](https://i.imgur.com/vmA7OW7.jpeg)
-![Mobile Screenshot 8](https://i.imgur.com/lWDs7Iu.jpeg)
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+  <img src="https://i.imgur.com/7pi9USr.jpeg" width="45%" />
+  <img src="https://i.imgur.com/3ksRC8R.jpeg" width="45%" />
+  <img src="https://i.imgur.com/Wu5jXLv.jpeg" width="45%" />
+  <img src="https://i.imgur.com/Bcy8QIu.jpeg" width="45%" />
+  <img src="https://i.imgur.com/AcXGewv.jpeg" width="45%" />
+  <img src="https://i.imgur.com/KQtCnnk.jpeg" width="45%" />
+  <img src="https://i.imgur.com/vmA7OW7.jpeg" width="45%" />
+  <img src="https://i.imgur.com/lWDs7Iu.jpeg" width="45%" />
+</div>
 
 </details>
 
 ### 💻 PC
 <details>
-<summary>Click để xem</summary>
+<summary>Click to view</summary>
 
-![PC Screenshot 1](https://i.imgur.com/tZ5NqOG.jpeg)
-![PC Screenshot 2](https://i.imgur.com/esxZv9N.jpeg)
-![PC Screenshot 3](https://i.imgur.com/4tTFvZW.jpeg)
-![PC Screenshot 4](https://i.imgur.com/gIExWnd.jpeg)
-![PC Screenshot 5](https://i.imgur.com/X7CG6kk.png)
-![PC Screenshot 6](https://i.imgur.com/y0Ym8iX.jpeg)
-![PC Screenshot 7](https://i.imgur.com/QcwfvAH.jpeg)
-![PC Screenshot 8](https://i.imgur.com/QvUpwfR.jpeg)
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+  <img src="https://i.imgur.com/tZ5NqOG.jpeg" width="45%" />
+  <img src="https://i.imgur.com/esxZv9N.jpeg" width="45%" />
+  <img src="https://i.imgur.com/4tTFvZW.jpeg" width="45%" />
+  <img src="https://i.imgur.com/gIExWnd.jpeg" width="45%" />
+  <img src="https://i.imgur.com/X7CG6kk.png" width="45%" />
+  <img src="https://i.imgur.com/y0Ym8iX.jpeg" width="45%" />
+  <img src="https://i.imgur.com/QcwfvAH.jpeg" width="45%" />
+  <img src="https://i.imgur.com/QvUpwfR.jpeg" width="45%" />
+</div>
 
 </details>
 
-## ✨ Tính năng
+## ✨ Features
 
-### 📝 Dịch Văn Bản
-- Dịch nhanh khi bôi đen văn bản
-- Dịch popup với giao diện đẹp
-- Dịch nâng cao với phân tích từ vựng
-- Tự động dịch trong ô nhập liệu
+### 📝 Text Translation
+- Quick translation when text is highlighted
+- Popup translation with an attractive interface
+- Advanced translation with vocabulary analysis
+- Automatic translation in input fields
 
-### 🖼️ Dịch Hình Ảnh (OCR)
-- Dịch file ảnh từ máy tính
-- Chụp và dịch màn hình
-- Dịch ảnh trên web
-- Dịch manga với overlay text
+### 🖼️ Image Translation (OCR)
+- Translate image files from your computer
+- Capture and translate screenshots
+- Translate images on the web
+- Manga translation with overlay text
 
-### 🎵 Dịch Media
-- Hỗ trợ file audio (MP3, WAV, OGG,...)
-- Hỗ trợ file video (MP4, WEBM,...)
-- Tự động tạo phụ đề SRT
+### 🎵 Media Translation
+- Supports audio files (MP3, WAV, OGG,...)
+- Supports video files (MP4, WEBM,...)
+- Automatically generate SRT subtitles
 
-### 🌐 Dịch Trang Web
-- Dịch toàn bộ trang web
-- Tự động nhận diện ngôn ngữ
-- Dịch file HTML và PDF
-- Tùy chọn loại trừ elements
+### 🌐 Website Translation
+- Translate entire web pages
+- Automatically detect language
+- Translate HTML and PDF files
+- Exclude specific elements as options
 
-## 🔧 Hướng dẫn cài đặt chi tiết
+## 🔧 Detailed Installation Guide
 
-### Bước 1: Cài Extension Quản lý Script
-- **Firefox (Khuyên dùng):**
-  - Cài Violentmonkey (Open source, khuyên dùng) hoặc Tampermonkey
-  - Mở Firefox Add-ons và click "Add to Firefox"
+### Step 1: Install Script Manager Extension
+- **Firefox (Recommended):**
+  - Install Violentmonkey (Open source, recommended) or Tampermonkey
+  - Open Firefox Add-ons and click "Add to Firefox"
 
 - **Chrome:**
-  - Cài Violentmonkey hoặc Tampermonkey từ Chrome Web Store
-  - Click "Thêm vào Chrome"
+  - Install Violentmonkey or Tampermonkey from the Chrome Web Store
+  - Click "Add to Chrome"
 
-### Bước 2: Lấy API Key Gemini
-1. Truy cập [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Đăng nhập Google
+### Step 2: Obtain Gemini API Key
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Sign in with Google
 3. Click "Create API Key"
-4. Sao chép API key
+4. Copy the API key
 
-### Bước 3: Cài đặt Script
-1. Click biểu tượng Violentmonkey
-2. Vào Dashboard > Utilities
-3. Dán link script vào "Install from URL" (link script ở cuối bài viết)
-4. Xác nhận cài đặt
+### Step 3: Install the Script
+1. Click the Violentmonkey icon
+2. Go to Dashboard > Utilities
+3. Paste the script link into "Install from URL" (script link at the end of this document)
+4. Confirm the installation
 
-### Bước 4: Cấu hình
-1. Mở cài đặt (Alt + S hoặc chạm 4 ngón)
-2. Chọn Gemini làm provider
-3. Nhập API key
-4. Lưu cài đặt
+### Step 4: Configuration
+1. Open settings (Alt + S or tap 4 fingers)
+2. Choose Gemini as the provider
+3. Enter the API key
+4. Save the settings
 
-## 📚 Hướng dẫn sử dụng chi tiết
+## 📚 Detailed Usage Instructions
 
-### Dịch Văn Bản
-1. Bôi đen văn bản cần dịch
-2. Chọn kiểu dịch:
-   - Click đơn: Dịch nhanh
-   - Click đúp: Dịch popup
-   - Giữ click: Dịch nâng cao
+### Text Translation
+1. Highlight the text to be translated
+2. Choose the type of translation:
+   - Single click: Quick translation
+   - Double click: Popup translation
+   - Hold click: Advanced translation
 
-### Dịch Trong Input
-- 🌐 : Dịch sang ngôn ngữ đích
-- 🔄 : Dịch sang ngôn ngữ nguồn
-- Alt + T: Dịch nhanh
+### Input Translation
+- 🌐 : Translate to target language
+- 🔄 : Translate to source language
+- Alt + T: Quick translation
 
-### Tools Dịch
-Click "Tools Dịch" góc phải màn hình:
-- Dịch Trang
-- Dịch Ảnh/OCR
-- Dịch Media
-- Dịch File
+### Translation Tools
+Click "Translation Tools" in the bottom right of the screen:
+- Translate Page
+- Translate Image/OCR
+- Translate Media
+- Translate File
 
-## ⌨️ Phím tắt
+## ⌨️ Shortcuts
 
-| Phím tắt | Chức năng |
+| Shortcut | Function |
 |----------|-----------|
-| Alt + F | Dịch trang |
-| Alt + Q | Dịch nhanh |
-| Alt + E | Dịch popup |
-| Alt + A | Dịch nâng cao |
-| Alt + T | Dịch input |
-| Alt + S | Mở cài đặt |
+| Alt + F | Translate page |
+| Alt + Q | Quick translation |
+| Alt + E | Popup translation |
+| Alt + A | Advanced translation |
+| Alt + T | Translate input |
+| Alt + S | Open settings |
 
-## 📱 Cảm ứng (Mobile)
+## 📱 Touch (Mobile)
 
-| Thao tác | Chức năng |
-|----------|-----------|
-| 2 ngón | Dịch popup |
-| 3 ngón | Dịch nâng cao |
-| 4 ngón | Mở cài đặt |
-| 5 ngón | Bật/tắt Tools |
+| Gesture | Function |
+|---------|-----------|
+| 2 fingers | Popup translation |
+| 3 fingers | Advanced translation |
+| 4 fingers | Open settings |
+| 5 fingers | Toggle Tools |
 
-## ⚙️ Cấu hình
+## ⚙️ Configuration
 
-### Giao diện
-- Theme sáng/tối
+### Interface
+- Light/Dark theme
 - Font size
-- Vị trí nút dịch
+- Position of the translate button
 
 ### API & Models
 - Provider: Gemini AI
 - API Keys
-- Lựa chọn model
+- Model selection
 
-### Tùy chỉnh
-- Prompt dịch
-- Phím tắt
+### Customization
+- Translation prompt
+- Shortcuts
 - Cache
-- Sao lưu/Khôi phục
+- Backup/Restore
 
-## ❗ Lưu ý
+## ❗ Notes
+- A valid Gemini API key is required to access the translation services
+- Limit of 5 requests/10s
+- Cache speeds up translation
+- Supports offline translation with cache
+- Automatic language detection
+- Supports multiple languages
+- **Detailed usage notes:** https://voz.vn/t/script-dung-ai-%C4%91e-dich-moi-thu-text-anh-audio-video.1072947/#-huong-dan-su-dung
 
-- Cần API key Gemini
-- Giới hạn 5 request/10s
-- Cache tăng tốc độ dịch
-- Hỗ trợ dịch offline với cache
-- Tự động phát hiện ngôn ngữ
-- Hỗ trợ nhiều ngôn ngữ
-- **Những lưu ý khi sử dụng chi tiết:** https://voz.vn/t/script-dung-ai-%C4%91e-dich-moi-thu-text-anh-audio-video.1072947/#-huong-dan-su-dung
+## 🤝 Contributions
 
-## 🤝 Đóng góp
-
-Mọi đóng góp đều được chào đón! Hãy:
-1. Fork project
-2. Tạo branch mới
+All contributions are welcome! Please:
+1. Fork the project
+2. Create a new branch
 3. Commit changes
 4. Push to branch
-5. Tạo Pull Request
+5. Create a Pull Request
 
-## 📄 Giấy phép
+## 📄 License
 
-Dự án này được phân phối dưới giấy phép GNU General Public License v3.0. Xem `LICENSE` để biết thêm chi tiết.
+This project is distributed under the GNU General Public License v3.0. See `LICENSE` for more details.
 
-## Donate? Muốn hỗ trợ mình 1 ly cà phê
-  > Hãy truy cập liên kết chứa thông tin Donate sau: https://kingsmanvn.pages.dev
+## Donate? Want to support me with a coffee?
+  * If you appreciate this userscript, please consider supporting me with a donation!<br>
+  * Please visit the following link for donation information:<br>
+    - Patreon: [https://www.patreon.com/c/king1x32/membership?](https://www.patreon.com/c/king1x32/membership?)<br>
+    - Website: [https://kingsmanvn.pages.dev](https://kingsmanvn.pages.dev)
 
-## 🔧 Cài đặt
+## 🔧 Download
 
-1. Phiên bản bình thường: [Github](https://github.com/king1x32/UserScripts/raw/main/King_Translator_AI.user.js) hoặc [Greasyfork](https://greasyfork.org/vi/scripts/529348-king-translator-ai)
+1. Normal version: [Github](https://github.com/king1x32/UserScripts/raw/main/King_Translator_AI.user.js) or [Greasyfork](https://greasyfork.org/vi/scripts/529348-king-translator-ai)
 
-2. Phiên bản nén (nhẹ hơn, mượt hơn): [Github](https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js)
+2. Compressed version (lighter, smoother): [Github](https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js)
 
 ---
 
 <div align="center">
   Made with ❤️ by King1x32
   <br>
-  <a href="https://github.com/king1x32">GitHub</a> •
-  <a href="https://discord.gg/v2DsBW6d">Discord</a> •
+  <a href="https://www.patreon.com/c/king1x32/membership?">Patreon</a> •
+  <a href="https://discord.gg/8DTwr8QpsM">Discord</a> •
   <a href="https://t.me/king1x32">Telegram</a>
 </div>
