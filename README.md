@@ -208,9 +208,9 @@ This project is distributed under the GNU General Public License v3.0. See `LICE
 
 ## 🔧 Download
 
-1. Normal version: [Github](https://github.com/king1x32/UserScripts/raw/main/King_Translator_AI.user.js) or [Greasyfork](https://greasyfork.org/vi/scripts/529348-king-translator-ai)
+1. Normal version: https://greasyfork.org/vi/scripts/529348-king-translator-ai
 
-2. Compressed version (lighter, smoother): [Github](https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js)
+2. Compressed version (lighter, smoother): https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js
 
 ---
 

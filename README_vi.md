@@ -208,9 +208,9 @@ Dự án này được phát hành dưới Giấy phép Công cộng GNU v3.0. X
 
 ## 🔧 Tải xuống
 
-1. Phiên bản bình thường: [Github](https://github.com/king1x32/UserScripts/raw/main/King_Translator_AI.user.js) hoặc [Greasyfork](https://greasyfork.org/vi/scripts/529348-king-translator-ai)
+1. Phiên bản bình thường: https://greasyfork.org/vi/scripts/529348-king-translator-ai
 
-2. Phiên bản nén (nhẹ hơn, mượt mà hơn): [Github](https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js)
+2. Phiên bản nén (nhẹ hơn, mượt mà hơn): https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/King20Translator20AI.user.js
 
 ---
 
