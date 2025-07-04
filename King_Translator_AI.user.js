@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          King Translator AI
 // @namespace     https://kingsmanvn.pages.dev
-// @version       5.0
+// @version       5.1
 // @author        King1x32
 // @icon          https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/icon/kings.jpg
 // @license       GPL3
@@ -49,6 +49,7 @@
     console.log("King Translator: Already initialized, skipping this execution.");
     return;
   }
+  window.kingTranslatorInitialized = true;
   const CONFIG = {
     API: {
       providers: {
@@ -133,7 +134,7 @@
           }),
           createRequestBody: (content, model = "sonar", tem = 0.6, topp = 0.8, topk = 30) => ({
             model: model,
-            // max_tokens: 4096,
+            max_tokens: 65536,
             messages: [{
               role: "user",
               content: content
@@ -192,7 +193,7 @@
           }),
           createRequestBody: (content, model = "claude-3-7-sonnet-latest", tem = 0.6, topp = 0.8, topk = 30) => ({
             model: model,
-            // max_tokens: 4096,
+            max_tokens: 65536,
             messages: [{
               role: "user",
               content: content
@@ -293,7 +294,7 @@
           }),
           createRequestBody: (content, model = "mistral-small-latest", tem = 0.6, topp = 0.8) => ({
             model: model,
-            // max_tokens: 4096,
+            max_tokens: 65536,
             messages: [{
               role: "user",
               content: Array.isArray(content) ? content : content
@@ -355,7 +356,7 @@
               "google/gemma-2-27b-it",
               "openrouter:01-ai/yi-large",
               "x-ai/grok-3-beta",
-              "gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "o1-pro", "o3", "o3-mini", "o4-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4.5-preview", "claude-3-7-sonnet-20250219", "claude-3-7-sonnet-latest", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-latest", "claude-3-5-sonnet-20240620", "claude-3-haiku-20240307", "WhereIsAI/UAE-Large-V1", "Qwen/QwQ-32B", "meta-llama/Llama-4-Scout-17B-16E-Instruct", "meta-llama/Llama-Guard-4-12B", "togethercomputer/m2-bert-80M-32k-retrieval", "deepseek-ai/DeepSeek-V3", "google/gemma-2-9b-it", "cartesia/sonic", "BAAI/bge-large-en-v1.5", "black-forest-labs/FLUX.1-schnell-Free", "black-forest-labs/FLUX.1.1-pro", "Qwen/Qwen2.5-7B-Instruct-Turbo", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free", "meta-llama-llama-2-70b-hf", "BAAI/bge-base-en-v1.5", "Gryphe/MythoMax-L2-13b", "google/gemma-2-27b-it", "Qwen/Qwen2-VL-72B-Instruct", "meta-llama/LlamaGuard-2-8b", "cartesia/sonic-2", "togethercomputer/m2-bert-80M-8k-retrieval", "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free", "Qwen/Qwen3-235B-A22B-fp8-tput", "scb10x/scb10x-llama3-1-typhoon2-70b-instruct", "togethercomputer/MoA-1", "meta-llama/Meta-Llama-3-70B-Instruct-Turbo", "togethercomputer/m2-bert-80M-2k-retrieval", "google/gemma-2b-it", "black-forest-labs/FLUX.1-pro", "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo", "Gryphe/MythoMax-L2-13b-Lite", "black-forest-labs/FLUX.1-redux", "scb10x/scb10x-llama3-1-typhoon2-8b-instruct", "meta-llama/Meta-Llama-Guard-3-8B", "black-forest-labs/FLUX.1-depth", "black-forest-labs/FLUX.1-canny", "arcee-ai/arcee-blitz", "arcee_ai/arcee-spotlight", "arcee-ai/caller", "arcee-ai/coder-large", "arcee-ai/maestro-reasoning", "arcee-ai/virtuoso-large", "arcee-ai/virtuoso-medium-v2", "mistralai/Mistral-Small-24B-Instruct-2501", "meta-llama/Llama-3-8b-chat-hf", "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8", "togethercomputer/MoA-1-Turbo", "meta-llama/Llama-3.3-70B-Instruct-Turbo", "Qwen/Qwen3-235B-A22B-fp8", "mistralai/Mistral-7B-Instruct-v0.1", "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B", "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", "meta-llama/Meta-Llama-3-8B-Instruct-Lite", "meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo", "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "mistralai/Mixtral-8x7B-v0.1", "black-forest-labs/FLUX.1-dev-lora", "deepseek-ai/DeepSeek-R1", "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", "mistralai/Mistral-7B-Instruct-v0.2", "deepseek-ai/DeepSeek-V3-p-dp", "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B", "Qwen/Qwen2.5-Coder-32B-Instruct", "Qwen/Qwen2-72B-Instruct", "black-forest-labs/FLUX.1-schnell", "mistralai/Mixtral-8x7B-Instruct-v0.1", "meta-llama/Llama-3-70b-chat-hf", "mistralai/Mistral-7B-Instruct-v0.3", "Salesforce/Llama-Rank-V1", "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", "meta-llama/Llama-Vision-Free", "meta-llama/Llama-Guard-3-11B-Vision-Turbo", "meta-llama/Llama-3.2-3B-Instruct-Turbo", "black-forest-labs/FLUX.1-dev", "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo", "Qwen/Qwen2.5-72B-Instruct-Turbo", "perplexity-ai/r1-1776", "meta-llama/Llama-2-70b-hf", "Qwen/Qwen2.5-VL-72B-Instruct", "model-fallback-test-1", "ministral-3b-2410", "ministral-3b-latest", "ministral-8b-2410", "ministral-8b-latest", "open-mistral-7b", "mistral-tiny", "mistral-tiny-2312", "open-mixtral-8x7b", "mistral-small", "mistral-small-2312", "open-mixtral-8x22b", "open-mixtral-8x22b-2404", "mistral-large-2411", "mistral-large-latest", "pixtral-large-2411", "pixtral-large-latest", "mistral-large-pixtral-2411", "codestral-2501", "codestral-latest", "codestral-2412", "codestral-2411-rc5", "pixtral-12b-2409", "pixtral-12b", "pixtral-12b-latest", "mistral-small-2503", "mistral-small-latest", "grok-beta", "grok-vision-beta", "deepseek-chat", "deepseek-reasoner", "gemini-1.5-flash", "gemini-2.0-flash", "openrouter:nousresearch/deephermes-3-mistral-24b-preview:free", "openrouter:mistralai/mistral-medium-3", "openrouter:google/gemini-2.5-pro-preview", "openrouter:arcee-ai/caller-large", "openrouter:arcee-ai/spotlight", "openrouter:arcee-ai/maestro-reasoning", "openrouter:arcee-ai/virtuoso-large", "openrouter:arcee-ai/coder-large", "openrouter:arcee-ai/virtuoso-medium-v2", "openrouter:arcee-ai/arcee-blitz", "openrouter:microsoft/phi-4-reasoning-plus:free", "openrouter:microsoft/phi-4-reasoning-plus", "openrouter:microsoft/phi-4-reasoning:free", "openrouter:qwen/qwen3-0.6b-04-28:free", "openrouter:inception/mercury-coder-small-beta", "openrouter:qwen/qwen3-1.7b:free", "openrouter:qwen/qwen3-4b:free", "openrouter:opengvlab/internvl3-14b:free", "openrouter:opengvlab/internvl3-2b:free", "openrouter:deepseek/deepseek-prover-v2:free", "openrouter:deepseek/deepseek-prover-v2", "openrouter:meta-llama/llama-guard-4-12b", "openrouter:qwen/qwen3-30b-a3b:free", "openrouter:qwen/qwen3-30b-a3b", "openrouter:qwen/qwen3-8b:free", "openrouter:qwen/qwen3-8b", "openrouter:qwen/qwen3-14b:free", "openrouter:qwen/qwen3-14b", "openrouter:qwen/qwen3-32b:free", "openrouter:qwen/qwen3-32b", "openrouter:qwen/qwen3-235b-a22b:free", "openrouter:qwen/qwen3-235b-a22b", "openrouter:tngtech/deepseek-r1t-chimera:free", "openrouter:thudm/glm-z1-rumination-32b", "openrouter:thudm/glm-z1-9b:free", "openrouter:thudm/glm-4-9b:free", "openrouter:microsoft/mai-ds-r1:free", "openrouter:thudm/glm-z1-32b:free", "openrouter:thudm/glm-z1-32b", "openrouter:thudm/glm-4-32b:free", "openrouter:thudm/glm-4-32b", "openrouter:google/gemini-2.5-flash-preview", "openrouter:google/gemini-2.5-flash-preview:thinking", "openrouter:openai/o4-mini-high", "openrouter:openai/o3", "openrouter:openai/o4-mini", "openrouter:shisa-ai/shisa-v2-llama3.3-70b:free", "openrouter:qwen/qwen2.5-coder-7b-instruct", "openrouter:openai/gpt-4.1", "openrouter:openai/gpt-4.1-mini", "openrouter:openai/gpt-4.1-nano", "openrouter:eleutherai/llemma_7b", "openrouter:alfredpros/codellama-7b-instruct-solidity", "openrouter:arliai/qwq-32b-arliai-rpr-v1:free", "openrouter:agentica-org/deepcoder-14b-preview:free", "openrouter:moonshotai/kimi-vl-a3b-thinking:free", "openrouter:x-ai/grok-3-mini-beta", "openrouter:x-ai/grok-3-beta", "openrouter:nvidia/llama-3.3-nemotron-super-49b-v1:free", "openrouter:nvidia/llama-3.3-nemotron-super-49b-v1", "openrouter:nvidia/llama-3.1-nemotron-ultra-253b-v1:free", "openrouter:meta-llama/llama-4-maverick:free", "openrouter:meta-llama/llama-4-maverick", "openrouter:meta-llama/llama-4-scout:free", "openrouter:meta-llama/llama-4-scout", "openrouter:all-hands/openhands-lm-32b-v0.1", "openrouter:mistral/ministral-8b", "openrouter:deepseek/deepseek-v3-base:free", "openrouter:scb10x/llama3.1-typhoon2-8b-instruct", "openrouter:scb10x/llama3.1-typhoon2-70b-instruct", "openrouter:allenai/molmo-7b-d:free", "openrouter:bytedance-research/ui-tars-72b:free", "openrouter:qwen/qwen2.5-vl-3b-instruct:free", "openrouter:google/gemini-2.5-pro-exp-03-25", "openrouter:qwen/qwen2.5-vl-32b-instruct:free", "openrouter:qwen/qwen2.5-vl-32b-instruct", "openrouter:deepseek/deepseek-chat-v3-0324:free", "openrouter:deepseek/deepseek-chat-v3-0324", "openrouter:featherless/qwerky-72b:free", "openrouter:openai/o1-pro", "openrouter:mistralai/mistral-small-3.1-24b-instruct:free", "openrouter:mistralai/mistral-small-3.1-24b-instruct", "openrouter:open-r1/olympiccoder-32b:free", "openrouter:google/gemma-3-1b-it:free", "openrouter:google/gemma-3-4b-it:free", "openrouter:google/gemma-3-4b-it", "openrouter:ai21/jamba-1.6-large", "openrouter:ai21/jamba-1.6-mini", "openrouter:google/gemma-3-12b-it:free", "openrouter:google/gemma-3-12b-it", "openrouter:cohere/command-a", "openrouter:openai/gpt-4o-mini-search-preview", "openrouter:openai/gpt-4o-search-preview", "openrouter:rekaai/reka-flash-3:free", "openrouter:google/gemma-3-27b-it:free", "openrouter:google/gemma-3-27b-it", "openrouter:thedrummer/anubis-pro-105b-v1", "openrouter:thedrummer/skyfall-36b-v2", "openrouter:microsoft/phi-4-multimodal-instruct", "openrouter:perplexity/sonar-reasoning-pro", "openrouter:perplexity/sonar-pro", "openrouter:perplexity/sonar-deep-research", "openrouter:deepseek/deepseek-r1-zero:free", "openrouter:qwen/qwq-32b:free", "openrouter:qwen/qwq-32b", "openrouter:moonshotai/moonlight-16b-a3b-instruct:free", "openrouter:nousresearch/deephermes-3-llama-3-8b-preview:free", "openrouter:openai/gpt-4.5-preview", "openrouter:google/gemini-2.0-flash-lite-001", "openrouter:anthropic/claude-3.7-sonnet", "openrouter:anthropic/claude-3.7-sonnet:thinking", "openrouter:anthropic/claude-3.7-sonnet:beta", "openrouter:perplexity/r1-1776", "openrouter:mistralai/mistral-saba", "openrouter:cognitivecomputations/dolphin3.0-r1-mistral-24b:free", "openrouter:cognitivecomputations/dolphin3.0-mistral-24b:free", "openrouter:meta-llama/llama-guard-3-8b", "openrouter:openai/o3-mini-high", "openrouter:deepseek/deepseek-r1-distill-llama-8b", "openrouter:google/gemini-2.0-flash-001", "openrouter:qwen/qwen-vl-plus", "openrouter:aion-labs/aion-1.0", "openrouter:aion-labs/aion-1.0-mini", "openrouter:aion-labs/aion-rp-llama-3.1-8b", "openrouter:qwen/qwen-vl-max", "openrouter:qwen/qwen-turbo", "openrouter:qwen/qwen2.5-vl-72b-instruct:free", "openrouter:qwen/qwen2.5-vl-72b-instruct", "openrouter:qwen/qwen-plus", "openrouter:qwen/qwen-max", "openrouter:openai/o3-mini", "openrouter:deepseek/deepseek-r1-distill-qwen-1.5b", "openrouter:mistralai/mistral-small-24b-instruct-2501:free", "openrouter:mistralai/mistral-small-24b-instruct-2501", "openrouter:deepseek/deepseek-r1-distill-qwen-32b:free", "openrouter:deepseek/deepseek-r1-distill-qwen-32b", "openrouter:deepseek/deepseek-r1-distill-qwen-14b:free", "openrouter:deepseek/deepseek-r1-distill-qwen-14b", "openrouter:perplexity/sonar-reasoning", "openrouter:perplexity/sonar", "openrouter:liquid/lfm-7b", "openrouter:liquid/lfm-3b", "openrouter:deepseek/deepseek-r1-distill-llama-70b:free", "openrouter:deepseek/deepseek-r1-distill-llama-70b", "openrouter:deepseek/deepseek-r1:free", "openrouter:deepseek/deepseek-r1", "openrouter:minimax/minimax-01", "openrouter:mistralai/codestral-2501", "openrouter:microsoft/phi-4", "openrouter:deepseek/deepseek-chat:free", "openrouter:deepseek/deepseek-chat", "openrouter:sao10k/l3.3-euryale-70b", "openrouter:openai/o1", "openrouter:eva-unit-01/eva-llama-3.33-70b", "openrouter:x-ai/grok-2-vision-1212", "openrouter:x-ai/grok-2-1212", "openrouter:cohere/command-r7b-12-2024", "openrouter:google/gemini-2.0-flash-exp:free", "openrouter:meta-llama/llama-3.3-70b-instruct:free", "openrouter:meta-llama/llama-3.3-70b-instruct", "openrouter:amazon/nova-lite-v1", "openrouter:amazon/nova-micro-v1", "openrouter:amazon/nova-pro-v1", "openrouter:qwen/qwq-32b-preview:free", "openrouter:qwen/qwq-32b-preview", "openrouter:google/learnlm-1.5-pro-experimental:free", "openrouter:eva-unit-01/eva-qwen-2.5-72b", "openrouter:openai/gpt-4o-2024-11-20", "openrouter:mistralai/mistral-large-2411", "openrouter:mistralai/mistral-large-2407", "openrouter:mistralai/pixtral-large-2411", "openrouter:x-ai/grok-vision-beta", "openrouter:infermatic/mn-inferor-12b", "openrouter:qwen/qwen-2.5-coder-32b-instruct:free", "openrouter:qwen/qwen-2.5-coder-32b-instruct", "openrouter:raifle/sorcererlm-8x22b", "openrouter:eva-unit-01/eva-qwen-2.5-32b", "openrouter:thedrummer/unslopnemo-12b", "openrouter:anthropic/claude-3.5-haiku:beta", "openrouter:anthropic/claude-3.5-haiku", "openrouter:anthropic/claude-3.5-haiku-20241022:beta", "openrouter:anthropic/claude-3.5-haiku-20241022", "openrouter:anthracite-org/magnum-v4-72b", "openrouter:anthropic/claude-3.5-sonnet:beta", "openrouter:anthropic/claude-3.5-sonnet", "openrouter:neversleep/llama-3.1-lumimaid-70b", "openrouter:x-ai/grok-beta", "openrouter:mistralai/ministral-8b", "openrouter:mistralai/ministral-3b", "openrouter:qwen/qwen-2.5-7b-instruct:free", "openrouter:qwen/qwen-2.5-7b-instruct", "openrouter:nvidia/llama-3.1-nemotron-70b-instruct", "openrouter:inflection/inflection-3-productivity", "openrouter:inflection/inflection-3-pi", "openrouter:google/gemini-flash-1.5-8b", "openrouter:thedrummer/rocinante-12b", "openrouter:anthracite-org/magnum-v2-72b", "openrouter:liquid/lfm-40b", "openrouter:meta-llama/llama-3.2-90b-vision-instruct", "openrouter:meta-llama/llama-3.2-1b-instruct:free", "openrouter:meta-llama/llama-3.2-1b-instruct", "openrouter:meta-llama/llama-3.2-3b-instruct:free", "openrouter:meta-llama/llama-3.2-3b-instruct", "openrouter:meta-llama/llama-3.2-11b-vision-instruct:free", "openrouter:meta-llama/llama-3.2-11b-vision-instruct", "openrouter:qwen/qwen-2.5-72b-instruct:free", "openrouter:qwen/qwen-2.5-72b-instruct", "openrouter:neversleep/llama-3.1-lumimaid-8b", "openrouter:openai/o1-preview-2024-09-12", "openrouter:openai/o1-mini", "openrouter:openai/o1-mini-2024-09-12", "openrouter:openai/o1-preview", "openrouter:mistralai/pixtral-12b", "openrouter:cohere/command-r-08-2024", "openrouter:cohere/command-r-plus-08-2024", "openrouter:sao10k/l3.1-euryale-70b", "openrouter:google/gemini-flash-1.5-8b-exp", "openrouter:qwen/qwen-2.5-vl-7b-instruct:free", "openrouter:qwen/qwen-2.5-vl-7b-instruct", "openrouter:microsoft/phi-3.5-mini-128k-instruct", "openrouter:nousresearch/hermes-3-llama-3.1-70b", "openrouter:nousresearch/hermes-3-llama-3.1-405b", "openrouter:openai/chatgpt-4o-latest", "openrouter:aetherwiing/mn-starcannon-12b", "openrouter:sao10k/l3-lunaris-8b", "openrouter:openai/gpt-4o-2024-08-06", "openrouter:meta-llama/llama-3.1-405b:free", "openrouter:meta-llama/llama-3.1-405b", "openrouter:nothingiisreal/mn-celeste-12b", "openrouter:perplexity/llama-3.1-sonar-small-128k-online", "openrouter:perplexity/llama-3.1-sonar-large-128k-online", "openrouter:meta-llama/llama-3.1-8b-instruct:free", "openrouter:meta-llama/llama-3.1-8b-instruct", "openrouter:meta-llama/llama-3.1-70b-instruct", "openrouter:meta-llama/llama-3.1-405b-instruct", "openrouter:mistralai/mistral-nemo:free", "openrouter:mistralai/mistral-nemo", "openrouter:mistralai/codestral-mamba", "openrouter:openai/gpt-4o-mini-2024-07-18", "openrouter:openai/gpt-4o-mini", "openrouter:google/gemma-2-27b-it", "openrouter:alpindale/magnum-72b", "openrouter:google/gemma-2-9b-it:free", "openrouter:google/gemma-2-9b-it", "openrouter:01-ai/yi-large", "openrouter:ai21/jamba-instruct", "openrouter:anthropic/claude-3.5-sonnet-20240620:beta", "openrouter:anthropic/claude-3.5-sonnet-20240620", "openrouter:sao10k/l3-euryale-70b", "openrouter:cognitivecomputations/dolphin-mixtral-8x22b", "openrouter:qwen/qwen-2-72b-instruct", "openrouter:mistralai/mistral-7b-instruct-v0.3", "openrouter:nousresearch/hermes-2-pro-llama-3-8b", "openrouter:mistralai/mistral-7b-instruct:free", "openrouter:mistralai/mistral-7b-instruct", "openrouter:microsoft/phi-3-mini-128k-instruct", "openrouter:microsoft/phi-3-medium-128k-instruct", "openrouter:neversleep/llama-3-lumimaid-70b", "openrouter:google/gemini-flash-1.5", "openrouter:deepseek/deepseek-coder", "openrouter:openai/gpt-4o-2024-05-13", "openrouter:meta-llama/llama-guard-2-8b", "openrouter:openai/gpt-4o", "openrouter:openai/gpt-4o:extended", "openrouter:allenai/olmo-7b-instruct", "openrouter:neversleep/llama-3-lumimaid-8b:extended", "openrouter:neversleep/llama-3-lumimaid-8b", "openrouter:sao10k/fimbulvetr-11b-v2", "openrouter:meta-llama/llama-3-70b-instruct", "openrouter:meta-llama/llama-3-8b-instruct", "openrouter:mistralai/mixtral-8x22b-instruct", "openrouter:microsoft/wizardlm-2-8x22b", "openrouter:openai/gpt-4-turbo", "openrouter:google/gemini-pro-1.5", "openrouter:cohere/command-r-plus", "openrouter:cohere/command-r-plus-04-2024", "openrouter:sophosympatheia/midnight-rose-70b", "openrouter:cohere/command-r", "openrouter:cohere/command", "openrouter:anthropic/claude-3-haiku:beta", "openrouter:anthropic/claude-3-haiku", "openrouter:anthropic/claude-3-sonnet:beta", "openrouter:anthropic/claude-3-sonnet", "openrouter:anthropic/claude-3-opus:beta", "openrouter:anthropic/claude-3-opus", "openrouter:cohere/command-r-03-2024", "openrouter:mistralai/mistral-large", "openrouter:openai/gpt-4-turbo-preview", "openrouter:openai/gpt-3.5-turbo-0613", "openrouter:nousresearch/nous-hermes-2-mixtral-8x7b-dpo", "openrouter:mistralai/mistral-tiny", "openrouter:mistralai/mistral-small", "openrouter:mistralai/mistral-medium", "openrouter:mistralai/mistral-7b-instruct-v0.2", "openrouter:mistralai/mixtral-8x7b-instruct", "openrouter:neversleep/noromaid-20b", "openrouter:anthropic/claude-2.1:beta", "openrouter:anthropic/claude-2.1", "openrouter:anthropic/claude-2:beta", "openrouter:anthropic/claude-2", "openrouter:undi95/toppy-m-7b", "openrouter:alpindale/goliath-120b", "openrouter:openrouter/auto", "openrouter:openai/gpt-4-1106-preview", "openrouter:openai/gpt-3.5-turbo-1106", "openrouter:jondurbin/airoboros-l2-70b", "openrouter:mistralai/mistral-7b-instruct-v0.1", "openrouter:openai/gpt-3.5-turbo-instruct", "openrouter:pygmalionai/mythalion-13b", "openrouter:openai/gpt-3.5-turbo-16k", "openrouter:openai/gpt-4-32k-0314", "openrouter:openai/gpt-4-32k", "openrouter:mancer/weaver", "openrouter:anthropic/claude-2.0:beta", "openrouter:anthropic/claude-2.0", "openrouter:undi95/remm-slerp-l2-13b", "openrouter:gryphe/mythomax-l2-13b", "openrouter:meta-llama/llama-2-70b-chat", "openrouter:openai/gpt-4", "openrouter:openai/gpt-3.5-turbo-0125", "openrouter:openai/gpt-3.5-turbo", "openrouter:openai/gpt-4-0314", "fake", "costly", "abuse"
+              "gpt-4o", "gpt-4o-mini", "o1", "o1-mini", "o1-pro", "o3", "o3-mini", "o4-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4.5-preview", "claude-opus-4-20250514", "claude-opus-4", "claude-opus-4-latest", "claude-sonnet-4-20250514", "claude-sonnet-4", "claude-sonnet-4-latest", "claude-3-7-sonnet-20250219", "claude-3-7-sonnet-latest", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-latest", "claude-3-5-sonnet-20240620", "claude-3-haiku-20240307", "togethercomputer/m2-bert-80M-32k-retrieval", "cartesia/sonic", "black-forest-labs/FLUX.1-schnell-Free", "intfloat/multilingual-e5-large-instruct", "Alibaba-NLP/gte-modernbert-base", "meta-llama/LlamaGuard-2-8b", "cartesia/sonic-2", "meta-llama/Llama-3.3-70B-Instruct-Turbo", "togethercomputer/MoA-1", "meta-llama/Meta-Llama-3-70B-Instruct-Turbo", "black-forest-labs/FLUX.1-pro", "black-forest-labs/FLUX.1.1-pro", "black-forest-labs/FLUX.1-redux", "meta-llama/Meta-Llama-Guard-3-8B", "arcee-ai/AFM-4.5B-Preview", "deepseek-ai/DeepSeek-V3", "lgai/exaone-3-5-32b-instruct", "deepseek-ai/DeepSeek-R1-0528-tput", "black-forest-labs/FLUX.1-canny", "mistralai/Mixtral-8x7B-Instruct-v0.1", "meta-llama/Llama-4-Scout-17B-16E-Instruct", "meta-llama/Llama-Vision-Free", "meta-llama/Llama-3-8b-chat-hf", "mistralai/Mistral-7B-Instruct-v0.1", "Qwen/Qwen2.5-VL-72B-Instruct", "BAAI/bge-base-en-v1.5-vllm", "meta-llama/Llama-2-70b-hf", "togethercomputer/MoA-1-Turbo", "meta-llama/Meta-Llama-3-8B-Instruct-Lite", "black-forest-labs/FLUX.1-kontext-max", "perplexity-ai/r1-1776", "mistralai/Mistral-7B-Instruct-v0.2", "deepseek-ai/DeepSeek-V3-p-dp", "arcee_ai/arcee-spotlight", "Qwen/Qwen2-72B-Instruct", "black-forest-labs/FLUX.1-schnell", "mistralai/Mistral-7B-Instruct-v0.3", "black-forest-labs/FLUX.1-dev", "NousResearch/Nous-Hermes-2-Mixtral-8x7B-DPO", "meta-llama/Llama-3.2-11B-Vision-Instruct-Turbo", "meta-llama/Llama-Guard-3-11B-Vision-Turbo", "google/gemma-2-27b-it", "togethercomputer/Refuel-Llm-V2-Small", "Qwen/Qwen2-VL-72B-Instruct", "meta-llama/Llama-3.2-90B-Vision-Instruct-Turbo", "scb10x/scb10x-llama3-1-typhoon2-70b-instruct", "black-forest-labs/FLUX.1-dev-lora", "arcee-ai/maestro-reasoning", "togethercomputer/Refuel-Llm-V2", "Salesforce/Llama-Rank-V1", "Qwen/Qwen2.5-Coder-32B-Instruct", "meta-llama/Llama-3.2-3B-Instruct-Turbo", "arcee-ai/virtuoso-medium-v2", "arcee-ai/coder-large", "meta-llama/Llama-Guard-4-12B", "deepseek-ai/DeepSeek-R1-Distill-Qwen-14B", "arcee-ai/virtuoso-large", "Qwen/Qwen2.5-72B-Instruct-Turbo", "meta-llama/Llama-3-70b-chat-hf", "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B", "black-forest-labs/FLUX.1-depth", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B", "nvidia/Llama-3.1-Nemotron-70B-Instruct-HF", "Qwen/QwQ-32B", "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free", "mistralai/Mistral-Small-24B-Instruct-2501", "meta-llama/Llama-4-Maverick-17B-128E-Instruct-FP8", "marin-community/marin-8b-instruct", "Qwen/Qwen2.5-7B-Instruct-Turbo", "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo", "meta-llama/Meta-Llama-3.1-405B-Instruct-Turbo", "scb10x/scb10x-typhoon-2-1-gemma3-12b", "Qwen/Qwen3-235B-A22B-fp8-tput", "meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo", "arcee-ai/caller", "black-forest-labs/FLUX.1-kontext-pro", "lgai/exaone-deep-32b", "deepseek-ai/DeepSeek-R1", "arcee-ai/arcee-blitz", "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free", "model-fallback-test-1", "ministral-3b-2410", "ministral-3b-latest", "ministral-8b-2410", "ministral-8b-latest", "open-mistral-7b", "mistral-tiny", "mistral-tiny-2312", "open-mixtral-8x7b", "mistral-small", "mistral-small-2312", "open-mixtral-8x22b", "open-mixtral-8x22b-2404", "mistral-large-2411", "mistral-large-latest", "pixtral-large-2411", "pixtral-large-latest", "mistral-large-pixtral-2411", "codestral-2501", "codestral-latest", "codestral-2412", "codestral-2411-rc5", "codestral-2405", "pixtral-12b-2409", "pixtral-12b", "pixtral-12b-latest", "mistral-small-2503", "mistral-small-latest", "mistral-small-2402", "grok-beta", "grok-vision-beta", "deepseek-chat", "deepseek-reasoner", "gemini-1.5-flash", "gemini-2.0-flash", "openrouter:mistralai/mistral-small-3.2-24b-instruct:free", "openrouter:minimax/minimax-m1", "openrouter:minimax/minimax-m1:extended", "openrouter:google/gemini-2.5-flash-lite-preview-06-17", "openrouter:google/gemini-2.5-flash", "openrouter:google/gemini-2.5-pro", "openrouter:moonshotai/kimi-dev-72b:free", "openrouter:openai/o3-pro", "openrouter:x-ai/grok-3-mini", "openrouter:x-ai/grok-3", "openrouter:mistralai/magistral-small-2506", "openrouter:mistralai/magistral-medium-2506", "openrouter:mistralai/magistral-medium-2506:thinking", "openrouter:google/gemini-2.5-pro-preview", "openrouter:sentientagi/dobby-mini-unhinged-plus-llama-3.1-8b", "openrouter:deepseek/deepseek-r1-distill-qwen-7b", "openrouter:deepseek/deepseek-r1-0528-qwen3-8b:free", "openrouter:deepseek/deepseek-r1-0528-qwen3-8b", "openrouter:deepseek/deepseek-r1-0528:free", "openrouter:deepseek/deepseek-r1-0528", "openrouter:sarvamai/sarvam-m:free", "openrouter:thedrummer/valkyrie-49b-v1", "openrouter:anthropic/claude-opus-4", "openrouter:anthropic/claude-sonnet-4", "openrouter:mistralai/devstral-small:free", "openrouter:mistralai/devstral-small", "openrouter:google/gemma-3n-e4b-it:free", "openrouter:google/gemini-2.5-flash-preview-05-20", "openrouter:google/gemini-2.5-flash-preview-05-20:thinking", "openrouter:openai/codex-mini", "openrouter:meta-llama/llama-3.3-8b-instruct:free", "openrouter:mistralai/mistral-medium-3", "openrouter:google/gemini-2.5-pro-preview-05-06", "openrouter:arcee-ai/caller-large", "openrouter:arcee-ai/spotlight", "openrouter:arcee-ai/maestro-reasoning", "openrouter:arcee-ai/virtuoso-large", "openrouter:arcee-ai/coder-large", "openrouter:arcee-ai/virtuoso-medium-v2", "openrouter:arcee-ai/arcee-blitz", "openrouter:microsoft/phi-4-reasoning-plus:free", "openrouter:microsoft/phi-4-reasoning-plus", "openrouter:microsoft/phi-4-reasoning:free", "openrouter:inception/mercury-coder-small-beta", "openrouter:opengvlab/internvl3-14b:free", "openrouter:opengvlab/internvl3-2b:free", "openrouter:deepseek/deepseek-prover-v2", "openrouter:meta-llama/llama-guard-4-12b", "openrouter:qwen/qwen3-30b-a3b:free", "openrouter:qwen/qwen3-30b-a3b", "openrouter:qwen/qwen3-8b:free", "openrouter:qwen/qwen3-8b", "openrouter:qwen/qwen3-14b:free", "openrouter:qwen/qwen3-14b", "openrouter:qwen/qwen3-32b:free", "openrouter:qwen/qwen3-32b", "openrouter:qwen/qwen3-235b-a22b:free", "openrouter:qwen/qwen3-235b-a22b", "openrouter:tngtech/deepseek-r1t-chimera:free", "openrouter:thudm/glm-z1-rumination-32b", "openrouter:microsoft/mai-ds-r1:free", "openrouter:thudm/glm-z1-32b:free", "openrouter:thudm/glm-z1-32b", "openrouter:thudm/glm-4-32b:free", "openrouter:thudm/glm-4-32b", "openrouter:google/gemini-2.5-flash-preview", "openrouter:google/gemini-2.5-flash-preview:thinking", "openrouter:openai/o4-mini-high", "openrouter:openai/o3", "openrouter:openai/o4-mini", "openrouter:shisa-ai/shisa-v2-llama3.3-70b:free", "openrouter:openai/gpt-4.1", "openrouter:openai/gpt-4.1-mini", "openrouter:openai/gpt-4.1-nano", "openrouter:eleutherai/llemma_7b", "openrouter:alfredpros/codellama-7b-instruct-solidity", "openrouter:arliai/qwq-32b-arliai-rpr-v1:free", "openrouter:agentica-org/deepcoder-14b-preview:free", "openrouter:moonshotai/kimi-vl-a3b-thinking:free", "openrouter:x-ai/grok-3-mini-beta", "openrouter:x-ai/grok-3-beta", "openrouter:nvidia/llama-3.3-nemotron-super-49b-v1:free", "openrouter:nvidia/llama-3.3-nemotron-super-49b-v1", "openrouter:nvidia/llama-3.1-nemotron-ultra-253b-v1:free", "openrouter:nvidia/llama-3.1-nemotron-ultra-253b-v1", "openrouter:meta-llama/llama-4-maverick:free", "openrouter:meta-llama/llama-4-maverick", "openrouter:meta-llama/llama-4-scout:free", "openrouter:meta-llama/llama-4-scout", "openrouter:all-hands/openhands-lm-32b-v0.1", "openrouter:deepseek/deepseek-v3-base:free", "openrouter:scb10x/llama3.1-typhoon2-70b-instruct", "openrouter:google/gemini-2.5-pro-exp-03-25", "openrouter:qwen/qwen2.5-vl-32b-instruct:free", "openrouter:qwen/qwen2.5-vl-32b-instruct", "openrouter:deepseek/deepseek-chat-v3-0324:free", "openrouter:deepseek/deepseek-chat-v3-0324", "openrouter:featherless/qwerky-72b:free", "openrouter:openai/o1-pro", "openrouter:mistralai/mistral-small-3.1-24b-instruct:free", "openrouter:mistralai/mistral-small-3.1-24b-instruct", "openrouter:google/gemma-3-4b-it:free", "openrouter:google/gemma-3-4b-it", "openrouter:ai21/jamba-1.6-large", "openrouter:ai21/jamba-1.6-mini", "openrouter:google/gemma-3-12b-it:free", "openrouter:google/gemma-3-12b-it", "openrouter:cohere/command-a", "openrouter:openai/gpt-4o-mini-search-preview", "openrouter:openai/gpt-4o-search-preview", "openrouter:rekaai/reka-flash-3:free", "openrouter:google/gemma-3-27b-it:free", "openrouter:google/gemma-3-27b-it", "openrouter:thedrummer/anubis-pro-105b-v1", "openrouter:thedrummer/skyfall-36b-v2", "openrouter:microsoft/phi-4-multimodal-instruct", "openrouter:perplexity/sonar-reasoning-pro", "openrouter:perplexity/sonar-pro", "openrouter:perplexity/sonar-deep-research", "openrouter:qwen/qwq-32b:free", "openrouter:qwen/qwq-32b", "openrouter:nousresearch/deephermes-3-llama-3-8b-preview:free", "openrouter:openai/gpt-4.5-preview", "openrouter:google/gemini-2.0-flash-lite-001", "openrouter:anthropic/claude-3.7-sonnet", "openrouter:anthropic/claude-3.7-sonnet:beta", "openrouter:anthropic/claude-3.7-sonnet:thinking", "openrouter:perplexity/r1-1776", "openrouter:mistralai/mistral-saba", "openrouter:cognitivecomputations/dolphin3.0-r1-mistral-24b:free", "openrouter:cognitivecomputations/dolphin3.0-mistral-24b:free", "openrouter:meta-llama/llama-guard-3-8b", "openrouter:openai/o3-mini-high", "openrouter:deepseek/deepseek-r1-distill-llama-8b", "openrouter:google/gemini-2.0-flash-001", "openrouter:qwen/qwen-vl-plus", "openrouter:aion-labs/aion-1.0", "openrouter:aion-labs/aion-1.0-mini", "openrouter:aion-labs/aion-rp-llama-3.1-8b", "openrouter:qwen/qwen-vl-max", "openrouter:qwen/qwen-turbo", "openrouter:qwen/qwen2.5-vl-72b-instruct:free", "openrouter:qwen/qwen2.5-vl-72b-instruct", "openrouter:qwen/qwen-plus", "openrouter:qwen/qwen-max", "openrouter:openai/o3-mini", "openrouter:deepseek/deepseek-r1-distill-qwen-1.5b", "openrouter:mistralai/mistral-small-24b-instruct-2501:free", "openrouter:mistralai/mistral-small-24b-instruct-2501", "openrouter:deepseek/deepseek-r1-distill-qwen-32b:free", "openrouter:deepseek/deepseek-r1-distill-qwen-32b", "openrouter:deepseek/deepseek-r1-distill-qwen-14b:free", "openrouter:deepseek/deepseek-r1-distill-qwen-14b", "openrouter:perplexity/sonar-reasoning", "openrouter:perplexity/sonar", "openrouter:liquid/lfm-7b", "openrouter:liquid/lfm-3b", "openrouter:deepseek/deepseek-r1-distill-llama-70b:free", "openrouter:deepseek/deepseek-r1-distill-llama-70b", "openrouter:deepseek/deepseek-r1:free", "openrouter:deepseek/deepseek-r1", "openrouter:minimax/minimax-01", "openrouter:mistralai/codestral-2501", "openrouter:microsoft/phi-4", "openrouter:deepseek/deepseek-chat:free", "openrouter:deepseek/deepseek-chat", "openrouter:sao10k/l3.3-euryale-70b", "openrouter:openai/o1", "openrouter:eva-unit-01/eva-llama-3.33-70b", "openrouter:x-ai/grok-2-vision-1212", "openrouter:x-ai/grok-2-1212", "openrouter:cohere/command-r7b-12-2024", "openrouter:google/gemini-2.0-flash-exp:free", "openrouter:meta-llama/llama-3.3-70b-instruct:free", "openrouter:meta-llama/llama-3.3-70b-instruct", "openrouter:amazon/nova-lite-v1", "openrouter:amazon/nova-micro-v1", "openrouter:amazon/nova-pro-v1", "openrouter:qwen/qwq-32b-preview", "openrouter:eva-unit-01/eva-qwen-2.5-72b", "openrouter:openai/gpt-4o-2024-11-20", "openrouter:mistralai/mistral-large-2411", "openrouter:mistralai/mistral-large-2407", "openrouter:mistralai/pixtral-large-2411", "openrouter:x-ai/grok-vision-beta", "openrouter:infermatic/mn-inferor-12b", "openrouter:qwen/qwen-2.5-coder-32b-instruct:free", "openrouter:qwen/qwen-2.5-coder-32b-instruct", "openrouter:raifle/sorcererlm-8x22b", "openrouter:eva-unit-01/eva-qwen-2.5-32b", "openrouter:thedrummer/unslopnemo-12b", "openrouter:anthropic/claude-3.5-haiku:beta", "openrouter:anthropic/claude-3.5-haiku", "openrouter:anthropic/claude-3.5-haiku-20241022:beta", "openrouter:anthropic/claude-3.5-haiku-20241022", "openrouter:neversleep/llama-3.1-lumimaid-70b", "openrouter:anthracite-org/magnum-v4-72b", "openrouter:anthropic/claude-3.5-sonnet:beta", "openrouter:anthropic/claude-3.5-sonnet", "openrouter:x-ai/grok-beta", "openrouter:mistralai/ministral-8b", "openrouter:mistralai/ministral-3b", "openrouter:qwen/qwen-2.5-7b-instruct", "openrouter:nvidia/llama-3.1-nemotron-70b-instruct", "openrouter:inflection/inflection-3-productivity", "openrouter:inflection/inflection-3-pi", "openrouter:google/gemini-flash-1.5-8b", "openrouter:thedrummer/rocinante-12b", "openrouter:anthracite-org/magnum-v2-72b", "openrouter:liquid/lfm-40b", "openrouter:meta-llama/llama-3.2-3b-instruct:free", "openrouter:meta-llama/llama-3.2-3b-instruct", "openrouter:meta-llama/llama-3.2-1b-instruct:free", "openrouter:meta-llama/llama-3.2-1b-instruct", "openrouter:meta-llama/llama-3.2-90b-vision-instruct", "openrouter:meta-llama/llama-3.2-11b-vision-instruct:free", "openrouter:meta-llama/llama-3.2-11b-vision-instruct", "openrouter:qwen/qwen-2.5-72b-instruct:free", "openrouter:qwen/qwen-2.5-72b-instruct", "openrouter:neversleep/llama-3.1-lumimaid-8b", "openrouter:openai/o1-preview", "openrouter:openai/o1-preview-2024-09-12", "openrouter:openai/o1-mini", "openrouter:openai/o1-mini-2024-09-12", "openrouter:mistralai/pixtral-12b", "openrouter:cohere/command-r-plus-08-2024", "openrouter:cohere/command-r-08-2024", "openrouter:qwen/qwen-2.5-vl-7b-instruct", "openrouter:sao10k/l3.1-euryale-70b", "openrouter:microsoft/phi-3.5-mini-128k-instruct", "openrouter:nousresearch/hermes-3-llama-3.1-70b", "openrouter:nousresearch/hermes-3-llama-3.1-405b", "openrouter:openai/chatgpt-4o-latest", "openrouter:sao10k/l3-lunaris-8b", "openrouter:aetherwiing/mn-starcannon-12b", "openrouter:openai/gpt-4o-2024-08-06", "openrouter:meta-llama/llama-3.1-405b", "openrouter:nothingiisreal/mn-celeste-12b", "openrouter:perplexity/llama-3.1-sonar-small-128k-online", "openrouter:perplexity/llama-3.1-sonar-large-128k-online", "openrouter:meta-llama/llama-3.1-8b-instruct:free", "openrouter:meta-llama/llama-3.1-8b-instruct", "openrouter:meta-llama/llama-3.1-405b-instruct", "openrouter:meta-llama/llama-3.1-70b-instruct", "openrouter:mistralai/mistral-nemo:free", "openrouter:mistralai/mistral-nemo", "openrouter:openai/gpt-4o-mini", "openrouter:openai/gpt-4o-mini-2024-07-18", "openrouter:google/gemma-2-27b-it", "openrouter:alpindale/magnum-72b", "openrouter:google/gemma-2-9b-it:free", "openrouter:google/gemma-2-9b-it", "openrouter:01-ai/yi-large", "openrouter:anthropic/claude-3.5-sonnet-20240620:beta", "openrouter:anthropic/claude-3.5-sonnet-20240620", "openrouter:sao10k/l3-euryale-70b", "openrouter:cognitivecomputations/dolphin-mixtral-8x22b", "openrouter:qwen/qwen-2-72b-instruct", "openrouter:mistralai/mistral-7b-instruct:free", "openrouter:mistralai/mistral-7b-instruct", "openrouter:nousresearch/hermes-2-pro-llama-3-8b", "openrouter:mistralai/mistral-7b-instruct-v0.3", "openrouter:microsoft/phi-3-mini-128k-instruct", "openrouter:microsoft/phi-3-medium-128k-instruct", "openrouter:neversleep/llama-3-lumimaid-70b", "openrouter:google/gemini-flash-1.5", "openrouter:openai/gpt-4o", "openrouter:openai/gpt-4o:extended", "openrouter:meta-llama/llama-guard-2-8b", "openrouter:openai/gpt-4o-2024-05-13", "openrouter:neversleep/llama-3-lumimaid-8b", "openrouter:sao10k/fimbulvetr-11b-v2", "openrouter:meta-llama/llama-3-8b-instruct", "openrouter:meta-llama/llama-3-70b-instruct", "openrouter:mistralai/mixtral-8x22b-instruct", "openrouter:microsoft/wizardlm-2-8x22b", "openrouter:google/gemini-pro-1.5", "openrouter:openai/gpt-4-turbo", "openrouter:cohere/command-r-plus", "openrouter:cohere/command-r-plus-04-2024", "openrouter:sophosympatheia/midnight-rose-70b", "openrouter:cohere/command", "openrouter:cohere/command-r", "openrouter:anthropic/claude-3-haiku:beta", "openrouter:anthropic/claude-3-haiku", "openrouter:anthropic/claude-3-opus:beta", "openrouter:anthropic/claude-3-opus", "openrouter:anthropic/claude-3-sonnet:beta", "openrouter:anthropic/claude-3-sonnet", "openrouter:cohere/command-r-03-2024", "openrouter:mistralai/mistral-large", "openrouter:openai/gpt-3.5-turbo-0613", "openrouter:openai/gpt-4-turbo-preview", "openrouter:nousresearch/nous-hermes-2-mixtral-8x7b-dpo", "openrouter:mistralai/mistral-medium", "openrouter:mistralai/mistral-small", "openrouter:mistralai/mistral-tiny", "openrouter:mistralai/mistral-7b-instruct-v0.2", "openrouter:mistralai/mixtral-8x7b-instruct", "openrouter:neversleep/noromaid-20b", "openrouter:anthropic/claude-2.1:beta", "openrouter:anthropic/claude-2.1", "openrouter:anthropic/claude-2:beta", "openrouter:anthropic/claude-2", "openrouter:undi95/toppy-m-7b", "openrouter:alpindale/goliath-120b", "openrouter:openrouter/auto", "openrouter:openai/gpt-3.5-turbo-1106", "openrouter:openai/gpt-4-1106-preview", "openrouter:openai/gpt-3.5-turbo-instruct", "openrouter:mistralai/mistral-7b-instruct-v0.1", "openrouter:pygmalionai/mythalion-13b", "openrouter:openai/gpt-3.5-turbo-16k", "openrouter:mancer/weaver", "openrouter:anthropic/claude-2.0:beta", "openrouter:anthropic/claude-2.0", "openrouter:undi95/remm-slerp-l2-13b", "openrouter:gryphe/mythomax-l2-13b", "openrouter:openai/gpt-3.5-turbo", "openrouter:openai/gpt-3.5-turbo-0125", "openrouter:openai/gpt-4", "openrouter:openai/gpt-4-0314", "fake", "costly", "abuse"
             ]
           },
           chat: async (content, options = {}) => {
@@ -392,6 +393,58 @@
             }
             throw new Error((this._("notifications.failed_read_api")));
           }
+        },
+        ollama: {
+          models: {},
+          headers: {
+            "Content-Type": "application/json"
+          },
+          createRequestBody: (content, model, temperature, top_p, top_k) => {
+            let prompt = '';
+            let images = [];
+            if (Array.isArray(content)) {
+              content.forEach(part => {
+                if (part.text) {
+                  prompt = part.text;
+                }
+                if (part.images && Array.isArray(part.images)) {
+                  images = part.images;
+                }
+              });
+            } else {
+              prompt = content;
+            }
+            const body = {
+              model: model,
+              prompt: prompt,
+              stream: false,
+              think: false,
+              options: {
+                temperature: temperature,
+                top_p: top_p,
+                top_k: top_k
+              }
+            };
+            if (images.length > 0) {
+              body.images = images;
+            }
+            console.log('body: ', body);
+            return body;
+          },
+          createBinaryParts: (prompt, _mimeType, base64Data) => ([
+            { text: prompt },
+            { images: [base64Data] }
+          ]),
+          responseParser: (response) => {
+            console.log('response: ', response);
+            if (typeof response === "string") {
+              return response;
+            }
+            if (response?.response) {
+              return response.response;
+            }
+            throw new Error("Không thể đọc kết quả từ API Ollama.");
+          }
         }
       },
       currentProvider: "gemini",
@@ -409,7 +462,7 @@
         openai: 0,
         mistral: 0
       },
-      maxRetries: 3,
+      maxRetries: 5,
       retryDelay: 1000
     },
     LANG_DATA: {
@@ -488,6 +541,8 @@
           prompt_note_zh: "Nếu có từ là tiếng Trung, hãy trả về giá trị phiên âm của từ đó chính là pinyin + số tone (1-4) của từ đó. Ví dụ: 你好 <|> Nǐ3 hǎo3 <|> Xin chào.",
           ocr_section: "DỊCH VĂN BẢN TRONG ẢNH",
           enable_ocr: "Bật OCR dịch:",
+          enable_manga_translate_all: "Bật dịch toàn bộ manga (chọn 2 ảnh):",
+          enable_manga_translate_all_site_only: "Ưu tiên bật dịch toàn bộ manga cho trang này:",
           media_section: "DỊCH MEDIA",
           enable_media: "Bật dịch Media:",
           video_streaming_section: "DỊCH PHỤ ĐỀ VIDEO TRỰC TUYẾN",
@@ -520,6 +575,9 @@
           shortcuts_section: "PHÍM TẮT",
           enable_settings_shortcut: "Bật phím tắt mở cài đặt:",
           enable_translation_shortcuts: "Bật phím tắt dịch:",
+          ocr_region_shortcut: "Dịch vùng chọn OCR:",
+          ocr_web_image_shortcut: "Dịch ảnh web:",
+          manga_web_shortcut: "Dịch manga web:",
           page_translate_shortcut: "Dịch trang:",
           input_translate_shortcut: "Dịch text trong hộp nhập:",
           quick_translate_shortcut: "Dịch nhanh",
@@ -551,6 +609,10 @@
           enable_media_cache: "Bật cache media:",
           media_cache_max_size: "Media cache entries:",
           media_cache_expiration: "Thời gian expire (giây):",
+          tts_cache: "TTS Cache",
+          enable_tts_cache: "Bật cache TTS:",
+          tts_cache_max_size: "TTS cache entries:",
+          tts_cache_expiration: "Thời gian expire (giây):",
           backup_settings_section: "SAO LƯU CÀI ĐẶT",
           export_settings: "Xuất cài đặt",
           import_settings: "Nhập cài đặt",
@@ -674,8 +736,15 @@
           rate_limit_wait: "Vui lòng chờ giữa các lần dịch",
           auth_error: "Lỗi xác thực API",
           generic_translation_error: "Lỗi dịch thuật:",
+          manga_guide_translate_all_prioritized: "Nhấp vào ảnh để dịch toàn bộ chương (Chế độ ưu tiên)",
+          manga_button_translate_single: "Chỉ dịch ảnh này",
           ocr_click_guide: "Click vào ảnh để OCR",
           manga_click_guide: "Click vào ảnh để dịch manga",
+          manga_translate_all_button: "Dịch Toàn Bộ (Chọn 2 ảnh)",
+          manga_select_first_image: "Vui lòng chọn ảnh thứ nhất...",
+          manga_select_last_image: "Đã chọn một ảnh. Vui lòng chọn ảnh thứ hai...",
+          manga_common_parent_not_found: "Không tìm thấy vùng chứa truyện chung. Vui lòng chọn 2 ảnh gần nhau hơn.",
+          manga_image_order_error: "Không thể xác định thứ tự ảnh. Vui lòng thử lại.",
           manga_font_size_small: "nhỏ",
           manga_font_size_medium: "trung bình",
           manga_font_size_large: "lớn",
@@ -739,12 +808,19 @@
           revert_google_translate_label: "Tắt dịch Google",
           google_translate_unsupported: "Google Translate không hỗ trợ trên trang này.",
           reload_page_label: "Tải lại trang",
-          not_find_video: "Không tìm thấy video nào đang phát sau 5 phút",
+          not_find_video: "Không tìm thấy video nào đang phát sau 3 phút",
           get_transcript_error: "Lỗi khi lấy bản chép lời YouTube:",
           get_transcript_error_generic: "Không thể lấy được bản chép lời từ YouTube sau nhiều lần thử.",
           get_transcript_error_suggestion1: "Gợi ý 1: Vui lòng thử tải lại (F5) trang này.",
           get_transcript_error_suggestion2: "Gợi ý 2: Nếu vẫn lỗi, hãy thử xóa cookie và dữ liệu trang web cho YouTube.",
         },
+        logs: {
+          manga_translate_all_started: "Bắt đầu dịch toàn bộ ảnh...",
+          manga_no_images_found: "Không tìm thấy ảnh hợp lệ trong vùng chọn.",
+          manga_translating_progress: "Đang dịch ảnh {current}/{total}...",
+          manga_translate_image_error: "Lỗi khi dịch ảnh {index}:",
+          manga_translate_all_completed: "Hoàn thành dịch toàn bộ!",
+        }
       },
       en: {
         script_name: "King Translator AI",
@@ -821,6 +897,8 @@
           prompt_note_zh: "For Chinese words, return its phonetic transcription as Pinyin + its tone number (1-4). For example: 你好 <|> Nǐ3 hǎo3 <|> Xin chào.",
           ocr_section: "IMAGE TEXT TRANSLATION (OCR)",
           enable_ocr: "Enable OCR Translation:",
+          enable_manga_translate_all: "Enable 'Translate All' for manga (select 2 images):",
+          enable_manga_translate_all_site_only: "Prioritize 'Translate All' for manga on this site:",
           media_section: "MEDIA TRANSLATION",
           enable_media: "Enable Media Translation:",
           video_streaming_section: "LIVE VIDEO SUBTITLE TRANSLATION",
@@ -853,6 +931,9 @@
           shortcuts_section: "SHORTCUTS",
           enable_settings_shortcut: "Enable Settings Shortcut:",
           enable_translation_shortcuts: "Enable Translation Shortcuts:",
+          ocr_region_shortcut: "OCR Region Translate:",
+          ocr_web_image_shortcut: "Web Image Translate:",
+          manga_web_shortcut: "Manga Web Translate:",
           page_translate_shortcut: "Page Translate:",
           input_translate_shortcut: "Input Text Translate:",
           quick_translate_shortcut: "Quick Translate",
@@ -884,6 +965,10 @@
           enable_media_cache: "Enable Media Cache:",
           media_cache_max_size: "Media Cache Entries:",
           media_cache_expiration: "Expiration Time (seconds):",
+          tts_cache: "TTS Cache",
+          enable_tts_cache: "Enable TTS Cache:",
+          tts_cache_max_size: "TTS Cache Entries:",
+          tts_cache_expiration: "Expiration Time (seconds):",
           backup_settings_section: "SETTINGS BACKUP",
           export_settings: "Export Settings",
           import_settings: "Import Settings",
@@ -1007,8 +1092,15 @@
           rate_limit_wait: "Please wait between translations",
           auth_error: "API authentication error",
           generic_translation_error: "Translation error:",
+          manga_guide_translate_all_prioritized: "Click any image to translate the whole chapter (Prioritized Mode)",
+          manga_button_translate_single: "Translate This Image Only",
           ocr_click_guide: "Click image to OCR",
           manga_click_guide: "Click image to translate manga",
+          manga_translate_all_button: "Translate All (Select 2 images)",
+          manga_select_first_image: "Please select the first image...",
+          manga_select_last_image: "One image selected. Please select the second image...",
+          manga_common_parent_not_found: "Could not find a common story container. Please select two closer images.",
+          manga_image_order_error: "Could not determine image order. Please try again.",
           manga_font_size_small: "small",
           manga_font_size_medium: "medium",
           manga_font_size_large: "large",
@@ -1072,12 +1164,19 @@
           revert_google_translate_label: "Disable Google Translate",
           google_translate_unsupported: "Google Translate is not supported on this page.",
           reload_page_label: "Reload Page",
-          not_find_video: "Could not find an active video after 5 minutes",
+          not_find_video: "Could not find an active video after 3 minutes",
           get_transcript_error: "Error getting video transcript:",
           get_transcript_error_generic: "Could not get the transcript from YouTube after multiple attempts.",
           get_transcript_error_suggestion1: "Suggestion 1: Please try refreshing (F5) this page.",
           get_transcript_error_suggestion2: "Suggestion 2: If the error persists, try clearing cookies and site data for YouTube.",
         },
+        logs: {
+          manga_translate_all_started: "Starting to translate all images...",
+          manga_no_images_found: "No valid images found in the selection.",
+          manga_translating_progress: "Translating image {current} of {total}...",
+          manga_translate_image_error: "Error translating image {index}:",
+          manga_translate_all_completed: "Finished translating all images!",
+        }
       }
     },
     TTS: {
@@ -1671,9 +1770,9 @@
       enabled: true,
       supportedSites: [
         'youtube.com',
+        'udemy.com',
         // 'netflix.com',
-        // 'udemy.com',  // Thêm Udemy
-        // 'coursera.org', // Thêm Coursera
+        // 'coursera.org',
       ],
       styles: {
         subtitleContainer: {
@@ -1764,11 +1863,15 @@
         expirationTime: 5 * 60 * 1000, // 5 phút
       },
       image: {
-        maxSize: 25, // Tối đa 25 entries cho ảnh
+        maxSize: 100, // Tối đa 100 entries cho ảnh
         expirationTime: 30 * 60 * 1000, // 30 phút
       },
       media: {
-        maxSize: 25, // Số lượng media được cache tối đa
+        maxSize: 50, // Số lượng media được cache tối đa
+        expirationTime: 30 * 60 * 1000, // 30 phút
+      },
+      tts: {
+        maxSize: 100, // Tối đa 100 file audio
         expirationTime: 30 * 60 * 1000, // 30 phút
       }
     },
@@ -1918,6 +2021,10 @@
       proModel: "o1-pro",
       customModel: ""
     },
+    ollamaOptions: {
+      endpoint: "http://localhost:11434",
+      model: "llama3",
+    },
     contextMenu: {
       enabled: true
     },
@@ -1967,8 +2074,8 @@
     },
     ocrOptions: {
       enabled: true,
+      mangaTranslateAll: true,
       preferredProvider: CONFIG.API.currentProvider,
-      displayType: "popup",
       maxFileSize: CONFIG.OCR.maxFileSize,
       temperature: CONFIG.OCR.generation.temperature,
       topP: CONFIG.OCR.generation.topP,
@@ -2036,6 +2143,9 @@
       enabled: true,
       pageTranslate: { key: "f", altKey: true },
       inputTranslate: { key: "t", altKey: true },
+      ocrRegion: { key: "z", altKey: true },        // Dịch vùng chọn
+      ocrWebImage: { key: "x", altKey: true },      // Dịch ảnh trên web
+      ocrMangaWeb: { key: "c", altKey: true },      // Dịch manga trên web
       quickTranslate: { key: "q", altKey: true },
       popupTranslate: { key: "e", altKey: true },
       advancedTranslate: { key: "a", altKey: true }
@@ -2068,6 +2178,11 @@
         enabled: true,
         maxSize: CONFIG.CACHE.media.maxSize,
         expirationTime: CONFIG.CACHE.media.expirationTime
+      },
+      tts: {
+        enabled: true,
+        maxSize: CONFIG.CACHE.tts.maxSize,
+        expirationTime: CONFIG.CACHE.tts.expirationTime
       }
     },
     rateLimit: {
@@ -2265,7 +2380,8 @@
         ['claude', 'Claude'],
         ['openai', 'OpenAI'],
         ['mistral', 'Mistral'],
-        ['puter', 'Puter']
+        ['puter', 'Puter'],
+        ['ollama', 'Ollama (Local)']
       ];
       return `
 <div style="margin-bottom: 15px;">
@@ -2306,6 +2422,38 @@
 `;
     }
     createModelSection(provider, settings) {
+      if (provider === 'ollama') {
+        const options = settings.ollamaOptions;
+        return `
+  <div class="ollama-models" style="display: ${settings.apiProvider === 'ollama' ? "" : "none"}">
+    <div class="settings-grid">
+      <span class="settings-label">Ollama API Endpoint:</span>
+      <input type="text" id="ollama-endpoint" class="settings-input"
+        value="${options?.endpoint || 'http://localhost:11434'}" placeholder="e.g., http://localhost:11434">
+    </div>
+    <div class="settings-grid">
+      <span class="settings-label">Model Name:</span>
+      <input type="text" id="ollama-custom-model" class="settings-input"
+        value="${options?.model || 'llama3'}" placeholder="Enter model name (e.g., llama3)">
+    </div>
+     <div class="settings-grid">
+      <span class="settings-label">${this._("settings.temperature")}</span>
+      <input type="number" id="ollama-temperature" class="settings-input"
+        value="${options?.temperature ?? 0.6}" min="0" max="2" step="0.1">
+    </div>
+    <div class="settings-grid">
+      <span class="settings-label">${this._("settings.top_p")}</span>
+      <input type="number" id="ollama-top-p" class="settings-input"
+        value="${options?.topP ?? 0.8}" min="0" max="1" step="0.1">
+    </div>
+    <div class="settings-grid">
+      <span class="settings-label">${this._("settings.top_k")}</span>
+      <input type="number" id="ollama-top-k" class="settings-input"
+        value="${options?.topK ?? 30}" min="1" max="100" step="1">
+    </div>
+  </div>
+`;
+      }
       const options = settings[`${provider}Options`];
       const modelTypes = this.getModelTypesCss(provider);
       const config = CONFIG.API.providers[provider].models;
@@ -2324,7 +2472,7 @@
         style="display: ${options?.modelType === type ? "" : "none"}">
         <span class="settings-label">Model ${this.capitalize(type)}:</span>
         <select id="${provider}-${type}-model" class="settings-input">
-          ${config[type].map(model => `
+          ${(config[type] || []).map(model => `
             <option value="${model}" ${options?.[`${type}Model`] === model ? "selected" : ""}>
               ${model}
             </option>
@@ -2374,7 +2522,7 @@
 ${this.createProviderRadios(settings)}
 <div style="margin-bottom: 15px;">
   <h3>API MODEL</h3>
-  ${['gemini', 'perplexity', 'claude', 'openai', 'mistral', 'puter']
+  ${['gemini', 'perplexity', 'claude', 'openai', 'mistral', 'puter', 'ollama']
           .map(p => this.createModelSection(p, settings)).join('')}
 </div>
 <div style="margin-bottom: 15px;">
@@ -2866,6 +3014,14 @@ ${this.renderSettingsUI(this.settings)}
         }>
   </div>
   <div class="settings-grid">
+    <span class="settings-label">${this._("settings.enable_manga_translate_all")}</span>
+    <input type="checkbox" id="mangaTranslateAll" ${this.settings.ocrOptions?.mangaTranslateAll ? "checked" : ""}>
+  </div>
+  <div class="settings-grid">
+    <span class="settings-label">${this._("settings.enable_manga_translate_all_site_only")}</span>
+    <input type="checkbox" id="mangaTranslateAllSiteOnly" ${(safeLocalStorageGet("kingtranslator_manga_all_for_site") === "true" || true) ? "checked" : ""}>
+  </div>
+  <div class="settings-grid">
     <span class="settings-label">${this._("settings.temperature")}</span>
     <input type="number" id="ocrTemperature" class="settings-input" value="${this.settings.ocrOptions.temperature
         }"
@@ -3102,6 +3258,30 @@ ${this.renderSettingsUI(this.settings)}
         }>
   </div>
   <div class="settings-grid">
+    <span class="settings-label">${this._("settings.ocr_region_shortcut")}</span>
+    <div class="shortcut-container">
+      <span class="shortcut-prefix">Cmd/Alt\u2003+</span>
+      <input type="text" id="ocrRegionKey" class="shortcut-input settings-input"
+        value="${this.settings.shortcuts.ocrRegion.key}">
+    </div>
+  </div>
+  <div class="settings-grid">
+    <span class="settings-label">${this._("settings.ocr_web_image_shortcut")}</span>
+    <div class="shortcut-container">
+      <span class="shortcut-prefix">Cmd/Alt\u2003+</span>
+      <input type="text" id="ocrWebImageKey" class="shortcut-input settings-input"
+        value="${this.settings.shortcuts.ocrWebImage.key}">
+    </div>
+  </div>
+  <div class="settings-grid">
+    <span class="settings-label">${this._("settings.manga_web_shortcut")}</span>
+    <div class="shortcut-container">
+      <span class="shortcut-prefix">Cmd/Alt\u2003+</span>
+      <input type="text" id="ocrMangaWebKey" class="shortcut-input settings-input"
+        value="${this.settings.shortcuts.ocrMangaWeb.key}">
+    </div>
+  </div>
+  <div class="settings-grid">
     <span class="settings-label">${this._("settings.page_translate_shortcut")}:</span>
     <div class="shortcut-container">
       <span class="shortcut-prefix">Cmd/Alt\u2003+</span>
@@ -3273,8 +3453,28 @@ ${this.renderSettingsUI(this.settings)}
       </div>
       <div class="settings-grid">
         <span class="settings-label">${this._("settings.media_cache_expiration")}</span>
-        <input type="number" id="mediaCacheExpirationTime" class="settings-input" value="${this.settings.cacheOptions.media?.expirationTime / 1000 ||
+        <input type="number" id="mediaCacheExpiration" class="settings-input" value="${this.settings.cacheOptions.media?.expirationTime / 1000 ||
         CONFIG.CACHE.media.expirationTime / 1000
+        }" min="60000" step="60000">
+      </div>
+    </div>
+    <div style="margin-bottom: 10px;">
+      <h4 style="margin-bottom: 8px;">${this._("settings.tts_cache")}</h4>
+      <div class="settings-grid">
+        <span class="settings-label">${this._("settings.enable_tts_cache")}</span>
+        <input type="checkbox" id="ttsCacheEnabled" ${this.settings.cacheOptions.tts?.enabled ? "checked" : ""
+        }>
+      </div>
+      <div class="settings-grid">
+        <span class="settings-label">${this._("settings.tts_cache_max_size")}</span>
+        <input type="number" id="ttsCacheMaxSize" class="settings-input" value="${this.settings.cacheOptions.tts?.maxSize ||
+        CONFIG.CACHE.tts.maxSize
+        }" min="5" max="100">
+      </div>
+      <div class="settings-grid">
+        <span class="settings-label">${this._("settings.tts_cache_expiration")}</span>
+        <input type="number" id="ttsCacheExpiration" class="settings-input" value="${this.settings.cacheOptions.tts?.expirationTime / 1000 ||
+        CONFIG.CACHE.tts.expirationTime / 1000
         }" min="60000" step="60000">
       </div>
     </div>
@@ -3316,7 +3516,7 @@ ${this.renderSettingsUI(this.settings)}
 </div>
 `;
       container.className = "translator-settings-container";
-      const providers = ['gemini', 'perplexity', 'claude', 'openai', 'mistral', 'puter'];
+      const providers = ['gemini', 'perplexity', 'claude', 'openai', 'mistral', 'puter', 'ollama'];
       container.querySelectorAll('input[name="apiProvider"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
           const provider = e.target.value;
@@ -3627,6 +3827,10 @@ ${this.renderSettingsUI(this.settings)}
           ...DEFAULT_SETTINGS.puterOptions,
           ...(savedSettings?.puterOptions || {})
         },
+        ollamaOptions: {
+          ...DEFAULT_SETTINGS.ollamaOptions,
+          ...(savedSettings?.ollamaOptions || {})
+        },
         apiKey: {
           gemini: [
             ...(savedSettings?.apiKey?.gemini ||
@@ -3718,9 +3922,9 @@ ${this.renderSettingsUI(this.settings)}
             ...DEFAULT_SETTINGS.cacheOptions.media,
             ...(savedSettings?.cacheOptions?.media || {})
           },
-          page: {
-            ...DEFAULT_SETTINGS.cacheOptions.page,
-            ...(savedSettings?.cacheOptions?.page || {})
+          tts: {
+            ...DEFAULT_SETTINGS.cacheOptions.tts,
+            ...(savedSettings?.cacheOptions?.tts || {})
           }
         },
         rateLimit: {
@@ -3840,6 +4044,13 @@ ${this.renderSettingsUI(this.settings)}
           proModel: settingsUI.querySelector('#puter-pro-model')?.value,
           customModel: settingsUI.querySelector('#puter-custom-model')?.value
         },
+        ollamaOptions: {
+          endpoint: settingsUI.querySelector('#ollama-endpoint')?.value.trim(),
+          model: settingsUI.querySelector('#ollama-custom-model')?.value.trim(),
+          temperature: parseFloat(settingsUI.querySelector('#ollama-temperature')?.value),
+          topP: parseFloat(settingsUI.querySelector('#ollama-top-p')?.value),
+          topK: parseInt(settingsUI.querySelector('#ollama-top-k')?.value, 10),
+        },
         contextMenu: {
           enabled: settingsUI.querySelector("#contextMenuEnabled").checked
         },
@@ -3910,10 +4121,10 @@ ${this.renderSettingsUI(this.settings)}
         },
         ocrOptions: {
           enabled: settingsUI.querySelector("#ocrEnabled").checked,
+          mangaTranslateAll: settingsUI.querySelector("#mangaTranslateAll").checked,
           preferredProvider: settingsUI.querySelector(
             'input[name="apiProvider"]:checked'
           ).value,
-          displayType: "popup",
           maxFileSize: CONFIG.OCR.maxFileSize,
           temperature: parseFloat(
             settingsUI.querySelector("#ocrTemperature").value
@@ -3965,6 +4176,18 @@ ${this.renderSettingsUI(this.settings)}
           settingsEnabled: settingsUI.querySelector("#settingsShortcutEnabled")
             .checked,
           enabled: settingsUI.querySelector("#shortcutsEnabled").checked,
+          ocrRegion: {
+            key: settingsUI.querySelector("#ocrRegionKey").value,
+            altKey: true
+          },
+          ocrWebImage: {
+            key: settingsUI.querySelector("#ocrWebImageKey").value,
+            altKey: true
+          },
+          ocrMangaWeb: {
+            key: settingsUI.querySelector("#ocrMangaWebKey").value,
+            altKey: true
+          },
           pageTranslate: {
             key: settingsUI.querySelector("#pageTranslateKey").value,
             altKey: true
@@ -4038,8 +4261,13 @@ ${this.renderSettingsUI(this.settings)}
             ),
             expirationTime:
               parseInt(
-                settingsUI.querySelector("#mediaCacheExpirationTime").value
+                settingsUI.querySelector("#mediaCacheExpiration").value
               ) * 1000
+          },
+          tts: {
+            enabled: settingsUI.querySelector("#ttsCacheEnabled").checked,
+            maxSize: parseInt(settingsUI.querySelector("#ttsCacheMaxSize").value),
+            expirationTime: parseInt(settingsUI.querySelector("#ttsCacheExpiration").value)
           }
         },
         rateLimit: {
@@ -4078,23 +4306,14 @@ ${this.renderSettingsUI(this.settings)}
           };
         });
       }
-      const isToolsEnabled = settingsUI.querySelector(
-        "#showTranslatorTools"
-      ).checked;
-      const currentState =
-        safeLocalStorageGet("translatorToolsEnabled") === "true";
-      if (isToolsEnabled !== currentState) {
-        safeLocalStorageSet(
-          "translatorToolsEnabled",
-          isToolsEnabled.toString()
-        );
-        this.translator.ui.removeToolsContainer();
-        this.translator.ui.resetState();
-        const overlays = this.$$(".translator-overlay");
-        overlays.forEach((overlay) => overlay.remove());
-        if (this.settings.translatorTools?.enabled && isToolsEnabled) {
-          this.translator.ui.setupTranslatorTools();
-        }
+      const isToolsEnabled = settingsUI.querySelector("#showTranslatorTools").checked;
+      safeLocalStorageSet("translatorToolsEnabled", isToolsEnabled.toString());
+      const isEnabledForSite = settingsUI.querySelector("#mangaTranslateAllSiteOnly").checked;
+      safeLocalStorageSet("kingtranslator_manga_all_for_site", isEnabledForSite.toString());
+      this.translator.ui.removeToolsContainer();
+      this.translator.ui.resetState();
+      if (this.settings.translatorTools?.enabled && isToolsEnabled) {
+        this.translator.ui.setupTranslatorTools();
       }
       this.currentLanguage = CONFIG.LANG_DATA[newSettings.uiLanguage];
       const mergedSettings = this.mergeWithDefaults(newSettings);
@@ -4336,6 +4555,9 @@ ${this.renderSettingsUI(this.settings)}
           });
           return provider.responseParser(result);
         }
+        if (this.currentProvider === "ollama") {
+          return await this.makeApiRequest(null, prompt, useCase);
+        }
         const settings = this.getSettings();
         let keysToTry = [];
         if (apiKey) {
@@ -4453,6 +4675,22 @@ ${this.renderSettingsUI(this.settings)}
             body: body,
             responseParser: config.responseParser
           };
+        case 'ollama':
+          const ollamaModel = this.getModel();
+          const ollamaEndpoint = settings.ollamaOptions.endpoint;
+          const { temperature, topP, topK } = settings.ollamaOptions;
+          return {
+            url: `${ollamaEndpoint}/api/generate`,
+            headers: config.headers,
+            body: config.createRequestBody(
+              content,
+              ollamaModel,
+              temperature,
+              topP,
+              topK
+            ),
+            responseParser: config.responseParser
+          };
         default:
           throw new Error(this._("notifications.unsupported_provider") + ` ${provider}`);
       }
@@ -4493,6 +4731,8 @@ ${this.renderSettingsUI(this.settings)}
         return this.getGeminiModel();
       } else if (provider === 'mistral') {
         return this.getMistralModel();
+      } else if (provider === 'ollama') {
+        return settings.ollamaOptions.model || 'llama3';
       }
       const Options = settings[`${provider}Options`];
       const config = this.config.providers[provider];
@@ -5040,15 +5280,15 @@ margin-top: 5px;
           sourceLang
         );
         if (this.settings.displayOptions.translationMode === "translation_only") {
-          this.setEditorContent(editor, result.trim());
+          this.setEditorContent(editor, result);
         } else {
           const translations = result.split("\n");
           let fullTranslation = "";
           for (const trans of translations) {
             const parts = trans.split("<|>");
-            fullTranslation += (parts[2]?.trim() || trans) + "\n";
+            fullTranslation += (parts[2] || trans) + "\n";
           }
-          this.setEditorContent(editor, fullTranslation.trim());
+          this.setEditorContent(editor, fullTranslation);
         }
       } catch (error) {
         console.error("Translation error:", error);
@@ -5184,10 +5424,6 @@ margin-top: 5px;
       this.translator = translator;
       this.isProcessing = false;
       this._ = this.translator.userSettings._;
-      this.imageCache = new FileCache(
-        CONFIG.CACHE.image.maxSize,
-        CONFIG.CACHE.image.expirationTime
-      );
     }
     async captureScreen() {
       try {
@@ -5569,37 +5805,44 @@ margin-top: 5px;
         throw error;
       }
     }
-    async processImage(file, prompts) {
+    async processImage(file, prompts, silent = false) {
       try {
         const settings = this.translator.userSettings.settings;
         this.isProcessing = true;
-        this.translator.ui.showProcessingStatus(this._("notifications.processing_image"));
+        if (!silent) this.translator.ui.showProcessingStatus(this._("notifications.processing_image"));
         const optimizedFile = await this.optimizeImage(file);
         const base64Image = await this.fileToBase64(optimizedFile);
-        this.translator.ui.updateProcessingStatus(this._("notifications.checking_cache"), 20);
-        if (this.imageCache && settings.cacheOptions.image.enabled) {
-          const cachedResult = await this.imageCache.get(base64Image);
+        if (!silent) this.translator.ui.updateProcessingStatus(this._("notifications.checking_cache"), 20);
+        let cacheKey = null;
+        if (this.translator.imageCache && settings.cacheOptions.image.enabled) {
+          const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(base64Image));
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          cacheKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          const cachedResult = await this.translator.imageCache.get(cacheKey);
           if (cachedResult) {
-            this.translator.ui.updateProcessingStatus(this._("notifications.found_in_cache"), 100);
+            if (!silent) this.translator.ui.updateProcessingStatus(this._("notifications.found_in_cache"), 100);
+            this.isProcessing = false;
+            if (!silent) setTimeout(() => this.translator.ui.removeProcessingStatus(), 1000);
             return cachedResult;
           }
         }
-        this.translator.ui.updateProcessingStatus(this._("notifications.detecting_text"), 40);
+        if (!silent) this.translator.ui.updateProcessingStatus(this._("notifications.detecting_text"), 40);
         const prompt = prompts ? prompts : this.translator.createPrompt("ocr", "ocr");
+        console.log('prompt: ', prompt);
         const content = await this.translator.fileProcess.processFile(file, prompt);
         if (this.translator.userSettings.settings.apiProvider === 'puter') return content;
         const result = await this.translator.api.request(content.content, 'ocr', content.key);
-        if (this.imageCache && settings.cacheOptions.image.enabled) {
-          await this.imageCache.set(base64Image, result);
+        if (cacheKey && this.translator.imageCache && settings.cacheOptions.image.enabled) {
+          await this.translator.imageCache.set(cacheKey, result);
         }
-        this.translator.ui.updateProcessingStatus(this._("notifications.completed"), 100);
+        if (!silent) this.translator.ui.updateProcessingStatus(this._("notifications.completed"), 100);
         return result;
       } catch (error) {
         console.error("OCR processing error:", error);
         throw error;
       } finally {
         this.isProcessing = false;
-        setTimeout(() => this.translator.ui.removeProcessingStatus(), 1000);
+        if (!silent) setTimeout(() => this.translator.ui.removeProcessingStatus(), 1000);
       }
     }
     async optimizeImage(file) {
@@ -5674,10 +5917,6 @@ margin-top: 5px;
       this.translator = translator;
       this.isProcessing = false;
       this._ = this.translator.userSettings._;
-      this.mediaCache = new FileCache(
-        CONFIG.CACHE.media.maxSize,
-        CONFIG.CACHE.media.expirationTime
-      );
     }
     async processMediaFile(file) {
       try {
@@ -5691,18 +5930,24 @@ margin-top: 5px;
         this.translator.ui.showProcessingStatus(this._("notifications.processing_media"));
         const base64Media = await this.fileToBase64(file);
         this.translator.ui.updateProcessingStatus(this._("notifications.checking_cache"), 20);
-        const cacheEnabled =
-          this.translator.userSettings.settings.cacheOptions.media?.enabled;
-        if (cacheEnabled && this.mediaCache) {
-          const cachedResult = await this.mediaCache.get(base64Media);
+        let cacheKey = null;
+        const cacheEnabled = this.translator.userSettings.settings.cacheOptions.media?.enabled;
+        if (cacheEnabled && this.translator.mediaCache) {
+          const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(base64Media));
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          cacheKey = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+          const cachedResult = await this.translator.mediaCache.get(cacheKey);
           if (cachedResult) {
             this.translator.ui.updateProcessingStatus(this._("notifications.found_in_cache"), 100);
             this.translator.ui.displayPopup(cachedResult, '', "Bản dịch");
+            this.isProcessing = false;
+            setTimeout(() => this.translator.ui.removeProcessingStatus(), 1000);
             return;
           }
         }
         this.translator.ui.updateProcessingStatus(this._("notifications.processing_audio_video"), 40);
         const prompt = this.translator.createPrompt("media", "media");
+        console.log('prompt: ', prompt);
         const content = await this.translator.fileProcess.processFile(file, prompt);
         if (this.translator.userSettings.settings.apiProvider === 'puter') return content;
         this.translator.ui.updateProcessingStatus(this._("notifications.translating"), 60);
@@ -5711,8 +5956,8 @@ margin-top: 5px;
         if (!result || result.length === 0) {
           throw new Error(this._("notifications.cannot_process_media"));
         }
-        if (cacheEnabled && this.mediaCache) {
-          await this.mediaCache.set(base64Media, result);
+        if (cacheKey && cacheEnabled && this.translator.mediaCache) {
+          await this.translator.mediaCache.set(cacheKey, result);
         }
         this.translator.ui.updateProcessingStatus(this._("notifications.completed"), 100);
         this.translator.ui.displayPopup(result, '', this._("notifications.translation_label"));
@@ -5829,21 +6074,7 @@ margin-top: 5px;
       this.captionObserver = null;
       this.platformInfo = this.detectPlatform();
       if (this.settings.videoStreamingOptions?.enabled && this.platformInfo) {
-        GM_addStyle(`
-.caption-window {
-  position: absolute !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-  width: 1px !important;
-  height: 1px !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  margin: -1px !important;
-  padding: 0 !important;
-  border: 0 !important;
-}`);
-        this.start();
+        setTimeout(() => this.start(), 2000);
       }
     }
     detectPlatform() {
@@ -5856,20 +6087,39 @@ margin-top: 5px;
             '#movie_player video',
           ],
           controlsContainer: [
-            '.ytp-right-controls',
-            '.player-controls-top',
+            '.ytp-subtitles-button',
+            '.ytp-settings-button',
+            'ytm-closed-captioning-button'
           ],
           videoContainer: [
             '#movie_player',
             '#player',
             '.html5-video-container',
           ],
-          captionSelector: ['.captions-text'],
-          captionButton: {
-            desktop: '.ytp-subtitles-button',
-            mobile: '.ytmClosedCaptioningButtonButton'
-          }
+          // captionSelector: ['.captions-text'],
+          // captionButton: {
+          //   desktop: '.ytp-subtitles-button',
+          //   mobile: '.ytmClosedCaptioningButtonButton'
+          // }
         },
+        udemy: {
+          videoSelector: [
+            'video',
+            '[class*="video-player--video-player"] video'
+          ],
+          controlsContainer: [
+            '[data-purpose="transcript-toggle"]',
+            '[id="popper-trigger--131"]'
+          ],
+          videoContainer: [
+            '[class*="video-player--mock-vjs-tech"]',
+            '[id*="video-container"]'
+          ],
+          // captionSelector: ['data-purpose="captions-cue-text"'],
+          // captionButton: {
+          //   desktop: 'button[data-purpose="transcript-toggle"]'
+          // }
+        }
       };
       const hostname = window.location.hostname;
       for (const [platform, config] of Object.entries(this.platformConfigs)) {
@@ -6042,23 +6292,118 @@ margin-top: 5px;
         }
       }
     }
+    async waitForElement(selector, timeout = 15000, interval = 500) {
+      const startTime = Date.now();
+      return new Promise((resolve) => {
+        const check = () => {
+          const element = document.querySelector(selector);
+          if (element) {
+            resolve(element);
+          } else if (Date.now() - startTime > timeout) {
+            resolve(null);
+          } else {
+            setTimeout(check, interval);
+          }
+        };
+        check();
+      });
+    }
+    async setupUdemyObserver() {
+      console.log('[King_DEBUG] Setting up observer for Udemy with multi-layered translation.');
+      const transcriptButton = await this.waitForElement('button[data-purpose="transcript-toggle"]');
+      if (!transcriptButton) return console.error('Udemy transcript button not found.');
+      if (transcriptButton.getAttribute('aria-expanded') !== 'true') {
+        transcriptButton.click();
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      const transcriptPanel = await this.waitForElement('[data-purpose="transcript-panel"]');
+      if (!transcriptPanel) return console.error('Could not find Udemy transcript panel to observe.');
+      const translateCueInBackground = async (cueElement) => {
+        const text = cueElement?.querySelector('[data-purpose="cue-text"]')?.textContent?.trim();
+        if (text && !this.subtitleCache.has(text)) {
+          try {
+            this.subtitleCache.set(text, 'translating...');
+            const translated = await this.translator.api.request(this.createLiveCaptionPrompt(text), 'media');
+            this.subtitleCache.set(text, translated || text);
+          } catch (error) {
+            console.error("Background cue translation failed:", error);
+            this.subtitleCache.set(text, text);
+          }
+        }
+      };
+      const handleNewActiveCue = async (activeCue) => {
+        const originalText = activeCue?.querySelector('[data-purpose="cue-text"]')?.textContent?.trim();
+        if (originalText && originalText !== this.lastCaption) {
+          this.lastCaption = originalText;
+          const cached = this.subtitleCache.get(originalText);
+          if (cached && cached !== 'translating...') {
+            this.updateSubtitles({ original: originalText, translation: cached });
+          } else {
+            this.updateSubtitles({ original: originalText, translation: '...' });
+            const translated = await this.translator.api.request(this.createLiveCaptionPrompt(originalText), 'media');
+            if (this.lastCaption === originalText) {
+              this.updateSubtitles({ original: originalText, translation: translated || originalText });
+            }
+            if (translated) this.subtitleCache.set(originalText, translated);
+          }
+          const upcomingCues = [];
+          let currentCueContainer = activeCue.parentElement;
+          for (let i = 0; i < 10 && currentCueContainer; i++) {
+            currentCueContainer = currentCueContainer.nextElementSibling;
+            if (currentCueContainer) {
+              const nextCueElement = currentCueContainer.querySelector('[data-purpose="transcript-cue"]');
+              if (nextCueElement) {
+                upcomingCues.push(nextCueElement);
+              }
+            }
+          }
+          console.log(`[King_DEBUG] Found ${upcomingCues.length} upcoming cues to pre-translate.`);
+          if (upcomingCues.length > 0) {
+            const translationPromises = upcomingCues.map(cue => translateCueInBackground(cue));
+            Promise.allSettled(translationPromises);
+          }
+        }
+      };
+      const observer = new MutationObserver((mutationsList) => {
+        for (const mutation of mutationsList) {
+          if (mutation.target?.getAttribute('data-purpose') === 'transcript-cue-active') {
+            handleNewActiveCue(mutation.target);
+            return;
+          }
+        }
+      });
+      observer.observe(transcriptPanel, { attributes: true, subtree: true, attributeFilter: ['data-purpose'] });
+      this.captionObserver = observer;
+      const initiallyActiveCue = transcriptPanel.querySelector('[data-purpose="transcript-cue-active"]');
+      if (initiallyActiveCue) {
+        handleNewActiveCue(initiallyActiveCue);
+      }
+      if (!this.fullTranscriptTranslated) {
+        this.translateFullUdemyTranscript(transcriptPanel);
+      }
+    }
     async getVideoTranscript() {
+      if (this.platformInfo.platform === 'udemy') {
+        console.log('[King_DEBUG] Skipping timestamp-based transcript fetch for Udemy.');
+        return null;
+      }
       if (this.videoTranscript) return this.videoTranscript;
       if (this.isFetchingTranscript) return null;
       this.isFetchingTranscript = true;
       console.log("[KING_DEBUG] getVideoTranscript: Starting to fetch transcript...");
-      const finalErrorMessage = this._("notifications.get_transcript_error_generic") + "\n\n" +
-        this._("notifications.get_transcript_error_suggestion1") + "\n" +
-        this._("notifications.get_transcript_error_suggestion2");
       try {
-        const domTranscript = await this.getTranscriptFromDOM();
-        if (domTranscript && domTranscript.length > 0) {
-          this.videoTranscript = domTranscript;
+        let transcriptData = null;
+        transcriptData = await this.getTranscriptFromDOM();
+        if (transcriptData && transcriptData.length > 0) {
+          this.videoTranscript = transcriptData;
           this.translatedTranscript = new Array(this.videoTranscript.length).fill(null);
-          console.log("[KING_DEBUG] getVideoTranscript (DOM): Success! Parsed", this.videoTranscript.length, "captions.");
+          console.log("[KING_DEBUG] getVideoTranscript: Success! Parsed", this.videoTranscript.length, "captions.");
           this.translateFullTranscriptInBackground();
           return this.videoTranscript;
         }
+        const finalErrorMessage = this._("notifications.get_transcript_error_generic") + "\n\n" +
+          this._("notifications.get_transcript_error_suggestion1") + "\n" +
+          this._("notifications.get_transcript_error_suggestion2");
         console.error("[King_DEBUG] All methods failed to get transcript.");
         if (!this.isNotify) this.translator.ui.showNotification(finalErrorMessage, "error");
         this.isNotify = true;
@@ -6095,24 +6440,44 @@ margin-top: 5px;
     }
     async translateFullTranscriptInBackground() {
       if (!this.videoTranscript || this.fullTranscriptTranslated) return;
-      console.log("[KING_DEBUG] Starting full transcript translation in background using JSON with IDs...");
+      console.log("[KING_DEBUG] Starting full transcript translation for YouTube...");
       try {
-        const originalTranscriptWithIDs = this.videoTranscript.map((caption, index) => ({
-          id: index,
-          text: caption.text
-        }));
-        const originalTranscriptJSON = JSON.stringify(originalTranscriptWithIDs, null, 2);
-        const docTitle = document.title ? `từ video có tiêu đề "${document.title}"` : '';
+        const untranslatedCaptions = this.videoTranscript
+          .map((caption, index) => ({ ...caption, originalIndex: index }))
+          .filter(caption => !this.translatedTranscript[caption.originalIndex]);
+        if (untranslatedCaptions.length === 0) {
+          console.log("[King_DEBUG] All YouTube transcript cues are already translated.");
+          this.fullTranscriptTranslated = true;
+          return;
+        }
+        const CHUNK_SIZE = 100;
+        const chunks = [];
+        for (let i = 0; i < untranslatedCaptions.length; i += CHUNK_SIZE) {
+          chunks.push(untranslatedCaptions.slice(i, i + CHUNK_SIZE));
+        }
+        console.log(`[KING_DEBUG] Splitting YouTube transcript into ${chunks.length} chunks of size ~${CHUNK_SIZE}.`);
+        const docTitle = document.title ? `and the title "${document.title}"` : '';
         const targetLang = this.settings.displayOptions.targetLanguage;
-        const fullPrompt = `You are an expert subtitle translator. Your task is to translate the 'text' field for each object in the following JSON array to '${targetLang}'.
-- The video is titled: "${docTitle}". Use this context.
+        const chunkPromises = chunks.map(async (chunk) => {
+          const chunkWithIDs = chunk.map(caption => ({ id: caption.originalIndex, text: caption.text }));
+          const chunkJSON = JSON.stringify(chunkWithIDs, null, 2);
+          const fullPrompt = `You are an expert subtitle translator. Your task is to translate the 'text' field for each object in the following JSON array to '${targetLang}'.
+- Target language: '${targetLang}'.
+- Use the context of ${docTitle} to determine the translation style.
+- The translation must strictly adhere to the context and tone of the original text.
+- Ensure fluency and naturalness as a native speaker would.
+- Do not add any explanations or interpretations beyond the translation.
+- Preserve terminology and proper nouns on a 1:1 basis.
 - You MUST return a valid JSON array.
 - For EACH object you translate, you MUST include the original 'id' from the input.
 - Each object in the output array must contain exactly two fields: "id" (the original integer ID) and "translation" (the translated text).
 - Do NOT add, merge, or skip any objects. The output array should ideally have the same number of objects as the input.
-- Do NOT add any extra text, comments, or markdown formatting (like \`\`\`json). The output must be raw, valid JSON.
+- Do NOT add any extra text, comments, or markdown formatting (DO NOT like \`\`\`json). The output must be raw, valid JSON.
+- CRITICAL: Properly escape all special characters within the "translation" strings, especially double quotes (").
 Input JSON:
-${originalTranscriptJSON}
+\`\`\`
+${chunkJSON}
+\`\`\`
 Expected Output JSON format:
 [
   { "id": 0, "translation": "Translated text for object with id 0..." },
@@ -6120,46 +6485,142 @@ Expected Output JSON format:
   ...
 ]
 `;
-        const rawResponse = await this.translator.api.request(fullPrompt, 'media');
-        if (rawResponse) {
-          let translatedData;
           try {
-            const jsonMatch = rawResponse.match(/\[\s*\{[\s\S]*\}\s*\]/);
-            if (jsonMatch) {
-              translatedData = JSON.parse(jsonMatch[0]);
-            } else {
-              throw new Error("No valid JSON array found in the response.");
+            const rawResponse = await this.translator.api.request(fullPrompt, 'media');
+            console.log('rawResponse:\n', rawResponse);
+            if (!rawResponse) return;
+            const translatedData = this.parseFaultyJSON(rawResponse);
+            if (Array.isArray(translatedData)) {
+              translatedData.forEach(item => {
+                const originalIndex = item.id;
+                const translation = item.translation || item.vi;
+                if (typeof originalIndex === 'number' && this.videoTranscript[originalIndex] && translation) {
+                  this.translatedTranscript[originalIndex] = {
+                    original: this.videoTranscript[originalIndex].text,
+                    translation: translation
+                  };
+                }
+              });
             }
-          } catch (e) {
-            console.error("[KING_DEBUG] Failed to parse JSON response from AI:", e);
-            console.error("[KING_DEBUG] Raw AI Response:", rawResponse);
-            return;
+          } catch (chunkError) {
+            console.error(`[King_DEBUG] Failed to translate a YouTube chunk:`, chunkError);
           }
-          if (Array.isArray(translatedData)) {
-            let successfulTranslations = 0;
-            translatedData.forEach(item => {
-              if (item && typeof item.id === 'number' && item.translation && this.videoTranscript[item.id]) {
-                this.translatedTranscript[item.id] = {
-                  original: this.videoTranscript[item.id].text,
-                  translation: item.translation
-                };
-                successfulTranslations++;
-              }
-            });
-            console.log(`[KING_DEBUG] Successfully mapped ${successfulTranslations} translations using IDs.`);
-            if (successfulTranslations / this.videoTranscript.length > 0.9) {
-              this.fullTranscriptTranslated = true;
-              console.log("[KING_DEBUG] Full transcript translation is considered complete!");
-            } else {
-              console.warn("[KING_DEBUG] Full transcript translation was partial. Fallback to chunk translation will continue for missing parts.");
-            }
-          } else {
-            console.error("[KING_DEBUG] Translated data is not an array.");
-          }
-        }
+        });
+        await Promise.allSettled(chunkPromises);
+        this.fullTranscriptTranslated = true;
+        console.log("[KING_DEBUG] All YouTube transcript chunks have been processed.");
       } catch (error) {
-        console.error("[KING_DEBUG] Error during full transcript translation:", error);
+        console.error("[KING_DEBUG] Error during full YouTube transcript translation:", error);
       }
+    }
+    async translateFullUdemyTranscript(transcriptPanel) {
+      if (this.fullTranscriptTranslated) return;
+      console.log("[King_DEBUG] Starting full transcript translation for Udemy...");
+      try {
+        const cues = transcriptPanel.querySelectorAll('[data-purpose="transcript-cue"]');
+        if (!cues || cues.length === 0) return;
+        const transcriptWithIDs = Array.from(cues).map((cue, index) => {
+          const text = cue.querySelector('[data-purpose="cue-text"]')?.textContent?.trim();
+          return (text && !this.subtitleCache.has(text)) ? { id: index, text: text } : null;
+        }).filter(Boolean);
+        if (transcriptWithIDs.length === 0) {
+          console.log("[King_DEBUG] All transcript cues are already cached.");
+          this.fullTranscriptTranslated = true;
+          return;
+        }
+        const CHUNK_SIZE = 100;
+        const chunks = [];
+        for (let i = 0; i < transcriptWithIDs.length; i += CHUNK_SIZE) {
+          chunks.push(transcriptWithIDs.slice(i, i + CHUNK_SIZE));
+        }
+        console.log(`[King_DEBUG] Splitting full transcript into ${chunks.length} chunks of size ~${CHUNK_SIZE}.`);
+        const docTitle = document.title ? `từ video có tiêu đề "${document.title}"` : '';
+        const targetLang = this.settings.displayOptions.targetLanguage;
+        const chunkPromises = chunks.map(async (chunk) => {
+          const chunkJSON = JSON.stringify(chunk, null, 2);
+          const fullPrompt = `You are an expert subtitle translator. Your task is to translate the 'text' field for each object in the following JSON array to '${targetLang}'.
+- Target language: '${targetLang}'.
+- Use the context of ${docTitle} to determine the translation style.
+- The translation must strictly adhere to the context and tone of the original text.
+- Ensure fluency and naturalness as a native speaker would.
+- Do not add any explanations or interpretations beyond the translation.
+- Preserve terminology and proper nouns on a 1:1 basis.
+- You MUST return a valid JSON array.
+- For EACH object you translate, you MUST include the original 'id' from the input.
+- Each object in the output array must contain exactly two fields: "id" (the original integer ID) and "translation" (the translated text).
+- Do NOT add, merge, or skip any objects. The output array should ideally have the same number of objects as the input.
+- Do NOT add any extra text, comments, or markdown formatting (DO NOT like \`\`\`json). The output must be raw, valid JSON.
+- CRITICAL: Properly escape all special characters within the "translation" strings, especially double quotes (").
+Input JSON:
+\`\`\`
+${chunkJSON}
+\`\`\`
+Expected Output JSON format:
+[
+  { "id": 0, "translation": "Translated text for object with id 0..." },
+  { "id": 1, "translation": "Translated text for object with id 1..." },
+  ...
+]
+`;
+          try {
+            const rawResponse = await this.translator.api.request(fullPrompt, 'media');
+            if (!rawResponse) return;
+            const translatedData = this.parseFaultyJSON(rawResponse);
+            if (Array.isArray(translatedData)) {
+              const originalTextsMap = new Map(chunk.map(item => [item.id, item.text]));
+              translatedData.forEach(item => {
+                const originalText = originalTextsMap.get(item.id);
+                const translation = item.translation || item.vi;
+                if (originalText && translation) {
+                  this.subtitleCache.set(originalText, translation);
+                }
+              });
+            }
+          } catch (chunkError) {
+            console.error(`[King_DEBUG] Failed to translate a chunk:`, chunkError);
+          }
+        });
+        await Promise.allSettled(chunkPromises);
+        this.fullTranscriptTranslated = true;
+        console.log("[King_DEBUG] All transcript chunks have been processed.");
+      } catch (error) {
+        console.error("[KING_DEBUG] Error during full Udemy transcript translation:", error);
+      }
+    }
+    parseFaultyJSON(jsonString) {
+      let cleanString = jsonString.trim();
+      const markdownMatch = cleanString.match(/```json\s*([\s\S]*?)\s*```/);
+      if (markdownMatch && markdownMatch[1]) {
+        cleanString = markdownMatch[1].trim();
+      }
+      try {
+        const parsed = JSON.parse(cleanString);
+        if (Array.isArray(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn("Could not parse the whole JSON string, attempting to parse line by line.", e.message);
+      }
+      const objects = [];
+      const lines = cleanString.split('\n');
+      let currentObjectStr = '';
+      lines.forEach(line => {
+        currentObjectStr += line;
+        try {
+          if (line.trim().endsWith('},') || line.trim().endsWith('}')) {
+            const objectToParse = currentObjectStr.trim().endsWith(',')
+              ? currentObjectStr.trim().slice(0, -1)
+              : currentObjectStr.trim();
+            const parsed = JSON.parse(objectToParse);
+            if (typeof parsed.id === 'number' && (parsed.translation || parsed.vi)) {
+              objects.push(parsed);
+            }
+            currentObjectStr = '';
+          }
+        } catch (e) {
+        }
+      });
+      return objects;
     }
     getCurrentCaption(transcript, currentTime) {
       if (!transcript || !Array.isArray(transcript)) return null;
@@ -6171,7 +6632,7 @@ Expected Output JSON format:
       return caption || null;
     }
     async processVideoFrame() {
-      if (!this.isEnabled || !this.currentVideo || this.isSeeking) return;
+      if (this.platformInfo.platform === 'udemy' || !this.isEnabled || !this.currentVideo || this.isSeeking) return;
       try {
         if (!this.videoTranscript && !this.isFetchingTranscript) {
           await this.getVideoTranscript();
@@ -6223,7 +6684,7 @@ Expected Output JSON format:
       }
     }
     checkNeedsTranslation(currentIndex) {
-      const LOOK_AHEAD = 20;
+      const LOOK_AHEAD = 10;
       const endIndex = Math.min(currentIndex + LOOK_AHEAD, this.videoTranscript.length);
       for (let i = currentIndex + 1; i < endIndex; i++) {
         if (!this.translatedTranscript[i] && !this.translatingIndexes.has(i)) {
@@ -6236,28 +6697,42 @@ Expected Output JSON format:
       if (this.isTranslatingChunk || !this.videoTranscript || this.fullTranscriptTranslated) return;
       this.isTranslatingChunk = true;
       try {
-        const CHUNK_SIZE = 5;
+        const CHUNK_SIZE = 10;
         const untranslatedCaptions = [];
         for (let i = currentIndex; i < this.videoTranscript.length && untranslatedCaptions.length < CHUNK_SIZE; i++) {
-          if (!this.translatedTranscript[i]) {
+          if (!this.translatedTranscript[i] && !this.translatingIndexes.has(i)) {
             untranslatedCaptions.push({ text: this.videoTranscript[i].text, index: i });
+            this.translatingIndexes.add(i);
           }
         }
-        if (untranslatedCaptions.length === 0) return;
-        console.log(`[KING_DEBUG] Translating temporary chunk of ${untranslatedCaptions.length} captions.`);
-        const chunkText = untranslatedCaptions.map(c => c.text).join(' <-> ');
-        const result = await this.translator.api.request(this.createLiveCaptionPrompt(chunkText), 'media');
-        if (result) {
-          const translations = result.split('<->');
-          untranslatedCaptions.forEach((captionInfo, index) => {
-            if (!this.fullTranscriptTranslated) {
-              this.translatedTranscript[captionInfo.index] = {
-                original: captionInfo.text,
-                translation: translations[index]?.trim() || captionInfo.text
-              };
-            }
-          });
+        if (untranslatedCaptions.length === 0) {
+          this.isTranslatingChunk = false;
+          return;
         }
+        console.log(`[King_DEBUG] Pre-translating ${untranslatedCaptions.length} upcoming captions in parallel.`);
+        const translationPromises = untranslatedCaptions.map(captionInfo =>
+          this.translator.api.request(this.createLiveCaptionPrompt(captionInfo.text), 'media')
+            .then(translatedText => ({
+              ...captionInfo,
+              translation: translatedText || captionInfo.text,
+              success: !!translatedText
+            }))
+            .catch(error => {
+              console.error(`Error translating upcoming caption: "${captionInfo.text}"`, error);
+              return { ...captionInfo, translation: captionInfo.text, success: false };
+            })
+        );
+        const results = await Promise.allSettled(translationPromises);
+        results.forEach(result => {
+          if (result.status === 'fulfilled') {
+            const { index, text, translation } = result.value;
+            this.translatedTranscript[index] = {
+              original: text,
+              translation: translation
+            };
+            this.translatingIndexes.delete(index);
+          }
+        });
       } catch (error) {
         console.error(this._("notifications.upcoming_captions_error"), error);
       } finally {
@@ -6265,18 +6740,35 @@ Expected Output JSON format:
       }
     }
     createLiveCaptionPrompt(text, isFast = false) {
-      const docTitle = `Đây là video có tiêu đề "${document.title}", hãy` || 'Hãy';
+      const docTitle = `và tiêu đề "${document.title}"` || '';
       const targetLang = this.settings.displayOptions.targetLanguage;
-      return `  ${isFast ? 'Hãy' : docTitle} dịch phụ đề từ video đó ở dưới đây sang "${targetLang}".
+      return `  Bạn là một người dịch phụ đề video chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Bạn cần dịch phụ đề video ở dưới đây sang "${targetLang}".
+  Lưu ý:
+    - Ngôn ngữ đích: '${targetLang}'.
+    - Dựa vào ngữ cảnh, bối cảnh ${isFast ? '' : docTitle} để xác định phong cách dịch.
+    - Bảo toàn các thuật ngữ và danh từ riêng với tỷ lệ 1:1.
+    - KHÔNG thêm bất kỳ văn bản, bình luận, hay định dạng markdown nào khác (KHÔNG dùng định dạng kiểu \`\`\`).
+    - Chỉ trả về bản dịch là văn bản thô hợp lệ và không giải thích gì thêm.
   Văn bản cần dịch:
 \`\`\`
 ${text}
 \`\`\`
-  Lưu ý:
-    - Nếu có <-> làm phân cách giữa các văn bản thì hãy chỉ dịch văn bản giữa <-> và không thay đổi vị trí sự phân cách của <-> ở bản dịch trả về.
-    - Trả về bản dịch mà không có dấu Backtick ở đầu và cuối văn bản.
-    - Chỉ trả về bản dịch theo yêu cầu trên và không giải thích gì thêm.
 `;
+    }
+    setupVideoWatcher() {
+      if (this.videoWatcherObserver) return;
+      const handleVideoChange = debounce(async () => {
+        const activeVideo = Array.from(document.querySelectorAll('video')).find(v => v.src && v.offsetHeight > 0);
+        if (activeVideo && activeVideo.src !== this.currentVideo?.src) {
+          console.log('[King_DEBUG] New video source detected. Re-initializing translator...');
+          this.cleanup();
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          this.start();
+        }
+      }, 1000);
+      const observer = new MutationObserver(handleVideoChange);
+      observer.observe(document.body, { childList: true, attributes: true, subtree: true, attributeFilter: ['src'] });
+      this.videoWatcherObserver = observer;
     }
     startVideoTracking() {
       if (this.videoTrackingInterval) {
@@ -6315,7 +6807,7 @@ ${text}
         return null;
       };
       let activeVideo = null;
-      const maxAttempts = 5 * 300; // 5 minutes
+      const maxAttempts = 3 * 300; // 3 minutes
       for (let i = 0; i < maxAttempts; i++) {
         if (!this.isEnabled) {
           console.log("[KING_DEBUG] Start process cancelled by user.");
@@ -6329,7 +6821,7 @@ ${text}
         await new Promise(resolve => setTimeout(resolve, 200));
       }
       if (!activeVideo) {
-        console.error("[KING_DEBUG] Could not find an active video after 5 minutes. Aborting.");
+        console.error("[KING_DEBUG] Could not find an active video after 3 minutes. Aborting.");
         this.translator.ui.showNotification(this._("notifications.not_find_video"), "error");
         this.isEnabled = false;
         return;
@@ -6337,36 +6829,41 @@ ${text}
       this.currentVideo = activeVideo;
       this.setupVideoListeners();
       this.createVideoControls();
-      this.startVideoTracking();
+      this.createSubtitleContainer();
+      if (this.platformInfo.platform === 'udemy') {
+        this.setupUdemyObserver();
+      } else {
+        this.startVideoTracking();
+      }
+      this.setupVideoWatcher();
     }
     stop() {
       this.isEnabled = false;
       this.isPlaying = false;
-      if (this.videoTrackingInterval) {
-        clearInterval(this.videoTrackingInterval);
-        this.videoTrackingInterval = null;
-      }
       this.cleanupVideo();
-      if (this.subtitleContainer) {
-        this.subtitleContainer.remove();
-        this.subtitleContainer = null;
-      }
-      this.isNotify = false;
+      if (this.videoTrackingInterval) clearInterval(this.videoTrackingInterval);
+      if (this.captionObserver) this.captionObserver.disconnect();
+      if (this.controlsContainer) this.controlsContainer.remove();
+      if (this.subtitleContainer) this.subtitleContainer.remove();
+      this.videoWatcherObserver = null;
+      this.captionObserver = null;
+      this.controlsContainer = null;
+      this.subtitleContainer = null;
       this.currentVideo = null;
+      this.lastOriginalText = '';
       this.subtitleCache.clear();
+      this.isNotify = false;
       this.rateLimitedKeys.clear();
       this.keyIndex = null;
       this.videoTranscript = null;
       this.translatedTranscript = null;
-      this.lastCaption = null;
       console.log(this._("notifications.stop_cap"));
     }
     cleanup() {
-      if (this.videoTrackingInterval) {
-        clearInterval(this.videoTrackingInterval);
-      }
-      this.stop();
+      this.fullTranscriptTranslated = false;
+      if (this.videoWatcherObserver) this.videoWatcherObserver.disconnect();
       this.subtitleCache.clear();
+      this.stop();
     }
     cleanupVideo() {
       if (this.currentVideo) {
@@ -6392,30 +6889,23 @@ ${text}
       let anchorButton = null;
       const selectors = this.platformInfo.config.controlsContainer;
       for (const selector of selectors) {
-        controlsTarget = document.querySelector(selector);
-        if (controlsTarget) {
+        anchorButton = document.querySelector(selector);
+        if (anchorButton) {
+          controlsTarget = anchorButton.parentElement;
+          toggleButton.className = anchorButton.className;
           console.log(`[KING_DEBUG] Found controls container with selector: ${selector}`);
           break;
         }
       }
       if (!controlsTarget) {
-        anchorButton = document.querySelector('.ytp-subtitles-button') || document.querySelector('.ytp-settings-button');
-        controlsTarget = anchorButton.parentElement;
-        toggleButton.className = anchorButton.className;
-      }
-      if (!controlsTarget) {
-        console.warn("[KING_DEBUG] Could not find controls container, attempting to append to video container.");
-        controlsTarget = this.findVideoContainer();
-        if (!controlsTarget) {
-          console.error("[KING_DEBUG] Failed to find any suitable container for controls.");
-          return;
-        }
+        console.error("[KING_DEBUG] Failed to find any suitable container for controls.");
+        return;
       }
       toggleButton.classList.add('video-translation-controls');
       toggleButton.title = this.isEnabled ? this._("notifications.live_caption_off") : this._("notifications.live_caption_on");
       toggleButton.setAttribute('role', 'button');
       toggleButton.setAttribute('tabindex', '6200');
-      toggleButton.innerHTML = `<img src="https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/icon/kings.jpg" style="width: 24px; height: 24px; vertical-align: middle;">`;
+      toggleButton.innerHTML = `<img src="https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/icon/kings.jpg" style="width: 65%; height: 65%; padding: 20%;">`;
       toggleButton.onclick = (e) => {
         e.stopPropagation();
         if (this.isEnabled) {
@@ -6482,20 +6972,6 @@ ${text}
           lineHeight: '1.2'
         });
         videoContainer.appendChild(this.subtitleContainer);
-        const originalCaption = document.querySelector('.caption-window-transform');
-        if (originalCaption) {
-          originalCaption.style.position = "absolute";
-          originalCaption.style.opacity = "0";
-          originalCaption.style.visibility = "hidden";
-          originalCaption.style.pointerEvents = "none";
-          originalCaption.style.width = "1px";
-          originalCaption.style.height = "1px";
-          originalCaption.style.overflow = "hidden";
-          originalCaption.style.clip = "rect(0 0 0 0)";
-          originalCaption.style.margin = "-1px";
-          originalCaption.style.padding = "0";
-          originalCaption.style.border = "0";
-        }
       } else {
         console.error(this._("notifications.video_container_not_found"));
       }
@@ -6505,42 +6981,40 @@ ${text}
       if (!this.subtitleContainer) return;
       const mode = this.settings.displayOptions.translationMode;
       const { original, translation } = captionData;
-      if (this.subtitleContainer) {
-        this.subtitleContainer.innerText = '';
-        const width = this.currentVideo.offsetWidth;
-        let tranWidth, origSize, transSize;
-        if (width <= 480) {
-          tranWidth = '98%';
-          origSize = '0.65em';
-          transSize = '0.7em';
-        } else if (width <= 962) {
-          tranWidth = '95%';
-          origSize = '0.75em';
-          transSize = '0.8em';
-        } else if (width <= 1366) {
-          tranWidth = '90%';
-          origSize = '0.85em';
-          transSize = '0.9em';
-        } else {
-          tranWidth = '90%';
-          origSize = '0.95em';
-          transSize = '1em';
-        }
-        this.subtitleContainer.style.maxWidth = tranWidth;
-        const createTextElement = (text, className, styles = {}) => {
-          const element = document.createElement('span');
-          element.className = className;
-          element.innerText = text;
-          Object.assign(element.style, styles, { display: 'block' });
-          return element;
-        }
-        if (mode === 'parallel' || (mode === 'language_learning' && this.settings.displayOptions.languageLearning?.showSource)) {
-          this.subtitleContainer.appendChild(
-            createTextElement(original, 'original-text', { fontSize: origSize, color: '#eeeeee', opacity: '0.9', marginBottom: '6px' })
-          );
-        }
-        this.subtitleContainer.appendChild(createTextElement(translation, 'translated-text', { fontSize: transSize, marginBottom: '2px' }));
+      this.subtitleContainer.innerText = '';
+      const width = this.currentVideo.offsetWidth;
+      let tranWidth, origSize, transSize;
+      if (width <= 480) {
+        tranWidth = '98%';
+        origSize = '0.65em';
+        transSize = '0.7em';
+      } else if (width <= 962) {
+        tranWidth = '95%';
+        origSize = '0.75em';
+        transSize = '0.8em';
+      } else if (width <= 1366) {
+        tranWidth = '90%';
+        origSize = '0.85em';
+        transSize = '0.9em';
+      } else {
+        tranWidth = '90%';
+        origSize = '0.95em';
+        transSize = '1em';
       }
+      this.subtitleContainer.style.maxWidth = tranWidth;
+      const createTextElement = (text, className, styles = {}) => {
+        const element = document.createElement('span');
+        element.className = className;
+        element.innerText = text;
+        Object.assign(element.style, styles, { display: 'block' });
+        return element;
+      }
+      if (mode === 'parallel' || (mode === 'language_learning' && this.settings.displayOptions.languageLearning?.showSource)) {
+        this.subtitleContainer.appendChild(
+          createTextElement(original, 'original-text', { fontSize: origSize, color: '#eeeeee', opacity: '0.9', marginBottom: '6px' })
+        );
+      }
+      this.subtitleContainer.appendChild(createTextElement(translation, 'translated-text', { fontSize: transSize, marginBottom: '2px' }));
     }
   }
   class PageTranslator {
@@ -6554,6 +7028,107 @@ ${text}
       this.languageCode = this.detectLanguage().languageCode;
       this.pageCache = new Map();
       this.pdfLoaded = true;
+      this.pageObserver = null;
+      this.sentinelContainer = null;
+      this.allTextNodes = [];
+    }
+    async translatePage() {
+      try {
+        if (this.isTranslated) {
+          if (this.pageObserver) {
+            this.pageObserver.disconnect();
+            this.pageObserver = null;
+          }
+          if (this.sentinelContainer) {
+            this.sentinelContainer.remove();
+            this.sentinelContainer = null;
+          }
+          if (this.domObserver) {
+            this.domObserver.disconnect();
+            this.domObserver = null;
+          }
+          await Promise.all(
+            Array.from(this.originalTexts.entries()).map(async ([node, originalText]) => {
+              if (node && (node.parentNode || document.contains(node))) {
+                node.textContent = originalText;
+              }
+            })
+          );
+          this.originalTexts.clear();
+          this.allTextNodes = [];
+          this.isTranslated = false;
+          return {
+            success: true,
+            message: this._("notifications.page_reverted_to_original")
+          };
+        }
+        if (this.pageObserver) this.pageObserver.disconnect();
+        this.allTextNodes = this.collectTextNodes();
+        if (this.allTextNodes.length === 0) {
+          return {
+            success: false,
+            message: this._("notifications.no_content_to_translate")
+          };
+        }
+        this.translator.ui.showNotification(this._("notifications.page_translate_loading"), "info");
+        const pageHeight = document.documentElement.scrollHeight;
+        const NUM_SECTIONS = Math.max(10, Math.min(50, Math.floor(pageHeight / 800))); // Chia trang thành các khu vực cao 800px
+        const sectionHeight = pageHeight / NUM_SECTIONS;
+        this.sentinelContainer = document.createElement('div');
+        this.sentinelContainer.style.cssText = 'position: absolute; top: 0; left: 0; width: 1px; height: 100%; pointer-events: none;';
+        document.body.appendChild(this.sentinelContainer);
+        const sentinels = [];
+        for (let i = 0; i < NUM_SECTIONS; i++) {
+          const sentinel = document.createElement('div');
+          sentinel.style.cssText = `position: absolute; top: ${i * sectionHeight}px; height: 1px; width: 1px;`;
+          sentinel.dataset.sectionIndex = i;
+          this.sentinelContainer.appendChild(sentinel);
+          sentinels.push(sentinel);
+        }
+        let translatedSections = 0;
+        this.pageObserver = new IntersectionObserver(
+          (entries, observer) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                const sentinel = entry.target;
+                observer.unobserve(sentinel);
+                const sectionIndex = parseInt(sentinel.dataset.sectionIndex, 10);
+                const startY = sectionIndex * sectionHeight;
+                const endY = startY + sectionHeight;
+                const nodesForThisSection = this.allTextNodes.filter(node => {
+                  const parent = node.parentElement;
+                  if (!parent) return false;
+                  const rect = parent.getBoundingClientRect();
+                  const nodeY = rect.top + window.scrollY;
+                  return nodeY >= startY && nodeY < endY && !this.originalTexts.has(node);
+                });
+                if (nodesForThisSection.length > 0) {
+                  const chunks = this.createChunks(nodesForThisSection, 2000);
+                  Promise.all(chunks.map(chunk => this.translateChunkWithRetries(chunk)))
+                    .catch(err => console.error("Error translating chunk in observer:", err));
+                }
+                translatedSections++;
+                if (translatedSections >= NUM_SECTIONS) {
+                  this.translator.ui.showNotification(this._("notifications.page_translated_success"), "success");
+                  if (!this.domObserver) {
+                    this.setupDOMObserver();
+                  }
+                }
+              }
+            }
+          }, {
+          rootMargin: "100% 0px",
+          threshold: 0.01,
+        }
+        );
+        sentinels.forEach(s => this.pageObserver.observe(s));
+        this.isTranslated = true;
+        return { success: true, message: this._("notifications.translating") };
+      } catch (error) {
+        console.error("Page translation error:", error);
+        this.isTranslated = false;
+        return { success: false, message: error.message };
+      }
     }
     getExcludeSelectors() {
       const settings = this.settings.pageTranslation;
@@ -6677,7 +7252,7 @@ ${text}
         }
         const result = await this.translatePage();
         if (result.success) {
-          const toolsContainer = this.$(
+          const toolsContainer = this.translator.ui.$(
             ".translator-tools-container"
           );
           if (toolsContainer) {
@@ -6692,75 +7267,20 @@ ${text}
               }
             }
           }
-          const floatingButton = this.$(
+          const floatingButton = this.translator.ui.$(
             ".page-translate-button"
           );
           if (floatingButton) {
             floatingButton.textContent = this.isTranslated
               ? `📄 ${this._("notifications.original_label")}` : `📄 ${this._("notifications.page_translate_menu_label")}`;
           }
-          this.translator.ui.showNotification(result.message, "success");
+          // this.translator.ui.showNotification(result.message, "success");
         } else {
           this.translator.ui.showNotification(result.message, "warning");
         }
         return result;
       } catch (error) {
         console.error("Translation check error:", error);
-        return {
-          success: false,
-          message: error.message
-        };
-      }
-    }
-    async translatePage() {
-      try {
-        if (!this.domObserver) {
-          this.setupDOMObserver();
-        }
-        if (this.isTranslated) {
-          await Promise.all(
-            Array.from(this.originalTexts.entries()).map(async ([node, originalText]) => {
-              if (node && (node.parentNode || document.contains(node))) {
-                node.textContent = originalText;
-              }
-            })
-          );
-          this.originalTexts.clear();
-          this.isTranslated = false;
-          return {
-            success: true,
-            message: this._("notifications.page_reverted_to_original")
-          };
-        }
-        const textNodes = this.collectTextNodes();
-        if (textNodes.length === 0) {
-          return {
-            success: false,
-            message: this._("notifications.no_content_to_translate")
-          };
-        }
-        const chunks = this.createChunks(textNodes, 2000);
-        const translationResults = await Promise.all(
-          chunks.map(chunk => this.translateChunkWithRetries(chunk))
-        );
-        const failedNodesCount = translationResults
-          .filter(result => !result.success)
-          .reduce((count, result) => count + result.nodes.length, 0);
-        this.isTranslated = true;
-        if (failedNodesCount > 0) {
-          return {
-            success: true,
-            message: this._("notifications.page_translated_partial").replace('{failed_count}', failedCount)
-          };
-        }
-        return {
-          success: true,
-          message: this._("notifications.page_translated_success")
-        };
-      } catch (error) {
-        console.error("Page translation error:", error);
-        this.isTranslated = false;
-        this.originalTexts.clear();
         return {
           success: false,
           message: error.message
@@ -6845,15 +7365,21 @@ ${text}
       }
       return finalChunks;
     }
-    async translateChunkWithRetries(chunk, maxRetries = 3, initialDelay = 1000) {
+    async translateChunkWithRetries(chunk, maxRetries = 5, initialDelay = 1000) {
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
+          chunk.forEach(node => {
+            if (!this.originalTexts.has(node)) {
+              this.originalTexts.set(node, node.textContent);
+            }
+          });
           const textsToTranslate = chunk
-            .map(node => node.textContent.trim())
+            .map(node => this.originalTexts.get(node).trim())
             .filter(text => text.length > 0)
             .join(' <-> ');
           if (!textsToTranslate) return { success: true, nodes: chunk };
           const prompt = this.translator.createPrompt(textsToTranslate, "page");
+          console.log('prompt: ', prompt);
           const translatedText = await this.translator.api.request(prompt, 'page');
           if (!translatedText) {
             throw new Error("API returned empty response for chunk.");
@@ -6862,15 +7388,12 @@ ${text}
           await Promise.all(
             chunk.map(async (node, index) => {
               if (index >= translations.length) return;
-              const text = node.textContent.trim();
-              if (text.length > 0 && node.parentNode && document.contains(node)) {
-                if (!this.originalTexts.has(node)) {
-                  this.originalTexts.set(node, node.textContent);
-                }
+              const originalText = this.originalTexts.get(node)?.trim();
+              if (originalText && node.parentNode && document.contains(node)) {
                 const translated = translations[index];
                 const mode = this.settings.displayOptions.translationMode;
                 let output = this.formatTranslation(
-                  text,
+                  originalText,
                   translated,
                   mode,
                   this.settings.displayOptions
@@ -6911,6 +7434,7 @@ ${text}
               if (validTexts.length === 0) return;
               const textToTranslate = validTexts.join(" <> ");
               const prompt = this.translator.createPrompt(textToTranslate, "page");
+              console.log('prompt: ', prompt);
               const translatedText = await this.translator.api.request(prompt, 'page');
               if (!translatedText) return;
               const translations = translatedText.split(" <> ");
@@ -6923,7 +7447,7 @@ ${text}
                       if (node.isAttribute) {
                         node.ownerElement.setAttribute(
                           node.attributeName,
-                          translations[index].trim()
+                          translations[index]
                         );
                       } else {
                         node.textContent = translations[index];
@@ -7074,19 +7598,19 @@ ${text}
       if (!text) return '';
       switch (mode) {
         case "translation_only":
-          return text.split("<|>")[0]?.trim() || text;
+          return text.split("<|>")[0] || text;
         case "parallel":
-          return `${this._("notifications.original")}: ${text.split("<|>")[0]?.trim() || ''}  ${this._("notifications.translation")}: ${text.split("<|>")[2]?.trim() || text}`;
+          return `${this._("notifications.original")}: ${text.split("<|>")[0] || ''}  ${this._("notifications.translation")}: ${text.split("<|>")[2] || text}`;
         case "language_learning":
           let parts = [];
           if (showSource) {
-            parts.push(`${this._("notifications.original")}: ${text.split("<|>")[0]?.trim() || ''}`);
+            parts.push(`${this._("notifications.original")}: ${text.split("<|>")[0] || ''}`);
           }
-          const pinyin = text.split("<|>")[1]?.trim();
+          const pinyin = text.split("<|>")[1];
           if (pinyin) {
             parts.push(`${this._("notifications.ipa")}: ${pinyin}`);
           }
-          const translation = text.split("<|>")[2]?.trim() || text;
+          const translation = text.split("<|>")[2] || text;
           parts.push(`${this._("notifications.translation")}: ${translation}`);
           return parts.join("  ");
         default:
@@ -7177,7 +7701,7 @@ ${text}
               <div class="section-title">${this._("notifications.ipa")}:</div>
               <div class="section-content">${this.formatTranslationContent(
         page.translations
-          .map(t => t.split(`${this._("notifications.ipa")}:`)[1]?.split(`${this._("notifications.translation_label")}:`)[0]?.trim())
+          .map(t => t.split(`${this._("notifications.ipa")}:`)[1]?.split(`${this._("notifications.translation_label")}:`)[0])
           .filter(Boolean)
           .join('\n')
       )}</div>
@@ -7187,7 +7711,7 @@ ${text}
             <div class="section-title">${this._("notifications.translation_label")}:</div>
             <div class="section-content">${this.formatTranslationContent(
         page.translations
-          .map(t => t.split(`${this._("notifications.translation_label")}:`)[1]?.trim())
+          .map(t => t.split(`${this._("notifications.translation_label")}:`)[1])
           .filter(Boolean)
           .join('\n')
       )}</div>
@@ -7352,6 +7876,7 @@ ${text}
           .join(" <-> ");
         if (!textsToTranslate) return;
         const prompt = this.translator.createPrompt(textsToTranslate, "page");
+        console.log('prompt: ', prompt);
         const translatedText = await this.translator.api.request(prompt, 'page');
         if (translatedText) {
           const translations = translatedText.split("<->");
@@ -7363,7 +7888,7 @@ ${text}
                 if (index < translations.length) {
                   const translated = translations[index];
                   const mode = this.settings.displayOptions.translationMode;
-                  let output = this.formatTranslation(text, translated.trim(), mode, this.settings.displayOptions);
+                  let output = this.formatTranslation(text, translated, mode, this.settings.displayOptions);
                   node.textContent = output;
                 }
               } catch (error) {
@@ -7383,18 +7908,18 @@ ${text}
         case "translation_only":
           return translatedText;
         case "parallel":
-          return `${this._("notifications.original")}: ${originalText}  ${this._("notifications.translation")}: ${translatedText.split("<|>")[2]?.trim() || translatedText}   `;
+          return `${this._("notifications.original")}: ${originalText}  ${this._("notifications.translation")}: ${translatedText.split("<|>")[2] || translatedText}   `;
         case "language_learning":
           let parts = [];
           if (showSource) {
             parts.push(`${this._("notifications.original")}: ${originalText}`);
           }
-          const pinyin = translatedText.split("<|>")[1]?.trim();
+          const pinyin = translatedText.split("<|>")[1];
           if (pinyin) {
             parts.push(`${this._("notifications.ipa")}: ${pinyin}`);
           }
           const translation =
-            translatedText.split("<|>")[2]?.trim() || translatedText;
+            translatedText.split("<|>")[2] || translatedText;
           parts.push(`${this._("notifications.translation")}: ${translation}   `);
           return parts.join("  ");
         default:
@@ -7402,161 +7927,97 @@ ${text}
       }
     }
   }
-  class FileCache {
-    constructor(maxSize, expirationTime) {
+  class PersistentCache {
+    constructor(storageKey, maxSize, expirationTime) {
+      this.storageKey = storageKey;
       this.maxSize = maxSize;
       this.expirationTime = expirationTime;
       this.cache = new Map();
       this.accessOrder = [];
+      this.isInitialized = false;
     }
-    async generateKey(fileData) {
-      const hashBuffer = await crypto.subtle.digest(
-        "SHA-256",
-        new TextEncoder().encode(fileData)
-      );
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    async init() {
+      if (this.isInitialized) return;
+      const storedData = await GM_getValue(this.storageKey);
+      if (storedData) {
+        try {
+          const parsed = JSON.parse(storedData);
+          this.cache = new Map(Object.entries(parsed.cache || {}));
+          this.accessOrder = parsed.accessOrder || [];
+          console.log(`Cache "${this.storageKey}" loaded with ${this.cache.size} items.`);
+        } catch (e) {
+          console.error(`Failed to load cache "${this.storageKey}":`, e);
+          this.cache = new Map();
+          this.accessOrder = [];
+        }
+      }
+      this.isInitialized = true;
     }
-    async set(fileData, result) {
-      const key = await this.generateKey(fileData);
+    async _saveToStorage() {
+      const dataToStore = {
+        cache: Object.fromEntries(this.cache),
+        accessOrder: this.accessOrder,
+      };
+      await GM_setValue(this.storageKey, JSON.stringify(dataToStore));
+    }
+    async set(key, value) {
+      if (!this.isInitialized) await this.init();
       if (this.cache.has(key)) {
         const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
-        this.accessOrder.push(key);
+        if (index > -1) this.accessOrder.splice(index, 1);
       } else {
         if (this.cache.size >= this.maxSize) {
           const oldestKey = this.accessOrder.shift();
           this.cache.delete(oldestKey);
         }
-        this.accessOrder.push(key);
       }
+      this.accessOrder.push(key);
       const compressedData = LZString.compressToUTF16(JSON.stringify({
-        result,
+        value,
         timestamp: Date.now()
       }));
       this.cache.set(key, compressedData);
+      await this._saveToStorage();
     }
-    async get(fileData) {
-      const key = await this.generateKey(fileData);
+    async get(key) {
+      if (!this.isInitialized) await this.init();
       const compressedData = this.cache.get(key);
       if (!compressedData) return null;
       const data = JSON.parse(LZString.decompressFromUTF16(compressedData));
       if (Date.now() - data.timestamp > this.expirationTime) {
         this.cache.delete(key);
         const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
+        if (index > -1) this.accessOrder.splice(index, 1);
+        await this._saveToStorage();
         return null;
       }
       const index = this.accessOrder.indexOf(key);
-      this.accessOrder.splice(index, 1);
+      if (index > -1) this.accessOrder.splice(index, 1);
       this.accessOrder.push(key);
-      return data.result;
+      await this._saveToStorage();
+      return data.value;
     }
-    clear() {
+    static arrayBufferToBase64(buffer) {
+      let binary = '';
+      const bytes = new Uint8Array(buffer);
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return window.btoa(binary);
+    }
+    static base64ToArrayBuffer(base64) {
+      const binary_string = window.atob(base64);
+      const len = binary_string.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary_string.charCodeAt(i);
+      }
+      return bytes.buffer;
+    }
+    async clear() {
       this.cache.clear();
       this.accessOrder = [];
-    }
-  }
-  class TranslationCache {
-    constructor(maxSize, expirationTime) {
-      this.maxSize = maxSize;
-      this.expirationTime = expirationTime;
-      this.cache = new Map();
-      this.accessOrder = [];
-    }
-    generateKey(text, isAdvanced, targetLanguage) {
-      return `${text}_${isAdvanced}_${targetLanguage}`;
-    }
-    set(text, translation, isAdvanced, targetLanguage) {
-      const key = this.generateKey(text, isAdvanced, targetLanguage);
-      if (this.cache.has(key)) {
-        const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
-        this.accessOrder.push(key);
-      } else {
-        if (this.cache.size >= this.maxSize) {
-          const oldestKey = this.accessOrder.shift();
-          this.cache.delete(oldestKey);
-        }
-        this.accessOrder.push(key);
-      }
-      const compressedData = LZString.compressToUTF16(JSON.stringify({
-        translation,
-        timestamp: Date.now()
-      }));
-      this.cache.set(key, compressedData);
-      this.saveToIndexedDB(key, compressedData);
-    }
-    get(text, isAdvanced, targetLanguage) {
-      const key = this.generateKey(text, isAdvanced, targetLanguage);
-      const compressedData = this.cache.get(key);
-      if (!compressedData) return null;
-      const data = JSON.parse(LZString.decompressFromUTF16(compressedData));
-      if (Date.now() - data.timestamp > this.expirationTime) {
-        this.cache.delete(key);
-        const index = this.accessOrder.indexOf(key);
-        this.accessOrder.splice(index, 1);
-        return null;
-      }
-      const index = this.accessOrder.indexOf(key);
-      this.accessOrder.splice(index, 1);
-      this.accessOrder.push(key);
-      return data.translation;
-    }
-    clear() {
-      this.cache.clear();
-      this.accessOrder = [];
-    }
-    optimizeStorage() {
-      if (this.cache.size > this.maxSize * 0.9) {
-        const itemsToKeep = Math.floor(this.maxSize * 0.7);
-        const sortedItems = [...this.accessOrder].slice(-itemsToKeep);
-        const tempCache = new Map();
-        sortedItems.forEach((key) => {
-          if (this.cache.has(key)) {
-            tempCache.set(key, this.cache.get(key));
-          }
-        });
-        this.cache = tempCache;
-        this.accessOrder = sortedItems;
-      }
-    }
-    async initDB() {
-      if (!window.indexedDB) {
-        console.warn("IndexedDB not supported");
-        return;
-      }
-      return new Promise((resolve, reject) => {
-        const request = indexedDB.open("translatorCache", 1);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        request.onupgradeneeded = (event) => {
-          const db = event.target.result;
-          if (!db.objectStoreNames.contains("translations")) {
-            db.createObjectStore("translations", { keyPath: "id" });
-          }
-        };
-      });
-    }
-    async saveToIndexedDB(key, value) {
-      const db = await this.initDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(["translations"], "readwrite");
-        const store = transaction.objectStore("translations");
-        const request = store.put({ id: key, value, timestamp: Date.now() });
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
-      });
-    }
-    async loadFromIndexedDB(key) {
-      const db = await this.initDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(["translations"], "readonly");
-        const store = transaction.objectStore("translations");
-        const request = store.get(key);
-        request.onsuccess = () => resolve(request.result?.value);
-        request.onerror = () => reject(request.error);
-      });
+      await GM_deleteValue(this.storageKey);
     }
   }
   class FileUploader {
@@ -8482,6 +8943,8 @@ ${text}
       this.voiceStorage = {};
       this.selectSource = null;
       this.selectVoice = null;
+      this.isTTSSpeaking = false;
+      this.currentTTSAudio = null;
       this.translationButtonEnabled = true;
       this.translationTapEnabled = true;
       this.mediaElement = null;
@@ -8590,15 +9053,15 @@ ${text}
         formattedTranslation = translatedText;
       } else if (mode === "parallel") {
         formattedTranslation = `<div style="margin-bottom: 8px">${this._("original_label")}: ${text}</div>
-<div>${this._("translation_label")}: ${translatedText.split("<|>")[2].trim() || translatedText}</div>`;
+<div>${this._("translation_label")}: ${translatedText.split("<|>")[2] || translatedText}</div>`;
       } else if (mode === "language_learning") {
         let sourceHTML = "";
         if (showSource) {
           sourceHTML = `<div style="margin-bottom: 8px">[${this._("original_label")}]: ${text}</div>`;
         }
         formattedTranslation = `${sourceHTML}
-<div>[${this._("pinyin_label")}]: ${translatedText.split("<|>")[1].trim() || ""}</div>
-<div>[${this._("translation_label")}]: ${translatedText.split("<|>")[2].trim() || translatedText}</div>`;
+<div>[${this._("pinyin_label")}]: ${translatedText.split("<|>")[1] || ""}</div>
+<div>[${this._("translation_label")}]: ${translatedText.split("<|>")[2] || translatedText}</div>`;
       }
       const translationDiv = document.createElement("div");
       translationDiv.classList.add("translator-content");
@@ -9373,6 +9836,313 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
       };
       document.addEventListener("keydown", handleEscape);
     }
+    async playTTS(text, voiceName, lang, options, playButton = null, isDark = false, menuItem = null) {
+      if (this.isTTSSpeaking) {
+        this.stopTTS();
+        return;
+      }
+      this.isTTSSpeaking = true;
+      if (playButton) this.updateButtonState(playButton, isDark);
+      if (menuItem) this.onSpeechEndCallback(menuItem);
+      try {
+        const provider = this.selectSource;
+        if (provider === 'local') {
+          this.currentTTSAudio = await this.playLocalTTS(text, voiceName, options, playButton, isDark, menuItem);
+          return;
+        }
+        const cacheEnabled = this.translator.userSettings.settings.cacheOptions.tts.enabled;
+        const optionsString = `${options.speedValue}-${options.pitchValue}-${options.volumeValue}`;
+        const cacheKey = `${provider}_${voiceName || lang}_${optionsString}_${text}`;
+        let audioBuffer = null;
+        if (cacheEnabled) {
+          const cachedBase64 = await this.translator.ttsCache.get(cacheKey);
+          if (cachedBase64) {
+            console.log("TTS found in persistent cache.");
+            audioBuffer = PersistentCache.base64ToArrayBuffer(cachedBase64);
+          }
+        }
+        if (!audioBuffer) {
+          console.log("TTS not in cache, fetching from API.");
+          const fetcherMap = {
+            'google_translate': () => this.fetchGoogleTranslateTTS(text, lang),
+            'google': () => this.fetchGoogleTTS(text, voiceName, lang, options),
+            'gemini': () => this.fetchGeminiTTS(text, voiceName),
+            'openai': () => this.fetchOpenAITTS(text, voiceName, options),
+          };
+          if (!fetcherMap[provider]) {
+            throw new Error(`TTS provider "${provider}" is not supported for caching.`);
+          }
+          audioBuffer = await fetcherMap[provider]();
+          if (!audioBuffer) {
+            throw new Error("Received no audio data from the API.");
+          }
+          if (cacheEnabled) {
+            const base64Audio = PersistentCache.arrayBufferToBase64(audioBuffer);
+            await this.translator.ttsCache.set(cacheKey, base64Audio);
+          }
+        }
+        this.currentTTSAudio = await this.playAudio(audioBuffer, options.volumeValue, playButton, isDark, menuItem);
+      } catch (error) {
+        console.error('TTS Playback Error:', error);
+        this.showNotification(this._("notifications.tts_playback_error") + ": " + error.message, "error");
+        this.isTTSSpeaking = false;
+        if (playButton) this.updateButtonState(playButton, isDark);
+        if (menuItem) this.onSpeechEndCallback(menuItem);
+      }
+    }
+    stopTTS() {
+      if (this.currentTTSAudio) {
+        if (this.currentTTSAudio?.stop) {
+          this.currentTTSAudio.stop();
+        }
+        if (this.currentTTSAudio?.disconnect) {
+          this.currentTTSAudio.disconnect();
+        }
+        if (this.currentTTSAudio?.pause) {
+          this.currentTTSAudio.pause();
+        }
+        this.isTTSSpeaking = false;
+        this.currentTTSAudio = null;
+      }
+      speechSynthesis.cancel();
+    }
+    updateButtonState(playButton, isDark) {
+      playButton.innerHTML = this.isTTSSpeaking ?
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>' :
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      playButton.title = this.isTTSSpeaking ? this._("notifications.stop_tts") : this._("notifications.play_tts");
+      playButton.style.backgroundColor = this.isTTSSpeaking ? (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)") : "transparent";
+    }
+    async playLocalTTS(text, voiceName, options, playButton, isDark, menuItem) {
+      return new Promise((resolve, reject) => {
+        if (!window.speechSynthesis) {
+          reject(new Error(this._("notifications.browser_tts_not_supported")));
+          return;
+        }
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = speechSynthesis.getVoices();
+        const voice = voices.find(v => v.name === voiceName);
+        if (voice) {
+          utterance.voice = voice;
+        }
+        utterance.rate = parseFloat(options.speedValue);
+        utterance.pitch = parseFloat(options.pitchValue);
+        utterance.volume = parseFloat(options.volumeValue);
+        utterance.onend = () => {
+          this.isTTSSpeaking = false;
+          if (playButton) this.updateButtonState(playButton, isDark);
+          if (menuItem) this.onSpeechEndCallback(menuItem);
+          resolve();
+        };
+        utterance.onerror = (event) => {
+          console.error('TTS Error:', event);
+          this.isTTSSpeaking = false;
+          if (playButton) this.updateButtonState(playButton, isDark);
+          if (menuItem) this.onSpeechEndCallback(menuItem);
+          reject(new Error(this._("notifications.tts_playback_error")));
+        };
+        speechSynthesis.speak(utterance);
+      });
+    };
+    createWavBlob(pcmData, sampleRate) {
+      const numChannels = 1;
+      const bitsPerSample = 16;
+      const blockAlign = (numChannels * bitsPerSample) / 8;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = pcmData.byteLength;
+      const chunkSize = 36 + dataSize;
+      const buffer = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(buffer);
+      view.setUint32(0, 0x52494646, false); // 'RIFF'
+      view.setUint32(4, chunkSize, true);
+      view.setUint32(8, 0x57415645, false); // 'WAVE'
+      view.setUint32(12, 0x666d7420, false); // 'fmt '
+      view.setUint32(16, 16, true); // 16 for PCM
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      view.setUint32(36, 0x64617461, false); // 'data'
+      view.setUint32(40, dataSize, true);
+      const pcm = new Uint8Array(pcmData);
+      const wav = new Uint8Array(buffer);
+      wav.set(pcm, 44);
+      return new Blob([wav], { type: 'audio/wav' });
+    }
+    async playAudio(audioData, volumeValue, playButton, isDark, menuItem) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioContext.decodeAudioData(audioData);
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = parseFloat(volumeValue);
+        source.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        source.onended = () => {
+          this.isTTSSpeaking = false;
+          if (playButton) this.updateButtonState(playButton, isDark);
+          if (menuItem) this.onSpeechEndCallback(menuItem);
+          audioContext.close();
+        };
+        source.start(0);
+        return source;
+      } catch (error) {
+        console.error('Audio playback error:', error);
+        throw error;
+      }
+    }
+    async fetchGoogleTranslateTTS(text, lang) {
+      try {
+        const chunks = text.match(/.{1,200}(?:\s|$)/g) || [];
+        const audioChunks = [];
+        for (const chunk of chunks) {
+          const chunkBuffer = await new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+              method: 'GET',
+              url: `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(chunk)}`,
+              responseType: 'arraybuffer',
+              headers: { 'Referer': 'https://translate.google.com/', 'User-Agent': 'Mozilla/5.0' },
+              onload: (response) => (response.status === 200) ? resolve(response.response) : reject(new Error(`Google Translate TTS error: ${response.status}`)),
+              onerror: reject
+            });
+          });
+          audioChunks.push(chunkBuffer);
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+        const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
+        const combinedBuffer = new ArrayBuffer(totalLength);
+        const combinedView = new Uint8Array(combinedBuffer);
+        let offset = 0;
+        for (const chunk of audioChunks) {
+          combinedView.set(new Uint8Array(chunk), offset);
+          offset += chunk.byteLength;
+        }
+        return combinedBuffer;
+      } catch (error) {
+        console.error('Google Translate TTS fetch error:', error);
+        throw error;
+      }
+    }
+    async fetchGoogleTTS(text, voiceName, lang, options) {
+      try {
+        const chunks = text.match(/.{1,200}(?:\s|$)/g) || [];
+        const audioChunks = [];
+        for (const chunk of chunks) {
+          const audioContent = await new Promise((resolve, reject) => {
+            GM_xmlhttpRequest({
+              method: 'POST',
+              url: 'https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw',
+              headers: { 'Content-Type': 'application/json' },
+              data: JSON.stringify({
+                audioConfig: { audioEncoding: 'MP3', pitch: parseFloat(options.pitchValue) - 1.0, speakingRate: parseFloat(options.speedValue) },
+                input: { text: chunk },
+                voice: { languageCode: lang, name: voiceName }
+              }),
+              responseType: 'json',
+              onload: (response) => (response.status === 200) ? resolve(response.response?.audioContent) : reject(new Error(`Google TTS API error: ${response.status}`)),
+              onerror: reject
+            });
+          });
+          if (audioContent) {
+            const binaryString = atob(audioContent);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            audioChunks.push(bytes.buffer);
+          }
+        }
+        if (audioChunks.length === 0) throw new Error("No audio data received from Google TTS.");
+        const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
+        const combinedBuffer = new ArrayBuffer(totalLength);
+        const combinedView = new Uint8Array(combinedBuffer);
+        let offset = 0;
+        for (const chunk of audioChunks) {
+          combinedView.set(new Uint8Array(chunk), offset);
+          offset += chunk.byteLength;
+        }
+        return combinedBuffer;
+      } catch (error) {
+        console.error('Google TTS fetch error:', error);
+        throw error;
+      }
+    }
+    async fetchGeminiTTS(text, voiceName) {
+      try {
+        const API_KEYS = this.settings.apiKey.gemini;
+        if (!API_KEYS || !API_KEYS[0]) throw new Error(this._("notifications.no_api_key_configured") + " for Gemini.");
+        const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
+        const model = this.settings.ttsOptions.defaultGeminiModel;
+        const requestBody = {
+          contents: [{ parts: [{ "text": text }] }],
+          generationConfig: {
+            responseModalities: ["AUDIO"],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: voiceName }
+              }
+            }
+          },
+          model: model
+        };
+        const response = await new Promise((resolve, reject) => {
+          GM_xmlhttpRequest({
+            method: "POST",
+            url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`,
+            headers: { "Content-Type": "application/json" },
+            data: JSON.stringify(requestBody),
+            responseType: 'json',
+            onload: (res) => {
+              if (res.status >= 200 && res.status < 300) {
+                resolve(res.response);
+              } else {
+                reject(new Error(`Request failed with status ${res.status}: ${res.statusText || res.responseText}`));
+              }
+            },
+            onerror: (error) => reject(error),
+            ontimeout: () => reject(new Error('Request timed out.'))
+          });
+        });
+        const part = response?.candidates?.[0]?.content?.parts?.[0];
+        const audioBase64 = part?.inlineData?.data;
+        if (!audioBase64) throw new Error(part?.text || "Invalid response structure from Gemini TTS.");
+        const binaryString = atob(audioBase64);
+        const pcmData = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) pcmData[i] = binaryString.charCodeAt(i);
+        const mimeType = part.inlineData.mimeType || 'audio/L16;codec=pcm;rate=24000';
+        const sampleRate = parseInt(mimeType.match(/rate=(\d+)/)?.[1] || '24000', 10);
+        const wavBlob = this.createWavBlob(pcmData.buffer, sampleRate);
+        return await wavBlob.arrayBuffer();
+      } catch (error) {
+        console.error('Gemini TTS fetch error:', error);
+        throw error;
+      }
+    }
+    async fetchOpenAITTS(text, voiceName, options) {
+      try {
+        const API_KEYS = this.settings.apiKey.openai;
+        const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
+        const model = this.settings.ttsOptions.defaultModel;
+        return await new Promise((resolve, reject) => {
+          GM_xmlhttpRequest({
+            method: "POST",
+            url: "https://api.openai.com/v1/audio/speech",
+            headers: { "Authorization": `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+            data: JSON.stringify({ model: model, input: text, voice: voiceName, speed: parseFloat(options.speedValue), response_format: 'wav' }),
+            responseType: "arraybuffer",
+            onload: (response) => (response.status === 200) ? resolve(response.response) : reject(new Error(`Request failed with status ${response.status}`)),
+            onerror: (error) => reject(error),
+          });
+        });
+      } catch (error) {
+        console.error('OpenAI TTS fetch error:', error);
+        throw error;
+      }
+    }
     createTTSButton(theme, isDark, text, lang) {
       if (!this.settings.ttsOptions?.enabled) return null;
       const buttonContainer = document.createElement('div');
@@ -9407,8 +10177,6 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
 `;
       settingsButton.title = this._("notifications.tts_settings");
       const playButton = document.createElement("button");
-      let isPlaying = false;
-      let currentAudio = null;
       Object.assign(playButton.style, {
         background: "none",
         border: "none",
@@ -9604,36 +10372,6 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
       const speedControl = createControl(this._("settings.speed"), 0.1, 2, this.settings.ttsOptions.defaultSpeed, 0.1);
       const volumeControl = createControl(this._("settings.volume"), 0, 1, this.settings.ttsOptions.defaultVolume, 0.1);
       const pitchControl = createControl(this._("settings.pitch"), 0, 2, this.settings.ttsOptions.defaultPitch, 0.1);
-      const playLocalTTS = async (text, voiceName) => {
-        return new Promise((resolve, reject) => {
-          if (!window.speechSynthesis) {
-            reject(new Error(this._("notifications.browser_tts_not_supported")));
-            return;
-          }
-          speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(text);
-          const voices = speechSynthesis.getVoices();
-          const voice = voices.find(v => v.name === voiceName);
-          if (voice) {
-            utterance.voice = voice;
-          }
-          utterance.rate = parseFloat(speedControl.input.value);
-          utterance.pitch = parseFloat(pitchControl.input.value);
-          utterance.volume = parseFloat(volumeControl.input.value);
-          utterance.onend = () => {
-            isPlaying = false;
-            updateButtonState();
-            resolve();
-          };
-          utterance.onerror = (event) => {
-            console.error('TTS Error:', event);
-            isPlaying = false;
-            updateButtonState();
-            reject(new Error(this._("notifications.tts_playback_error")));
-          };
-          speechSynthesis.speak(utterance);
-        });
-      };
       const getLocalVoices = (lang) => {
         const voices = window.speechSynthesis.getVoices();
         return voices.filter(voice => {
@@ -9642,259 +10380,6 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
           name: voice.name,
           display: `${voice.name} (${voice.lang})`
         }));
-      };
-      function createWavBlob(pcmData, sampleRate) {
-        const numChannels = 1;
-        const bitsPerSample = 16;
-        const blockAlign = (numChannels * bitsPerSample) / 8;
-        const byteRate = sampleRate * blockAlign;
-        const dataSize = pcmData.byteLength;
-        const chunkSize = 36 + dataSize;
-        const buffer = new ArrayBuffer(44 + dataSize);
-        const view = new DataView(buffer);
-        view.setUint32(0, 0x52494646, false); // 'RIFF'
-        view.setUint32(4, chunkSize, true);
-        view.setUint32(8, 0x57415645, false); // 'WAVE'
-        view.setUint32(12, 0x666d7420, false); // 'fmt '
-        view.setUint32(16, 16, true); // 16 for PCM
-        view.setUint16(20, 1, true); // PCM
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, byteRate, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, bitsPerSample, true);
-        view.setUint32(36, 0x64617461, false); // 'data'
-        view.setUint32(40, dataSize, true);
-        const pcm = new Uint8Array(pcmData);
-        const wav = new Uint8Array(buffer);
-        wav.set(pcm, 44);
-        return new Blob([wav], { type: 'audio/wav' });
-      }
-      const playAudio = async (audioData) => {
-        try {
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const audioBuffer = await audioContext.decodeAudioData(audioData);
-          const source = audioContext.createBufferSource();
-          source.buffer = audioBuffer;
-          const gainNode = audioContext.createGain();
-          gainNode.gain.value = parseFloat(volumeControl.input.value);
-          source.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          source.onended = () => {
-            isPlaying = false;
-            updateButtonState();
-            audioContext.close();
-          };
-          source.start(0);
-          return source;
-        } catch (error) {
-          console.error('Audio playback error:', error);
-          throw error;
-        }
-      };
-      const playGoogleTranslateTTS = async (text, lang) => {
-        try {
-          const chunks = text.match(/.{1,200}(?:\s|$)/g) || [];
-          const audioChunks = [];
-          for (const chunk of chunks) {
-            await new Promise((resolve, reject) => {
-              GM_xmlhttpRequest({
-                method: 'GET',
-                url: `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(chunk)}`,
-                responseType: 'arraybuffer',
-                headers: {
-                  'Referer': 'https://translate.google.com/',
-                  'User-Agent': 'Mozilla/5.0'
-                },
-                onload: function(response) {
-                  if (response.status === 200) {
-                    audioChunks.push(response.response);
-                    resolve();
-                  } else {
-                    reject(new Error(`Google Translate TTS error: ${response.status}`));
-                  }
-                },
-                onerror: reject
-              });
-            });
-            await new Promise(resolve => setTimeout(resolve, 50));
-          }
-          const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
-          const combinedBuffer = new ArrayBuffer(totalLength);
-          const combinedView = new Uint8Array(combinedBuffer);
-          let offset = 0;
-          for (const chunk of audioChunks) {
-            combinedView.set(new Uint8Array(chunk), offset);
-            offset += chunk.byteLength;
-          }
-          return await playAudio(combinedBuffer);
-        } catch (error) {
-          console.error('Google Translate TTS error:', error);
-          throw error;
-        }
-      };
-      const playGoogleTTS = async (text, voiceName) => {
-        try {
-          const chunks = text.match(/.{1,200}(?:\s|$)/g) || [];
-          const audioChunks = [];
-          for (const chunk of chunks) {
-            const audioContent = await new Promise((resolve, reject) => {
-              GM_xmlhttpRequest({
-                method: 'POST',
-                url: 'https://texttospeech.googleapis.com/v1beta1/text:synthesize?key=AIzaSyBOti4mM-6x9WDnZIjIeyEU21OpBXqWBgw',
-                headers: { 'Content-Type': 'application/json' },
-                data: JSON.stringify({
-                  audioConfig: {
-                    audioEncoding: 'MP3',
-                    pitch: parseFloat(pitchControl.input.value) - 1.0,
-                    speakingRate: parseFloat(speedControl.input.value),
-                    volumeGainDb: Math.log10(parseFloat(volumeControl.input.value)) * 20
-                  },
-                  input: { text: chunk },
-                  voice: {
-                    languageCode: lang,
-                    name: voiceName
-                  }
-                }),
-                responseType: 'json',
-                onload: function(response) {
-                  if (response.status === 200) {
-                    resolve(response.response?.audioContent);
-                  } else {
-                    reject(new Error(`Google TTS API error: ${response.status}`));
-                  }
-                },
-                onerror: reject
-              });
-            });
-            if (audioContent) {
-              const binaryString = atob(audioContent);
-              const bytes = new Uint8Array(binaryString.length);
-              for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-              }
-              audioChunks.push(bytes.buffer);
-            }
-          }
-          if (audioChunks.length === 0) {
-            throw new Error("No audio data received from Google TTS.");
-          }
-          const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.byteLength, 0);
-          const combinedBuffer = new ArrayBuffer(totalLength);
-          const combinedView = new Uint8Array(combinedBuffer);
-          let offset = 0;
-          for (const chunk of audioChunks) {
-            combinedView.set(new Uint8Array(chunk), offset);
-            offset += chunk.byteLength;
-          }
-          return await playAudio(combinedBuffer);
-        } catch (error) {
-          console.error('Google TTS error:', error);
-          throw error;
-        }
-      };
-      const playGeminiTTS = async (text, voiceName) => {
-        try {
-          const API_KEYS = this.settings.apiKey.gemini;
-          if (!API_KEYS || !API_KEYS[0]) {
-            throw new Error(_("notifications.no_api_key_configured") + " for Gemini.");
-          }
-          const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-          const model = document.querySelector('#tts-gemini-model')?.value || this.settings.ttsOptions.defaultGeminiModel;
-          const requestBody = {
-            contents: [{ parts: [{ "text": text }] }],
-            generationConfig: {
-              responseModalities: ["AUDIO"],
-              speechConfig: {
-                voiceConfig: {
-                  prebuiltVoiceConfig: { voiceName: voiceName }
-                }
-              }
-            },
-            model: model
-          };
-          const response = await new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-              method: "POST",
-              url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`,
-              headers: { "Content-Type": "application/json" },
-              data: JSON.stringify(requestBody),
-              responseType: 'json',
-              onload: (res) => {
-                if (res.status >= 200 && res.status < 300) {
-                  resolve(res.response);
-                } else {
-                  reject(new Error(`Request failed with status ${res.status}: ${res.statusText || res.responseText}`));
-                }
-              },
-              onerror: (error) => reject(error),
-              ontimeout: () => reject(new Error('Request timed out.'))
-            });
-          });
-          const part = response?.candidates?.[0]?.content?.parts?.[0];
-          const audioBase64 = part?.inlineData?.data;
-          if (!audioBase64) {
-            const textResponse = part?.text;
-            throw new Error(textResponse || "Invalid response structure from Gemini TTS.");
-          }
-          const binaryString = atob(audioBase64);
-          const len = binaryString.length;
-          const pcmData = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
-            pcmData[i] = binaryString.charCodeAt(i);
-          }
-          const mimeType = part.inlineData.mimeType || 'audio/L16;codec=pcm;rate=24000';
-          const sampleRateMatch = mimeType.match(/rate=(\d+)/);
-          const sampleRate = sampleRateMatch ? parseInt(sampleRateMatch[1], 10) : 24000;
-          const wavBlob = createWavBlob(pcmData.buffer, sampleRate);
-          const audioBuffer = await wavBlob.arrayBuffer();
-          return await playAudio(audioBuffer);
-        } catch (error) {
-          console.error('Gemini TTS error:', error);
-          throw error;
-        }
-      };
-      const playOpenAITTS = async (text, voiceName) => {
-        try {
-          const API_KEYS = this.settings.apiKey.openai;
-          const API_KEY = API_KEYS[Math.floor(Math.random() * API_KEYS.length)];
-          const model = this.settings.ttsOptions.defaultModel;
-          const result = await new Promise((resolve, reject) => {
-            GM_xmlhttpRequest({
-              method: "POST",
-              url: "https://api.openai.com/v1/audio/speech",
-              headers: {
-                "Authorization": `Bearer ${API_KEY}`,
-                "Content-Type": "application/json"
-              },
-              data: JSON.stringify({
-                model: model,
-                input: text,
-                voice: voiceName,
-                speed: parseFloat(speedControl.input.value),
-                response_format: 'wav'
-              }),
-              responseType: "arraybuffer",
-              onload: (response) => {
-                console.log(response);
-                if (response.status === 200) {
-                  resolve(response.response);
-                } else {
-                  reject(
-                    new Error(`Request failed with status ${response.status}`),
-                  );
-                }
-              },
-              onerror: function(error) {
-                reject(error);
-              },
-            });
-          });
-          return await playAudio(result);
-        } catch (error) {
-          console.error('OpenAI TTS error:', error);
-          throw error;
-        }
       };
       let hideSettingsTimeout;
       const showSettingsButton = () => {
@@ -9961,62 +10446,14 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
           hideSettingsPanel();
         }
       });
-      const updateButtonState = () => {
-        playButton.innerHTML = isPlaying ?
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>' :
-          '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-        playButton.title = isPlaying ? this._("notifications.stop_tts") : this._("notifications.play_tts");
-        playButton.style.backgroundColor = isPlaying ? (isDark ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.2)") : "transparent";
-      };
+      let speedValue, volumeValue, pitchValue;
       playButton.onclick = async () => {
-        if (isPlaying) {
-          if (currentAudio) {
-            switch (this.selectSource) {
-              case 'gemini':
-              case 'openai':
-              case 'google':
-              case 'google_translate':
-                currentAudio.stop();
-                currentAudio.disconnect();
-                currentAudio = null;
-                break;
-              case 'local':
-                currentAudio.pause();
-                currentAudio = null;
-                break;
-            }
-          }
-          speechSynthesis.cancel();
-          isPlaying = false;
-          updateButtonState();
-          return;
-        }
-        try {
-          isPlaying = true;
-          updateButtonState();
-          this.selectVoice = this.voiceStorage[this.selectSource]?.voice || JSON.parse(voiceSelect.value);
-          switch (this.selectSource) {
-            case 'local':
-              currentAudio = await playLocalTTS(text, this.selectVoice.name);
-              break;
-            case 'gemini':
-              currentAudio = await playGeminiTTS(text, this.selectVoice.name);
-              break;
-            case 'openai':
-              currentAudio = await playOpenAITTS(text, this.selectVoice.name);
-              break;
-            case 'google':
-              currentAudio = await playGoogleTTS(text, this.selectVoice.name);
-              break;
-            case 'google_translate':
-              currentAudio = await playGoogleTranslateTTS(text, lang);
-              break;
-          }
-        } catch (error) {
-          console.error('TTS error:', error);
-          isPlaying = false;
-          updateButtonState();
-        }
+        speedValue = speedControl.input.value;
+        volumeValue = volumeControl.input.value;
+        pitchValue = pitchControl.input.value;
+        this.selectVoice = this.voiceStorage[this.selectSource]?.voice || JSON.parse(voiceSelect.value);
+        this.playTTS(text, this.selectVoice.name, lang, { speedValue, volumeValue, pitchValue }, playButton, isDark);
+        setTimeout(this.updateButtonState(playButton, isDark), 50);
       };
       sourceSelect.addEventListener('change', () => {
         this.selectSource = sourceSelect.value;
@@ -10024,58 +10461,17 @@ overflow-wrap: break-word; /* Ngắt từ nếu quá dài */
         this.selectVoice = JSON.parse(voiceSelect.value);
         this.voiceStorage[this.selectSource] = { voice: this.selectVoice };
       });
-      let previousSource = sourceSelect.value;
       voiceSelect.addEventListener('change', async () => {
+        speedValue = speedControl.input.value;
+        volumeValue = volumeControl.input.value;
+        pitchValue = pitchControl.input.value;
         this.selectVoice = JSON.parse(voiceSelect.value);
         this.voiceStorage[this.selectSource] = { voice: this.selectVoice };
-        if (isPlaying) {
-          try {
-            if (currentAudio) {
-              switch (previousSource) {
-                case 'gemini':
-                case 'openai':
-                case 'google':
-                case 'google_translate':
-                  currentAudio.stop();
-                  currentAudio.disconnect();
-                  currentAudio = null;
-                  break;
-                case 'local':
-                  currentAudio.pause();
-                  currentAudio = null;
-                  break;
-              }
-            }
-            speechSynthesis.cancel();
-            isPlaying = true;
-            updateButtonState();
-            previousSource = sourceSelect.value;
-            switch (this.selectSource) {
-              case 'local':
-                currentAudio = await playLocalTTS(text, this.selectVoice.name);
-                break;
-              case 'gemini':
-                currentAudio = await playGeminiTTS(text, this.selectVoice.name);
-                break;
-              case 'openai':
-                currentAudio = await playOpenAITTS(text, this.selectVoice.name);
-                break;
-              case 'google':
-                currentAudio = await playGoogleTTS(text, this.selectVoice.name);
-                break;
-              case 'google_translate':
-                currentAudio = await playGoogleTranslateTTS(text, lang);
-                break;
-            }
-          } catch (error) {
-            console.error('TTS error:', error);
-            isPlaying = false;
-            updateButtonState();
-          }
-        }
+        this.playTTS(text, this.selectVoice.name, lang, { speedValue, volumeValue, pitchValue }, playButton, isDark);
+        setTimeout(this.updateButtonState(playButton, isDark), 50);
       });
       updateVoices(this.selectSource);
-      updateButtonState();
+      this.updateButtonState(playButton, isDark);
       buttonContainer.appendChild(settingsButton);
       buttonContainer.appendChild(playButton);
       buttonContainer.appendChild(settingsPanel);
@@ -10572,8 +10968,6 @@ border-radius: 0 8px 8px 0;
         this.translator.userSettings.saveSettings();
         this.removeToolsContainer();
         this.resetState();
-        const overlays = this.$$(".translator-overlay");
-        overlays.forEach((overlay) => overlay.remove());
         if (this.settings.translatorTools?.enabled && newState) {
           this.setupTranslatorTools();
         }
@@ -11254,6 +11648,7 @@ img:hover, canvas:hover {
             const settings = this.settings;
             if (settings.apiProvider === "puter") {
               const prompt = this.translator.createPrompt("ocr", "ocr");
+              console.log('prompt: ', prompt);
               const ocrResult = CONFIG.API.providers.puter.vision(prompt, e.target.src, false, {
                 model: this.translator.api.getModel(),
               });
@@ -11325,15 +11720,15 @@ img:hover, canvas:hover {
         let text = "";
         for (const trans of translations) {
           const parts = trans.split("<|>");
-          text += (parts[0]?.trim() || "") + "\n";
-          pinyin += (parts[1]?.trim() || "") + "\n";
-          fullTranslation += (parts[2]?.trim() || trans) + "\n";
+          text += (parts[0] || "") + "\n";
+          pinyin += (parts[1] || "") + "\n";
+          fullTranslation += (parts[2] || trans) + "\n";
         }
         this.displayPopup(
-          fullTranslation.trim(),
-          text.trim(),
+          fullTranslation,
+          text,
           "King1x32 <3",
-          pinyin.trim()
+          pinyin
         );
       } else {
         this.displayPopup(result, '', "King1x32 <3");
@@ -11757,9 +12152,6 @@ img:hover, canvas:hover {
   z-index: 2147483647;
   pointer-events: none;
 }
-.translator-overlay.translating-done {
-  background-color: transparent;
-}
 .translator-guide {
   position: fixed;
   top: 20px;
@@ -11893,10 +12285,6 @@ img:hover, canvas:hover {
 }
 .translating-done {
   background-color: transparent;
-  pointer-events: none;
-}
-.translating-done * {
-  pointer-events: auto;
 }
 `;
       this.shadowRoot.appendChild(style);
@@ -11936,87 +12324,282 @@ pointer-events: none;
       this.shadowRoot.appendChild(overlayContainer);
       let existingOverlays = [];
       let isProcessingMangaClick = false;
-      const handleClick = async (e) => {
-        if (e.target.tagName === "IMG" || e.target.tagName === "CANVAS") {
-          e.preventDefault();
-          e.stopPropagation();
-          if (isProcessingMangaClick) return;
-          try {
-            isProcessingMangaClick = true;
-            console.log("[Manga Debug] Manga translation initiated for element:", e.target);
-            const settings = this.settings;
-            if (settings.apiProvider === "puter") {
-              const prompt = this.translator.createPrompt("ocr", "ocr");
-              const ocrResult = CONFIG.API.providers.puter.vision(prompt, e.target.src, false, {
-                model: this.translator.api.getModel(),
-              });
-              const result = CONFIG.API.providers.puter.responseParser(ocrResult);
-              this.translator.ui.updateProcessingStatus(this._("notifications.completed"), 100);
-              this.formatTrans(result);
-              return;
-            }
-            this.showTranslatingStatus();
-            const targetElement = e.target;
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d", { willReadFrequently: true });
-            if (targetElement.tagName === "IMG") {
-              console.log("[Manga Debug] Target is an IMG. Source:", targetElement.src);
-              await this.loadImage(targetElement, canvas, ctx);
-              console.log("[Manga Debug] Image loaded successfully to canvas.");
-            } else if (targetElement.tagName === "CANVAS") {
-              console.log("[Manga Debug] Target is a CANVAS.");
-              await this.processCanvas(targetElement, canvas, ctx);
-              console.log("[Manga Debug] Canvas processed successfully.");
-            }
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const hasContent = imageData.data.some(pixel => pixel !== 0);
-            if (!hasContent) {
-              throw new Error(this._("notifications.cannot_capture_element"));
-            }
-            const blob = await new Promise((resolve, reject) => {
-              canvas.toBlob((b) => {
-                if (b) {
-                  resolve(b);
-                  console.log("[Manga Debug] Canvas converted to blob. Size:", b.size);
-                } else reject(new Error("Could not create blob"));
-              }, "image/png");
+      const isGlobalEnabled = this.settings.ocrOptions?.mangaTranslateAll;
+      const isPrioritizedMode = safeLocalStorageGet("kingtranslator_manga_all_for_site") === 'true' || true;
+      const singleImageTranslateAction = async (e) => {
+        if (isProcessingMangaClick) return;
+        try {
+          isProcessingMangaClick = true;
+          overlay.classList.add("translating-done");
+          const result = await this.detectAndTranslateMangaImage(e.target);
+          if (result?.regions) {
+            const sortedRegions = this.sortRegions(result.regions);
+            sortedRegions.forEach(region => {
+              const mangaOverlay = this.createMangaOverlay(region, e.target);
+              overlayContainer.appendChild(mangaOverlay);
+              existingOverlays.push(mangaOverlay);
             });
-            const file = new File([blob], "manga.png", { type: "image/png" });
-            console.log("[Manga Debug] Blob converted to file. Awaiting text detection...");
-            const result = await this.detectTextPositions(file);
-            console.log("[Manga Debug] Text detection result:", result);
-            if (result?.regions) {
-              overlay.classList.add("translating-done");
-              const sortedRegions = this.sortRegions(result.regions);
-              sortedRegions.forEach(region => {
-                const overlay = this.createMangaOverlay(region, e.target);
-                overlayContainer.appendChild(overlay);
-                existingOverlays.push(overlay);
-              });
-            }
-          } catch (error) {
-            console.error("[Manga Debug] Error during manga translation:", error);
-            this.showNotification(error.message, "error");
-          } finally {
-            isProcessingMangaClick = false;
-            this.removeTranslatingStatus();
           }
+        } catch (error) { this.showNotification(error.message, "error"); }
+        finally { isProcessingMangaClick = false; }
+      };
+      const multiImageTranslateSetupAction = (e) => {
+        document.removeEventListener("click", mainClickListener, true);
+        overlay.classList.add("translating-done");
+        const actionButton = guide.querySelector('button');
+        this.enterMangaSelectionMode(guide, actionButton, cancelBtn, existingOverlays, overlayContainer);
+        if (e && (e.target.tagName === "IMG" || e.target.tagName === "CANVAS")) {
+          const imageClickHandler = guide.imageClickHandler;
+          if (imageClickHandler) imageClickHandler(e);
         }
       };
-      document.addEventListener("click", handleClick, true);
-      cancelBtn.addEventListener("click", () => {
-        this.cleanupManga(handleClick, existingOverlays, overlay, guide, cancelBtn, style, globalStyle, overlayContainer);
-      });
-      this.mangaListeners = {
-        click: handleClick,
-        overlay,
-        guide,
-        cancelBtn,
-        style,
-        globalStyle,
-        overlayContainer,
-        existingOverlays
+      let mainClickListener;
+      if (isGlobalEnabled && isPrioritizedMode) {
+        guide.textContent = this._("notifications.manga_guide_translate_all_prioritized");
+        mainClickListener = (e) => {
+          if (e.target.tagName === "IMG" || e.target.tagName === "CANVAS") {
+            e.preventDefault(); e.stopPropagation();
+            multiImageTranslateSetupAction(e);
+          }
+        };
+        const singleButton = document.createElement("button");
+        singleButton.textContent = this._("notifications.manga_button_translate_single");
+        Object.assign(singleButton.style, {
+          marginLeft: '15px',
+          padding: '5px 10px',
+          cursor: 'pointer',
+          pointerEvents: "auto",
+          border: '1px solid #fff',
+          borderRadius: '5px',
+          backgroundColor: 'rgba(74, 144, 226, 0.8)',
+          color: 'white'
+        });
+        singleButton.onclick = () => {
+          guide.textContent = this._("notifications.manga_click_guide");
+          singleButton.style.display = 'none';
+          document.removeEventListener("click", mainClickListener, true);
+          document.addEventListener("click", singleImageTranslateAction, { once: true, capture: true });
+        };
+        guide.appendChild(singleButton);
+      } else {
+        guide.textContent = this._("notifications.manga_click_guide");
+        mainClickListener = (e) => {
+          if (e.target.tagName === "IMG" || e.target.tagName === "CANVAS") {
+            e.preventDefault(); e.stopPropagation();
+            singleImageTranslateAction(e);
+          }
+        };
+        if (isGlobalEnabled) {
+          const allButton = document.createElement("button");
+          allButton.textContent = this._("notifications.manga_translate_all_button");
+          Object.assign(allButton.style, {
+            marginLeft: '15px',
+            padding: '5px 10px',
+            cursor: 'pointer',
+            pointerEvents: "auto",
+            border: '1px solid #fff',
+            borderRadius: '5px',
+            backgroundColor: 'rgba(74, 144, 226, 0.8)',
+            color: 'white'
+          });
+          allButton.onclick = multiImageTranslateSetupAction;
+          guide.appendChild(allButton);
+        }
+      }
+      document.addEventListener("click", mainClickListener, true);
+      const fullCleanup = () => {
+        document.removeEventListener("click", mainClickListener, true);
+        this.cleanupManga(null, existingOverlays, overlay, guide, cancelBtn, style, globalStyle, overlayContainer);
       };
+      cancelBtn.addEventListener("click", fullCleanup);
+      this.mangaListeners = {
+        click: mainClickListener,
+        overlay, guide, cancelBtn, style, globalStyle, overlayContainer, existingOverlays
+      };
+    }
+    enterMangaSelectionMode(guideElement, buttonElement, cancelBtn, existingOverlays, overlayContainer) {
+      let firstImageSelected = null;
+      guideElement.textContent = this._("notifications.manga_select_first_image");
+      if (buttonElement) buttonElement.style.display = 'none';
+      document.body.style.cursor = 'crosshair';
+      const imageHoverHandler = e => {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'CANVAS') {
+          e.target.style.outline = '3px dashed #4CAF50';
+        }
+      };
+      const imageLeaveHandler = e => {
+        if (e.target.tagName === 'IMG' || e.target.tagName === 'CANVAS') {
+          e.target.style.outline = '';
+        }
+      };
+      document.addEventListener('mouseover', imageHoverHandler);
+      document.addEventListener('mouseout', imageLeaveHandler);
+      const cleanupSelectionListeners = () => {
+        document.removeEventListener('click', imageClickHandler, true);
+        document.removeEventListener('mouseover', imageHoverHandler);
+        document.removeEventListener('mouseout', imageLeaveHandler);
+        if (firstImageSelected) firstImageSelected.style.outline = '';
+        document.body.style.cursor = 'default';
+      };
+      const imageClickHandler = async (e) => {
+        if (e.target.tagName !== 'IMG' && e.target.tagName !== 'CANVAS') return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (!firstImageSelected) {
+          firstImageSelected = e.target;
+          firstImageSelected.style.outline = '5px solid #4CAF50';
+          guideElement.textContent = this._("notifications.manga_select_last_image");
+        } else {
+          const secondImageSelected = e.target;
+          secondImageSelected.style.outline = '5px solid #2196F3';
+          cleanupSelectionListeners();
+          this.translateImageRange(firstImageSelected, secondImageSelected, overlayContainer, existingOverlays, guideElement);
+        }
+      };
+      document.addEventListener('click', imageClickHandler, true);
+      cancelBtn.onclick = () => {
+        cleanupSelectionListeners();
+        this.cleanupManga(
+          this.mangaListeners.click,
+          existingOverlays,
+          this.mangaListeners.overlay,
+          this.mangaListeners.guide,
+          this.mangaListeners.cancelBtn,
+          this.mangaListeners.style,
+          this.mangaListeners.globalStyle,
+          this.mangaListeners.overlayContainer
+        );
+      };
+    }
+    async translateImageWithRetries(imgElement, maxRetries = 5, initialDelay = 1000) {
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const result = await this.detectAndTranslateMangaImage(imgElement, true);
+          return result;
+        } catch (error) {
+          console.warn(`Attempt ${attempt}/${maxRetries} failed for image`, imgElement.src, error);
+          if (attempt === maxRetries) {
+            console.error(`Failed to translate image after ${maxRetries} attempts.`, imgElement.src);
+            return null;
+          }
+          const delay = initialDelay * Math.pow(2, attempt - 1);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+      return null;
+    }
+    async translateImageRange(startImage, endImage, overlayContainer, existingOverlays, guideElement) {
+      const _ = this._;
+      let commonParent = startImage.parentElement;
+      for (let i = 0; i < 10 && commonParent; i++) {
+        if (commonParent.contains(endImage)) break;
+        commonParent = commonParent.parentElement;
+      }
+      if (!commonParent || !commonParent.contains(endImage)) {
+        this.showNotification(_("notifications.manga_common_parent_not_found"), "error");
+        if (guideElement) guideElement.parentElement.remove();
+        return;
+      }
+      const allImagesInContainer = Array.from(commonParent.querySelectorAll('img, canvas'));
+      const filteredImages = allImagesInContainer.filter(img => {
+        const rect = img.getBoundingClientRect();
+        return rect.width > 100 && rect.height > 100 && img.offsetParent !== null;
+      });
+      if (filteredImages.length === 0) {
+        this.showNotification(_("logs.manga_no_images_found"), "warning");
+        if (guideElement) guideElement.remove();
+        return;
+      }
+      const BATCH_SIZE = 10;
+      const translationState = new Set();
+      let translatedCount = 0;
+      const totalImages = filteredImages.length;
+      if (guideElement) {
+        guideElement.textContent = _("logs.manga_translating_progress", { current: 0, total: totalImages });
+      }
+      const translateAndOverlay = async (img) => {
+        const result = await this.translateImageWithRetries(img);
+        if (result?.regions) {
+          const sortedRegions = this.sortRegions(result.regions);
+          sortedRegions.forEach(region => {
+            const overlay = this.createMangaOverlay(region, img);
+            overlayContainer.appendChild(overlay);
+            existingOverlays.push(overlay);
+          });
+        }
+        translatedCount++;
+        if (guideElement) {
+          guideElement.textContent = _("logs.manga_translating_progress", { current: translatedCount, total: totalImages });
+        }
+        if (translatedCount === totalImages) {
+          setTimeout(() => {
+            if (guideElement) guideElement.remove();
+            this.showNotification(_("logs.manga_translate_all_completed"), "success");
+          }, 1000);
+        }
+      };
+      const queueTranslation = (img) => {
+        if (!translationState.has(img)) {
+          translationState.add(img);
+          translateAndOverlay(img).catch(err => {
+            console.error("Lỗi khi dịch ảnh trong batch:", img.src, err);
+            translationState.delete(img);
+          });
+        }
+      };
+      const intersectionObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const startImg = entry.target;
+            const startIndex = filteredImages.indexOf(startImg);
+            if (startIndex > -1) {
+              for (let i = startIndex; i < startIndex + BATCH_SIZE && i < totalImages; i++) {
+                queueTranslation(filteredImages[i]);
+              }
+            }
+          }
+        }
+      }, {
+        rootMargin: '100% 0%',
+        threshold: 0.01
+      });
+      filteredImages.forEach(img => intersectionObserver.observe(img));
+      if (this.mangaListeners) {
+        this.mangaListeners.observer = intersectionObserver;
+      }
+    }
+    async detectAndTranslateMangaImage(targetElement, silent = false) {
+      if (!silent) {
+        this.showTranslatingStatus();
+      }
+      try {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        if (targetElement.tagName === "IMG") {
+          await this.loadImage(targetElement, canvas, ctx);
+        } else if (targetElement.tagName === "CANVAS") {
+          await this.processCanvas(targetElement, canvas, ctx);
+        }
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        if (!imageData.data.some(pixel => pixel !== 0)) {
+          throw new Error(this._("notifications.cannot_capture_element"));
+        }
+        const blob = await new Promise((resolve, reject) => {
+          canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Could not create blob")), "image/png");
+        });
+        const file = new File([blob], "manga-page.png", { type: "image/png" });
+        const result = await this.detectTextPositions(file, silent);
+        return result;
+      } catch (error) {
+        if (!silent) {
+          this.removeTranslatingStatus();
+        }
+        throw error;
+      } finally {
+        if (!silent) {
+          this.removeTranslatingStatus();
+        }
+      }
     }
     async loadImage(targetElement, canvas, ctx) {
       const src = targetElement.src;
@@ -12099,13 +12682,16 @@ pointer-events: none;
           method: 'GET',
           url: src,
           headers: {
-            "Accept-Language": "en-US,en;q=0.9",
-            "Cache-Control": "no-cache",
-            "Pragma": "no-cache",
+            "User-Agent": navigator.userAgent,
+            "Accept-Language": "en-US,vi;q=0.5",
+            "Connection": "keep-alive",
             "Referer": window.location.href,
+            "X-Requested-With": "XMLHttpRequest",
             "Sec-Fetch-Mode": "no-cors",
             "Sec-Fetch-Site": "cross-site",
-            "User-Agent": navigator.userAgent
+            "Priority": "u=5, i",
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache"
           },
           overrideMimeType: 'text/plain; charset=x-user-defined',
           responseType: 'text',
@@ -12193,6 +12779,9 @@ pointer-events: none;
         .flat();
     }
     cleanupManga(handleClick, existingOverlays, ...elements) {
+      if (this.mangaListeners?.observer) {
+        this.mangaListeners.observer.disconnect();
+      }
       document.removeEventListener("click", handleClick, true);
       existingOverlays.forEach(overlay => {
         if (overlay.cleanup) {
@@ -12202,7 +12791,7 @@ pointer-events: none;
       });
       elements.forEach(element => element.remove());
     }
-    async detectTextPositions(file) {
+    async detectTextPositions(file, silent = false) {
       try {
         const settings = this.settings;
         const targetLanguage = settings.displayOptions.targetLanguage;
@@ -12293,7 +12882,7 @@ Return JSON object with this structure:
     }
   }]
 }`;
-        const response = await this.ocr.processImage(file, prompt);
+        const response = await this.ocr.processImage(file, prompt, silent);
         console.log("response: ", response);
         if (response) {
           const jsonMatch = response.match(/\{[\s\S]*\}/);
@@ -12416,7 +13005,6 @@ Return JSON object with this structure:
     }
     setupContextMenu() {
       if (!this.settings.contextMenu?.enabled) return;
-      let isSpeaking = false;
       document.addEventListener("contextmenu", (e) => {
         const selection = window.getSelection();
         const selectedText = selection.toString().trim();
@@ -12432,7 +13020,7 @@ Return JSON object with this structure:
             {
               text: this._("notifications.play_tts"),
               action: "tts",
-              getLabel: () => isSpeaking ? this._("notifications.stop_tts") : this._("notifications.play_tts")
+              getLabel: () => this.isTTSSpeaking ? this._("notifications.stop_tts") : this._("notifications.play_tts")
             }
           ];
           const range = selection.getRangeAt(0).cloneRange();
@@ -12447,25 +13035,28 @@ Return JSON object with this structure:
               newSelection.removeAllRanges();
               newSelection.addRange(range);
               if (item.action === "tts") {
-                if (isSpeaking) {
-                  speechSynthesis.cancel();
-                  isSpeaking = false;
+                if (this.isTTSSpeaking) {
+                  this.stopTTS();
+                  this.isTTSSpeaking = false;
                 } else {
-                  speechSynthesis.cancel();
-                  const utterance = new SpeechSynthesisUtterance(selectedText);
-                  utterance.lang = this.settings.displayOptions.sourceLanguage;
-                  utterance.onend = () => {
-                    isSpeaking = false;
-                    menuItem.textContent = this._("notifications.play_tts");
-                  };
-                  utterance.oncancel = () => {
-                    isSpeaking = false;
-                    menuItem.textContent = this._("notifications.play_tts");
-                  };
-                  speechSynthesis.speak(utterance);
-                  isSpeaking = true;
+                  const displayOptions = this.settings.displayOptions;
+                  const sourceLang = displayOptions.sourceLanguage === 'auto' ? this.page.languageCode : displayOptions.sourceLanguage;
+                  const speedValue = this.settings.ttsOptions.defaultSpeed;
+                  const volumeValue = this.settings.ttsOptions.defaultVolume;
+                  const pitchValue = this.settings.ttsOptions.defaultPitch;
+                  this.selectSource = this.settings.ttsOptions?.defaultProvider || 'google';
+                  if (this.selectSource === 'openai') {
+                    this.selectVoice = this.settings.ttsOptions?.defaultVoice?.[this.selectSource]?.voice || 'sage';
+                    this.selectVoice = { name: this.selectVoice }
+                  } else if (this.selectSource === 'google') {
+                    this.selectVoice = this.settings.ttsOptions?.defaultVoice?.[this.selectSource]?.[sourceLang] || null;
+                  } else {
+                    this.selectVoice = null;
+                  }
+                  this.voiceStorage[this.selectSource] = { voice: this.selectVoice };
+                  this.playTTS(selectedText, this.selectVoice.name, sourceLang, { speedValue, pitchValue, volumeValue }, null, false, menuItem);
                 }
-                menuItem.textContent = isSpeaking ? this._("notifications.stop_tts") : this._("notifications.play_tts")
+                this.onSpeechEndCallback(menuItem);
               } else {
                 this.handleTranslateButtonClick(newSelection, item.action);
                 contextMenu.remove();
@@ -12543,6 +13134,11 @@ Return JSON object with this structure:
         }
       });
     }
+    onSpeechEndCallback(menuItem) {
+      if (menuItem) {
+        menuItem.textContent = this.isTTSSpeaking ? this._("notifications.stop_tts") : this._("notifications.play_tts")
+      }
+    };
     removeWebImageListeners() {
       if (this.webImageListeners) {
         document.removeEventListener(
@@ -12586,7 +13182,29 @@ Return JSON object with this structure:
       const shortcuts = this.settings.shortcuts;
       if (e.altKey || e.metaKey) {
         let translateType = null;
-        if (e.key === shortcuts.pageTranslate.key) {
+        if (e.key === shortcuts.ocrRegion.key) {
+          e.preventDefault();
+          try {
+            const screenshot = await this.ocr.captureScreen();
+            if (!screenshot) return;
+            this.showTranslatingStatus();
+            const result = await this.ocr.processImage(screenshot);
+            this.removeTranslatingStatus();
+            if (result) this.formatTrans(result);
+          } catch (error) {
+            this.showNotification(error.message, "error");
+            this.removeTranslatingStatus();
+          }
+          return;
+        } else if (e.key === shortcuts.ocrWebImage.key) {
+          e.preventDefault();
+          this.startWebImageOCR();
+          return;
+        } else if (e.key === shortcuts.ocrMangaWeb.key) {
+          e.preventDefault();
+          this.startMangaTranslation();
+          return;
+        } else if (e.key === shortcuts.pageTranslate.key) {
           e.preventDefault();
           await this.handlePageTranslation();
           return;
@@ -12640,6 +13258,7 @@ Return JSON object with this structure:
         try {
           translator.ui.showTranslatingStatus();
           const promptText = translator.createPrompt("", "file_content");
+          console.log('prompt: ', promptText);
           const processedContent = await translator.fileProcess.processFile(input, promptText);
           const result = await translator.api.request(processedContent.content, 'ocr', processedContent.key);
           translator.ui.removeTranslatingStatus();
@@ -12715,9 +13334,6 @@ Return JSON object with this structure:
           this.removeToolsContainer();
           const newSettings = e.detail;
           this.settings = newSettings;
-          if (newSettings.theme !== this.settings.theme) {
-            this.updateAllButtonStyles();
-          }
           this.updateSettingsListener(newSettings.shortcuts?.settingsEnabled);
           this.updateSettingsTranslationListeners(newSettings.shortcuts?.enabled);
           if (newSettings.clickOptions?.enabled !== undefined) {
@@ -12734,14 +13350,10 @@ Return JSON object with this structure:
               this.removeTranslateButton();
             }
           }
-          this.translator.cache = new TranslationCache(
-            newSettings.cacheOptions.text.maxSize,
-            newSettings.cacheOptions.text.expirationTime
-          );
-          this.translator.cache.clear();
-          if (this.ocr?.imageCache) {
-            this.ocr.imageCache.clear();
-          }
+          if (this.translator?.cache) this.translator.cache.clear();
+          if (this.translator?.imageCache) this.translator.imageCache.clear();
+          if (this.translator?.mediaCache) this.translator.mediaCache.clear();
+          if (this.translator?.ttsCache) this.translator.ttsCache.clear();
           const apiConfig = {
             providers: CONFIG.API.providers,
             currentProvider: newSettings.apiProvider,
@@ -12880,6 +13492,10 @@ Return JSON object with this structure:
         currentProvider: this.userSettings.getSetting("apiProvider"),
         apiKey: this.userSettings.getSetting("apiKey")
       };
+      this.cache = new PersistentCache('textCache', this.userSettings.settings.cacheOptions.text.maxSize, this.userSettings.settings.cacheOptions.text.expirationTime);
+      this.imageCache = new PersistentCache('imageCache', this.userSettings.settings.cacheOptions.image.maxSize, this.userSettings.settings.cacheOptions.image.expirationTime);
+      this.mediaCache = new PersistentCache('mediaCache', this.userSettings.settings.cacheOptions.media.maxSize, this.userSettings.settings.cacheOptions.media.expirationTime);
+      this.ttsCache = new PersistentCache('ttsCache', this.userSettings.settings.cacheOptions.tts.maxSize, this.userSettings.settings.cacheOptions.tts.expirationTime);
       this.uiRoot = new UIRoot(this);
       this.fileProcess = new FileProcessor(this);
       this.videoStreaming = new VideoStreamingTranslator(this);
@@ -12889,12 +13505,7 @@ Return JSON object with this structure:
       this.ocr = new OCRManager(this);
       this.media = new MediaManager(this);
       this.fileManager = new FileManager(this);
-      this.cache = new TranslationCache(
-        this.userSettings.settings.cacheOptions.text.maxSize,
-        this.userSettings.settings.cacheOptions.text.expirationTime
-      );
       this.ui = new UIManager(this);
-      this.cache.optimizeStorage();
     }
     async translate(
       text,
@@ -12909,16 +13520,17 @@ Return JSON object with this structure:
         const targetLanguage = targetLang || settings.targetLanguage;
         const promptType = isAdvanced ? "advanced" : "normal";
         const prompt = this.createPrompt(text, promptType, targetLanguage);
+        console.log('prompt: ', prompt);
         let translatedText;
         const cacheEnabled =
           this.userSettings.settings.cacheOptions.text.enabled;
         if (cacheEnabled) {
-          translatedText = this.cache.get(text, isAdvanced, targetLanguage);
+          translatedText = await this.cache.get(text, isAdvanced, targetLanguage);
         }
         if (!translatedText) {
           translatedText = await this.api.request(prompt, 'page');
           if (cacheEnabled && translatedText) {
-            this.cache.set(text, translatedText, isAdvanced, targetLanguage);
+            await this.cache.set(text, translatedText, isAdvanced, targetLanguage);
           }
         }
         if (
@@ -12933,14 +13545,14 @@ Return JSON object with this structure:
               let pinyin = "";
               for (const trans of translations) {
                 const parts = trans.split("<|>");
-                pinyin += (parts[1]?.trim() || "") + "\n";
-                fullTranslation += (parts[2]?.trim() || trans) + "\n";
+                pinyin += (parts[1] || "") + "\n";
+                fullTranslation += (parts[2] || trans) + "\n";
               }
               this.ui.displayPopup(
-                fullTranslation.trim(),
-                text.trim(),
+                fullTranslation,
+                text,
                 "King1x32 <3",
-                pinyin.trim()
+                pinyin
               );
             } else {
               this.ui.displayPopup(translatedText, '', "King1x32 <3");
@@ -12997,7 +13609,7 @@ Return JSON object with this structure:
     //   const prompt = `Vui lòng kiểm tra và sửa chữa bất kỳ lỗi ngữ pháp hoặc vấn đề về ngữ cảnh trong bản dịch sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' này: "${translation}". Không thêm hay bớt ý của bản gốc cũng như không thêm tiêu đề, không giải thích về các thay đổi đã thực hiện.`;
     //   try {
     //     const corrected = await this.api.request(prompt, 'page');
-    //     return corrected.trim();
+    //     return corrected;
     //   } catch (error) {
     //     console.error("Auto-correction failed:", error);
     //     return translation;
@@ -13008,7 +13620,7 @@ Return JSON object with this structure:
       const settings = this.userSettings.settings;
       const targetLanguage =
         targetLang || settings.displayOptions.targetLanguage;
-      const sourceLanguage = settings.displayOptions.sourceLanguage;
+      const sourceLanguage = settings.displayOptions.sourceLanguage === 'auto' ? this.page.languageCode : settings.displayOptions.sourceLanguage;
       const isPinyinMode =
         settings.displayOptions.translationMode !== "translation_only";
       if (
@@ -13029,6 +13641,7 @@ Return JSON object with this structure:
             );
         }
       }
+      // if (settings.apiProvider === 'ollama') return `Translate to '${targetLanguage}':\n  "${text}"`;
       return this.createDefaultPrompt(text, type, isPinyinMode, targetLanguage);
     }
     createDefaultPrompt(
@@ -13037,11 +13650,11 @@ Return JSON object with this structure:
       isPinyinMode = false,
       targetLang = ""
     ) {
-      const docTitle = `có tiêu đề "${document.title}"` || 'ở phía dưới';
+      const docTitle = `và tiêu đề "${document.title}"` || '';
       const settings = this.userSettings.settings;
       const targetLanguage = targetLang || settings.displayOptions.targetLanguage;
       const share_per = `  - Ngôn ngữ đích: '${targetLanguage}'.
-  - Dựa vào ngữ cảnh, bối cảnh và chủ đề ${docTitle} để xác định phong cách dịch.
+  - Dựa vào ngữ cảnh, bối cảnh ${docTitle} để xác định phong cách dịch.
   - Đảm bảo nghĩa của các câu không bị thay đổi khi dịch.
   - Sử dụng các từ lóng hoặc cụm từ thông dụng khi cần thiết để bản dịch gần gũi với người đọc.
   - Kiểm tra chính tả và ngữ pháp trong bản dịch.
@@ -13051,7 +13664,7 @@ Return JSON object with this structure:
 `;
       const share_normal = `Bạn là người dịch thuật chuyên nghiệp, chuyên tạo bản dịch chính xác và tự nhiên. Hãy dịch văn bản cần xử lý ${docTitle} sang ngôn ngữ có mã ngôn ngữ là '${targetLanguage}' với các yêu cầu sau:
   - Ngôn ngữ đích: '${targetLanguage}'.
-  - Dựa vào ngữ cảnh, bối cảnh và chủ đề ${docTitle} để xác định phong cách dịch.
+  - Dựa vào ngữ cảnh, bối cảnh ${docTitle} để xác định phong cách dịch.
   - Dịch phải tuân thủ chặt chẽ bối cảnh và sắc thái ban đầu của văn bản.
   - Đảm bảo sự lưu loát và tự nhiên như người bản xứ.
   - Không thêm bất kỳ giải thích hay diễn giải nào ngoài bản dịch.
@@ -13098,7 +13711,7 @@ Lưu ý:
         media: `${share_media}
 Lưu ý:
   - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,..
-  - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc rõ ràng.
+  - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại có ít nhất 4 dòng bao gồm dòng được đánh số thứ tự, dòng có thời gian bắt đầu và kết thúc rõ ràng, dòng nội dung bản dịch và dòng trống để tách các phần số thứ tự hội thoại ở trên.
   - Chỉ trả về bản dịch, không giải thích.`,
         page: `${share_normal}
 ${note_normal}
@@ -13122,7 +13735,7 @@ ${note_pinyin}
         media: `${share_media}
 Lưu ý:
   - Bản dịch phải hoàn toàn là ngôn ngữ có mã ngôn ngữ là '${targetLanguage}', nhưng ví dụ khi dịch sang tiếng Việt nếu gặp những danh từ riêng chỉ địa điểm hoặc tên riêng, có phạm trù trong ngôn ngữ là từ ghép của 2 ngôn ngữ gọi là từ Hán Việt, hãy dịch sang nghĩa từ Hán Việt như Diệp Trần, Lục Thiếu Du, Long kiếm, Thiên kiếp, núi Long Sĩ Đầu, ngõ Nê Bình, Thiên Kiếm môn,... thì sẽ hay hơn là dịch hẳn sang nghĩa tiếng Việt là Lá Trần, Rồng kiếm, Trời kiếp, núi Rồng Ngẩng Đầu,..
-  - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại được đánh số thứ tự, có thời gian bắt đầu và kết thúc rõ ràng.
+  - Định dạng bản dịch của bạn theo định dạng SRT và đảm bảo rằng mỗi đoạn hội thoại có ít nhất 4 dòng bao gồm dòng được đánh số thứ tự, dòng có thời gian bắt đầu và kết thúc rõ ràng, dòng nội dung bản dịch và dòng trống để tách các phần số thứ tự hội thoại ở trên.
   - Chỉ trả về bản dịch, không giải thích.`,
         page: `${share_normal}
 ${share_pinyin}
