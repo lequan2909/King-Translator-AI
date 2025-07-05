@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          King Translator AI
 // @namespace     https://kingsmanvn.pages.dev
-// @version       5.1
+// @version       5.2
 // @author        King1x32
 // @icon          https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/icon/kings.jpg
 // @license       GPL3
@@ -2608,6 +2608,11 @@ h2 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   grid-column: 1 / -1;
 }
+.settings-title-text {
+    flex-grow: 1;
+    text-align: center;
+    margin-right: 10px; /* Tạo khoảng cách với dropdown */
+}
 @keyframes text-shimmer {
   0% {
     background-position: -200% 0; /* Bắt đầu từ bên trái của gradient */
@@ -2738,7 +2743,9 @@ button:active {
       styleElement.textContent = resetStyle;
       container.appendChild(styleElement);
       container.innerHTML += `
-<h2 style="position: sticky; top: 0; background-color: ${theme.background}; padding: 20px; margin: 0; z-index: 2147483647; border-bottom: 1px solid ${theme.border}; border-radius: 15px 15px 0 0;">${this._("settings.title")}</h2>
+<h2 id="settings-header" style="position: sticky; top: 0; background-color: ${theme.background}; padding: 20px; margin: 0; z-index: 2147483647; border-bottom: 1px solid ${theme.border}; border-radius: 15px 15px 0 0;">
+  <span class="settings-title-text">${this._("settings.title")}</span>
+</h2>
 <div style="margin-bottom: 15px;">
   <h3>${this._("settings.interface_section")}</h3>
   <span class="settings-label">${this._("settings.theme_mode")}</span>
@@ -3516,6 +3523,101 @@ ${this.renderSettingsUI(this.settings)}
 </div>
 `;
       container.className = "translator-settings-container";
+      const header = container.querySelector('#settings-header');
+      const navContainer = document.createElement('div');
+      navContainer.className = 'custom-nav-container';
+      Object.assign(navContainer.style, {
+        position: 'relative',
+        marginLeft: '15px'
+      });
+      const navButton = document.createElement('button');
+      navButton.className = 'custom-nav-button';
+      navButton.innerHTML = `<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAAsTAAALEwEAmpwYAAAD4ElEQVR4nO2ZX2hbVRzHr6BBQXwRBj514GybmKZt2rTVJo19cX872powh7Tbqqtr7UMnWkEfurHW3qpY14mu0JqxSLeFNlttapKmtTA254P4INMHn71lqIjCxIGwj/wid8owkNwG5abnAx/I+XfP+Z6Em3sSTVMoFAqFQqFQKBQKxd+4wjjK+hnf2s/61n6wpX0YZf3okkUrlEf70Lf1QSkoWQregPJejIoXoeIwT2o2pbwXv2SQLAUPfrwXRM3mWM7heQFEs3x6Fexkrhx5430eRLO8vAR2MleOvPEdAlGzOZZzNB7AaDoIjYfwazal4SCBbIYDFm6C/i50fzeUiGMFb4ArjCPYhR7swgh2gU2VtVt7EFIoFJubcBhHR5jx9jDrHWGwpSGM9hC6ZCl4A0Ih9FAISsTCT4P7OjGe7YR9z9j3NLi/HX82Q6eFB6HnOkDUbI7lHN3tIJrld9fATubKkTc9e0E0y4tJsJO5cuTN4TYQNZtjOceRXRh9u6F/j31Pg0d2E5AMkqXgwQM70Qd2QSn40k4Lp8HhMI7B7eiDOzAGd4BNNSSDZCl4AxQKxeZmOIzjWCvjx1pZP94KtvQpjOOtFm+CJ4LoI0EoBU+08GbBGzDWgqG3wKifZs2mjLcQkAx6gO8LHvy2H0TN5ljOMdEMoll+7SpsxKEr/DR0lbeG17g315y9X3Lf0BXekb4bnS9XjryZfAJEszx6GYrkqVxzjlzm/WLNkytH3nzQBKJWJCZWaZn8jFsnV7l9ao09d7efXKFN2qTP5AqBYs1rOcdUA+tTDTBVX7yfxD7K8HIkA5EMP0STPGLWn02zJbLMDWmbyXC0WPN9WEezZDjts3AanK5nfMYHG7Ken6d9TMRcf30PA/fMp1iaT8F8krSUxbkUCambS7IsZekrY2Z8vCfX2Og6pustnAZjLhwRL/qZOowzdbBBI+Z102m2pJe4kf0ff5HBdIKj8jq9xI/Jf3wqZEwR5pW1j5lvwH9O1EtT1MvNqBeitfSY9Z9/Qtu1BW5/scAtUV5fu8TeO+Nq6cmO8XLzbB2Nmp2ZrWH/uRo4V83vsx5qzfrrFxn55iKI1+OMmvXnPbhnq/lNxpyvoVsrBWLVTMeq4YKH76INPGTWG3NUinf6uXgw5uFb6RvzMKWVCpEy7o+7+SpeBfNVXMjVL17Fx9k+br6ONfGAVkosOnnskptfF9yw4Gbg7napk7ZsHxfbtFIk4SK85IKEkz8STl6JV/KwmHDyqtRJ26cuQlopk3LyRsoJ/2bSyevaZmC5gu0rFWRWKvhFzJSzvFrJ0//3uhQKhULbbPwJfPNsE9o0QzgAAAAASUVORK5CYII=" alt="menu-list-down" style="width: 20px; height: 20px; display: block;">`;
+      Object.assign(navButton.style, {
+        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+        border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+        borderRadius: '8px',
+        width: '38px',
+        height: '38px',
+        padding: '0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'background-color 0.2s'
+      });
+      navButton.onmouseover = () => navButton.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)';
+      navButton.onmouseout = () => navButton.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+      const navMenu = document.createElement('div');
+      navMenu.className = 'custom-nav-menu';
+      Object.assign(navMenu.style, {
+        display: 'none',
+        position: 'absolute',
+        top: 'calc(100% + 5px)',
+        right: '0',
+        color: theme.text,
+        backgroundColor: theme.background,
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+        padding: '8px',
+        minWidth: '240px',
+        maxHeight: '400px',
+        overflowY: 'auto',
+        zIndex: '2147483648',
+        border: `1px solid ${theme.border}`
+      });
+      const sections = container.querySelectorAll('h3');
+      sections.forEach((section, index) => {
+        const title = section.textContent.trim();
+        if (title) {
+          if (!section.id) section.id = `settings-section-${index}`;
+          const menuItem = document.createElement('div');
+          menuItem.className = 'custom-nav-menu-item';
+          menuItem.textContent = title;
+          menuItem.dataset.targetId = section.id;
+          Object.assign(menuItem.style, {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            marginBottom: '5px',
+            borderRadius: '10px',
+            padding: '10px 15px',
+            cursor: 'pointer',
+            border: `1px solid ${theme.border}`,
+            backgroundColor: theme.backgroundShadow,
+            transition: 'background-color 0.2s, color 0.2s',
+            whiteSpace: 'nowrap'
+          });
+          menuItem.onmouseover = () => menuItem.style.backgroundColor = theme.button.translate.background;
+          menuItem.onmouseout = () => menuItem.style.backgroundColor = 'transparent';
+          menuItem.addEventListener('click', () => {
+            const targetId = menuItem.dataset.targetId;
+            const targetElement = container.querySelector(`#${targetId}`);
+            if (targetElement) {
+              const headerHeight = header.offsetHeight;
+              const targetOffsetTop = targetElement.offsetTop;
+              container.scrollTo({
+                top: targetOffsetTop - headerHeight - 20,
+                behavior: 'smooth'
+              });
+            }
+            navMenu.style.display = 'none';
+          });
+          navMenu.appendChild(menuItem);
+        }
+      });
+      navButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        navMenu.style.display = navMenu.style.display === 'block' ? 'none' : 'block';
+      });
+      document.addEventListener('click', (e) => {
+        if (!navContainer.contains(e.target)) {
+          navMenu.style.display = 'none';
+        }
+      });
+      navContainer.appendChild(navButton);
+      navContainer.appendChild(navMenu);
+      header.appendChild(navContainer);
       const providers = ['gemini', 'perplexity', 'claude', 'openai', 'mistral', 'puter', 'ollama'];
       container.querySelectorAll('input[name="apiProvider"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
