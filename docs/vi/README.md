@@ -4,7 +4,7 @@
 
 # King Translator AI - Công Cụ Dịch Thuật AI Đa Năng 🔥
 
-![Version](https://img.shields.io/badge/version-5.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-5.3-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/status-active-green?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-GPL--3.0-orange?style=for-the-badge)
 [![Discord](https://img.shields.io/discord/1206126615848554526?style=for-the-badge&logo=discord&label=Discord)](https://discord.gg/8DTwr8QpsM)
@@ -32,10 +32,10 @@
 
 Phiên bản 5.0 là một bản cập nhật lớn, tập trung vào việc mở rộng khả năng, tối ưu hóa hiệu suất và nâng cao trải nghiệm người dùng:
 
-- 🧠 **Hỗ Trợ Đa Nền Tảng AI:** Tích hợp 6 nhà cung cấp AI hàng đầu: **Gemini, Claude, Perplexity, OpenAI, Mistral, và Puter**.
+- 🧠 **Hỗ Trợ Đa Nền Tảng AI:** Tích hợp 6 nhà cung cấp AI hàng đầu: **Gemini, Claude, Perplexity, OpenAI, Mistral, và Ollama**.
   - **Gemini:** Hỗ trợ đầy đủ tất cả tính năng, bao gồm dịch file lớn.
   - **Claude, Perplexity, OpenAI, Mistral:** Hỗ trợ tất cả tính năng trừ dịch file.
-  - **Puter:** Hỗ trợ các tính năng liên quan đến văn bản và dịch live-caption YouTube.
+  - **Ollama:** Hỗ trợ các tính năng liên quan đến văn bản và dịch live-caption YouTube.
 - 🗣️ **Text-to-Speech (TTS) Đa Dạng:** Thêm 5 nguồn TTS mới (Gemini, OpenAI, Google Cloud, Google Translate) cùng với TTS của thiết bị, với khả năng tùy chỉnh giọng nói, tốc độ, và cao độ.
 - 📂 **Dịch File & Media Nâng Cao:** Dịch nhiều định dạng file local và URL. Hỗ trợ tài liệu (`PDF`, `DOCX`, `HTML`, `SRT`), media (`MP4`, `MP3`, `WAV`), và file lớn lên đến 2GB qua API Gemini.
 - 🚀 **Tối Ưu Hóa API & Hiệu Suất:** Cải thiện cơ chế quản lý API key, giảm thiểu tình trạng rate-limit, dịch trang nhanh và ổn định hơn.
@@ -59,7 +59,7 @@ Phiên bản 5.0 là một bản cập nhật lớn, tập trung vào việc m�
 <details>
 <summary><b>🧠 Dịch Thuật Đa Nền Tảng AI</b></summary>
 
-- Lựa chọn linh hoạt giữa 6 nhà cung cấp AI hàng đầu: **Google Gemini, Anthropic Claude, Perplexity, OpenAI, Mistral, và Puter**.
+- Lựa chọn linh hoạt giữa 6 nhà cung cấp AI hàng đầu: **Google Gemini, Anthropic Claude, Perplexity, OpenAI, Mistral, và Ollama**.
 - Tận dụng điểm mạnh của từng mô hình cho các tác vụ dịch thuật khác nhau.
 - Quản lý API key thông minh, tự động xoay vòng để tối ưu hiệu suất và tránh rate-limit.
 </details>
@@ -89,7 +89,7 @@ Phiên bản 5.0 là một bản cập nhật lớn, tập trung vào việc m�
 
 - **Dịch File Audio/Video:** Tải lên các file media (MP3, MP4, WAV, WEBM...) để nhận bản ghi và bản dịch.
 - **Hỗ Trợ File Lớn (Gemini API):** Dịch các file tài liệu, media lên đến 2GB.
-- **Dịch Trực Tiếp Từ URL (Gemini/Puter):** Dán link file để dịch mà không cần tải về.
+- **Dịch Trực Tiếp Từ URL (Gemini):** Dán link file để dịch mà không cần tải về.
 - **Dịch Tài Liệu:** Hỗ trợ dịch các file PDF, HTML, SRT, VTT, JSON, MD...
 </details>
 
@@ -136,25 +136,24 @@ Bạn cần một trình quản lý userscript. **Violentmonkey** được khuy�
 - **Safari:** Sử dụng ứng dụng [Tampermonkey](https://www.tampermonkey.net/index.php?browser=safari) hoặc [Userscripts](https://apps.apple.com/us/app/userscripts/id1463298887).
 
 ### Bước 2: Cài Đặt Script King Translator AI
-> **Lưu ý Quan trọng:** Do chính sách mới của Greasy Fork, phiên bản 5.0 hiện không thể được cập nhật trên nền tảng đó. Vui lòng cài đặt phiên bản mới nhất **trực tiếp từ GitHub** để nhận được tất cả các tính năng và bản vá lỗi.
 
 <p align="center">
-  <i>Cài đặt phiên bản mới nhất (v5.0) từ GitHub:</i>
+  <i>Cài đặt phiên bản mới nhất từ GitHub:</i>
   <br><br>
   <a href="https://raw.githubusercontent.com/king1x32/compiledUserscripts/release/release/KingTranslatorAI.user.js" style="text-decoration:none;">
-    <img src="https://img.shields.io/badge/Phiên_bản_nén_(Khuyên_dùng)-Nhanh_&_Nhẹ-blueviolet?style=for-the-badge&logo=github" alt="GitHub Compressed Version">
+    <img src="https://img.shields.io/badge/Phiên_bản_nén-Nhanh_&_Nhẹ-blueviolet?style=for-the-badge&logo=github" alt="GitHub Compressed Version">
   </a>
      
-  <a href="https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/King_Translator_AI.user.js" style="text-decoration:none;">
+  <a href="https://raw.githubusercontent.com/king1x32/King-Translator-AI/refs/heads/main/King-Translator-AI.user.js" style="text-decoration:none;">
     <img src="https://img.shields.io/badge/Phiên_bản_thường-Mã_nguồn-blue?style=for-the-badge&logo=github" alt="GitHub Normal Version">
   </a>
 </p>
 
 <p align="center">
-  <i>Phiên bản cũ hơn trên GreasyFork (không còn được cập nhật):</i>
+  <i>Cài đặt phiên bản mới nhất từ GreasyFork:</i>
   <br><br>
   <a href="https://greasyfork.org/vi/scripts/529348-king-translator-ai" style="text-decoration:none;">
-    <img src="https://img.shields.io/badge/GreasyFork_(v4.x)-Đã_lỗi_thời-gray?style=for-the-badge" alt="Greasy Fork">
+    <img src="https://img.shields.io/badge/GreasyFork-Mã_nguồn-bluegray?style=for-the-badge" alt="Greasy Fork">
   </a>
 </p>
 
@@ -163,7 +162,11 @@ Bạn cần một trình quản lý userscript. **Violentmonkey** được khuy�
    - **Gemini (Khuyên dùng):** Truy cập [Google AI Studio](https://aistudio.google.com/app/apikey) -> `Create API Key`.
    - Các nhà cung cấp khác: Truy cập trang chủ của họ để lấy API key (Claude, OpenAI, Perplexity, Mistral).
 2. **Cấu Hình Script:**
-   - Mở cài đặt script (Phím tắt `Alt + S` hoặc qua menu của Violentmonkey).
+   - Mở cài đặt script:
+      - Phím tắt `Alt + S` (Windows, Linux, Android)
+      - Phím tắt `Cmd + S` (IOS, IpadOS, MacOS)
+      - Menu nhỏ của Violentmonkey.
+      - Chọn '⚙️' (ở góc dưới bên phải màn hình lướt web) > Cài đặt King AI
    - Trong phần `API PROVIDER`, chọn nhà cung cấp bạn muốn dùng.
    - Dán API key vào ô tương ứng. **Lưu ý:** Để dịch trang và dịch live-caption mượt mà, nên thêm nhiều key (từ 3-5 key) để tránh bị giới hạn.
    - Nhấn **Lưu**.
