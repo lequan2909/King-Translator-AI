@@ -8629,6 +8629,36 @@ ${JSON.stringify(jsonPayload, null, 2)}
   font-size: 14px;
   line-height: 1.4;
 }
+
+.manga-overlay-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2147483646;
+}
+.manga-translated-region {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95);
+    color: black;
+    border: 1px solid #999;
+    font-family: "Arial", sans-serif;
+    font-weight: 500;
+    box-sizing: border-box;
+    padding: 2px 4px;
+    line-height: 1.1;
+    overflow: hidden;
+    border-radius: 3px;
+    box-shadow: 0px 1px 3px rgba(0,0,0,0.4);
+    pointer-events: auto; /* Make regions clickable to be removed */
+    cursor: pointer;
+}
 .translator-settings-container * {
   font-family: "GoMono Nerd Font", "Noto Sans", Arial;
   box-sizing: border-box;
@@ -12905,41 +12935,28 @@ pointer-events: none;
         GM_xmlhttpRequest({
           method: 'GET',
           url: src,
+          responseType: 'blob',
           headers: {
             "User-Agent": navigator.userAgent,
-            "Accept-Language": "en-US,vi;q=0.5",
-            "Connection": "keep-alive",
+            "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9,vi;q=0.8",
             "Referer": window.location.href,
-            "X-Requested-With": "XMLHttpRequest",
+            "Sec-Fetch-Dest": "image",
             "Sec-Fetch-Mode": "no-cors",
-            "Sec-Fetch-Site": "cross-site",
-            "Priority": "u=5, i",
-            "Pragma": "no-cache",
-            "Cache-Control": "no-cache"
+            "Sec-Fetch-Site": "cross-site"
           },
-          overrideMimeType: 'text/plain; charset=x-user-defined',
-          responseType: 'text',
-          anonymous: true,
           onload: function(response) {
-            if (response.status >= 200 && response.status < 300) {
-              const responseText = response.responseText;
-              const buffer = new Uint8Array(responseText.length);
-              for (let i = 0; i < responseText.length; i++) {
-                buffer[i] = responseText.charCodeAt(i) & 0xff;
+            if (response.status >= 200 && response.status < 400 && response.response) {
+              if (response.response.size < 100) {
+                return reject(new Error("Fetched image blob is too small."));
               }
-              let mimeType = 'image/png';
-              const contentTypeHeader = response.responseHeaders.match(/content-type:\s*(.*)/i);
-              if (contentTypeHeader && contentTypeHeader[1]) {
-                mimeType = contentTypeHeader[1].trim();
-              }
-              const blob = new Blob([buffer], { type: mimeType });
-              if (blob.size < 100) return reject(new Error("Reconstructed blob is too small."));
-              resolve(blob);
+              resolve(response.response);
             } else {
-              reject(new Error(`Request failed with status ${response.status}.`));
+              reject(new Error(`Request failed with status ${response.status}. Response object: ${response.response}`));
             }
           },
-          onerror: (err) => reject(new Error(`Network error: ${err.statusText}`)),
+          onerror: (err) => reject(new Error(`Network error during GM_xmlhttpRequest: ${err.statusText}`)),
+          ontimeout: () => reject(new Error("Request timed out."))
         });
       });
     }
