@@ -14614,8 +14614,7 @@ font-family: inherit;
       try {
         translator.ui.showTranslatingStatus();
         const result = await translator.translateFile(file);
-        console.log(file.type);
-        const blob = file.type === 'pdf' ? result : new Blob([result], { type: file.type });
+        const blob = file.type.endsWith('pdf') ? result : new Blob([result], { type: file.type });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
